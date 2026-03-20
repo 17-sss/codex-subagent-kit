@@ -20,6 +20,7 @@
 - curses 기반 TUI
 - 비대화형 install CLI
 - 카테고리형 built-in subagent catalog
+- project/global `.toml` source discovery와 precedence
 - VoltAgent-style Codex-compatible TOML output
 - root orchestrator가 포함된 project-scope `team.toml` seed
 - `__codex_agents`에서 이관한 shell control-plane reference asset
@@ -46,7 +47,6 @@
 
 ## MVP 이후
 
-- external `.toml` agent discovery
 - role별 project-specific owner agent 생성기
 - `tmux` / `cmux` control panel launcher
 - queue / dispatch / recovery 통합

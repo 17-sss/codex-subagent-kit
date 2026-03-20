@@ -14,7 +14,6 @@
 
 후속 범위:
 
-- external `.toml` agent discovery
 - queue / dispatch ledger 확장
 - recovery / bootstrap 고도화
 - `tmux` / `cmux` control panel
@@ -25,6 +24,7 @@
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
 PYTHONPATH=src python3 -m codex_orchestrator.cli tui
 ```
 
@@ -68,6 +68,13 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - `project` scope는 최소 1개의 meta-orchestration agent가 필요하다.
 - `project` scope는 `.codex/agents`와 `.codex/orchestrator`를 함께 만든다.
 - `global` scope는 `~/.codex/agents`만 다루고 project-local scaffold는 만들지 않는다.
+
+## 현재 discovery 동작
+
+- `catalog --scope project`는 built-in + global + project `.toml` agent를 함께 보여준다.
+- `catalog --scope global`는 built-in + global `.toml` agent를 보여준다.
+- 같은 key가 겹치면 `project > global > built-in` precedence를 따른다.
+- 외부 `.toml`이 built-in key를 override하면 기존 category를 유지하고, 새 key면 `Imported & External` category로 분류한다.
 
 ## 현재 생성 포맷
 

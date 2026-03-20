@@ -24,7 +24,7 @@
 ### 현재 구현됨
 
 - `Project` / `Global` scope 선택
-- built-in catalog 기반 agent 선택
+- built-in + discovered `.toml` source 기반 agent 선택
 - 선택한 agent를 `.codex/agents/*.toml`로 생성
 - generated agent는 VoltAgent-style Codex-compatible TOML에 가깝게 출력
 - project-scope install 시 `.codex/orchestrator` scaffold 생성
@@ -35,7 +35,6 @@
 
 - terminal control panel
 - `operator/user -> orchestrator -> subagents` 시각화
-- 외부 `.toml` agent source를 읽는 구조
 
 ## Workflow Diagram
 
@@ -90,12 +89,12 @@ flowchart LR
 
 ## 중요한 드리프트
 
-- 아직 외부 `.toml` agent source를 읽는 discovery 단계는 구현되지 않았다.
 - terminal control panel 자체는 아직 없고 현재는 team topology seed까지만 생성한다.
-- 따라서 다음 단계는 catalog source를 하드코딩 목록에서 파일 기반 구조로 확장하고, generated team metadata를 panel runtime에 연결하는 것이다.
+- built-in source는 여전히 Python 코드에 남아 있고, 아직 packaged TOML library로 옮겨지진 않았다.
+- 따라서 다음 단계는 generated team metadata를 panel runtime에 연결하고, 필요하면 built-in source도 파일 기반 구조로 옮기는 것이다.
 
 ## 다음 구현 우선순위
 
-1. external `.toml` discovery를 추가한다.
-2. generated `team.toml`을 terminal control panel 렌더링에 연결한다.
-3. 이후 `tmux` / `cmux` launcher를 붙인다.
+1. generated `team.toml`을 terminal control panel 렌더링에 연결한다.
+2. 이후 `tmux` / `cmux` launcher를 붙인다.
+3. 필요하면 built-in source도 portable file-based catalog로 정리한다.
