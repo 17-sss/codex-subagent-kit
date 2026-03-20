@@ -6,7 +6,7 @@
 - Project ID: codex-orchestrator
 - Repo Root: /Users/hoyoungson/Code/Project/Personal/codex-orchestrator
 - Branch: 001-orchestrator-scaffold
-- Last Updated: 2026-03-20T15:41:00+09:00
+- Last Updated: 2026-03-20T16:14:38+09:00
 - Updated By: hoyoungson
 
 ## TL;DR
@@ -21,10 +21,11 @@
 - `dispatch-open` 명령은 다음 `pending` queue command를 `ready` dispatch ticket으로 열고 queue status를 `claimed`로 바꾼다.
 - `apply-result` 명령은 dispatch outcome을 queue / ledger / runtime state에 반영하고 panel summary까지 갱신한다.
 - project install은 `.codex/orchestrator/launchers/` 아래 board/monitor/`tmux`/`cmux` launcher seed를 생성한다.
+- `launch` 명령은 generated `tmux` / `cmux` launcher seed를 직접 실행하거나 dry-run preview할 수 있다.
 
 ## Current Objective
 
-- generated launcher seed를 first-class launch path와 terminal control-panel 연결로 이어 간다.
+- file-based control-plane을 actual agent IO 방향으로 연결할 다음 thin slice를 정한다.
 
 ## Current State
 
@@ -42,13 +43,14 @@ Done
 - `dispatch-open --project-root <path>`는 하나의 `pending` command를 `ready` dispatch ticket으로 승격한다.
 - `apply-result --project-root <path> --dispatch-id ... --outcome ... --summary ...`는 하나의 active dispatch를 terminal lifecycle 기준 완료 상태로 정리한다.
 - project install은 launcher seed를 backfill 가능하게 생성한다.
+- `launch --project-root <path> --backend tmux|cmux [--dry-run]`은 generated launcher seed를 first-class entrypoint로 승격한다.
 - `__codex_agents`에서 generic shell control-plane docs/scripts를 `reference/legacy_shell_control_plane/`로 이관했다.
 - `specs/001-orchestrator-scaffold/` 아래 spec/plan/tasks/quickstart를 정리했다.
 - `.specify/memory/constitution.md`, `docs/TESTING.ko.md`, `scripts/test.sh`, `tests/`로 SDD + testing 기반을 마련했다.
 In progress
-- generated launcher seed를 first-class launch path로 연결하는 방식 정리
+- actual `send_input` / `wait_agent` integration을 어디서 thin slice로 시작할지 정리
 To confirm
-- generated launcher script를 직접 실행하는 CLI surface를 둘지, Python backend wrapper를 둘지
+- live Codex agent IO를 file-based queue/dispatch와 어떻게 매핑할지
 
 ## Recent Changes
 
@@ -65,6 +67,7 @@ Changes
 - dispatch result apply 흐름 추가
 - role-specific terminal board 추가
 - board/monitor/`tmux`/`cmux` launcher seed 추가
+- first-class `launch` CLI 추가
 Validation run
 - `python3 -m compileall src`
 - `./scripts/test.sh`
@@ -78,6 +81,8 @@ Validation run
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root <tmp-project>`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root <tmp-project> --dispatch-id dispatch-001 --outcome completed --summary "..."`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root <tmp-project> --role <role>`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root <tmp-project> --backend tmux --dry-run`
+- `env PATH="/usr/bin:/bin" PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root <tmp-project> --backend cmux`
 - generated launcher scripts에 대해 `bash -n` syntax check
 - PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui`를 키 입력으로 통과시켜 install flow 확인
 Impact
@@ -89,6 +94,7 @@ Impact
 - dispatch 결과를 queue / ledger / runtime state에 반영하는 최소 lifecycle이 생겼다.
 - launcher pane/window가 보여줄 role-specific board가 생겼다.
 - project-local launcher seed가 생겨 optional dashboard backend와 연결할 발판이 마련됐다.
+- generated launcher seed를 직접 실행하는 first-class CLI entrypoint가 생겼다.
 
 ## Known Issues / Watch List
 
@@ -99,7 +105,7 @@ Risk
 - 현재 reference 폴더는 “실행 엔트리포인트”가 아니라 “구현 seed”다.
 - TUI end-to-end는 아직 완전 자동화되지 않았고 PTY 수동 smoke에 의존한다.
 - built-in source는 여전히 Python 데이터 구조에 남아 있고 packaged TOML library로는 아직 옮기지 않았다.
-- current panel/control-plane은 launcher seed까지는 생성하지만, first-class launch CLI / live pane 상태 / actual send_input-wait_agent 연동은 아직 없다.
+- current panel/control-plane은 first-class launch CLI까지는 있지만, live pane 상태 / actual send_input-wait_agent 연동은 아직 없다.
 Workaround
 - 실제 제품 로직은 `src/codex_orchestrator/`를 source of truth로 본다.
 - control panel 구현 시 reference shell asset을 그대로 재사용하지 말고, generated scaffold와 team metadata를 기준으로 재구성하는 방향을 우선 검토한다.
@@ -125,10 +131,11 @@ Commands
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli tui`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`
 Links / dashboards
-- minimal text panel은 있음. runtime-aware control panel은 다음 단계 구현 대상이다.
+- minimal text panel과 first-class launch CLI는 있음. live runtime-aware control panel은 다음 단계 구현 대상이다.
 
 ## Validation
 
@@ -159,22 +166,22 @@ Results
 - `board` 명령은 role별 queue/dispatch/runtime 상태를 read-only terminal view로 렌더링함
 - project install은 `.codex/orchestrator/launchers/` 아래 runnable shell seed를 생성함
 - generated launcher scripts는 `tmux` / `cmux`가 없을 때 soft-fail 하도록 생성됨
+- `launch` 명령은 generated launcher path를 resolve하고 dry-run 또는 actual launcher execution entrypoint로 동작함
 Not run yet
-- first-class launcher execution CLI
 - actual `send_input` / `wait_agent` integration flow
 
 ## Next Actions
 
-1. generated launcher seed를 직접 실행하거나 래핑하는 first-class launch CLI를 정한다.
-2. actual `send_input` / `wait_agent` integration flow 방향을 정한다.
+1. actual `send_input` / `wait_agent` integration flow를 thin slice로 정한다.
+2. live pane/session status sync가 필요한 최소 상태 모델을 정한다.
 3. 필요하면 built-in catalog도 portable file-based source로 정리한다.
 
 ## Resume Checklist
 
 - `README.md`, `docs/PRD.ko.md`, `docs/UNDERSTANDING_AND_WORKFLOW.ko.md`, `docs/HANDOFF.md`를 먼저 읽는다.
-- `./scripts/test.sh`, `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`, `PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator`, `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`로 현재 상태를 확인한다.
-- `reference/legacy_shell_control_plane/`를 보고 launcher seed를 first-class launch path로 올릴지 결정한다.
+- `./scripts/test.sh`, `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`, `PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator`, `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`, `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run`로 현재 상태를 확인한다.
+- `reference/legacy_shell_control_plane/`를 참고하되, 다음 thin slice는 actual agent IO 연결 관점에서 재정의한다.
 
 ## Resume Prompt
 
-Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: promote the generated launcher seed into a first-class launch path or backend wrapper, using the migrated legacy control-plane assets only as reference, not as the primary runtime.
+Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: connect the file-based queue/dispatch control-plane to a minimal actual agent IO path, using the migrated legacy control-plane assets only as reference, not as the primary runtime.

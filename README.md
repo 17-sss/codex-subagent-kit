@@ -11,25 +11,31 @@
 - project-scope install 시 runtime / queue / dispatch ledger seed 생성
 - role-specific terminal board 제공
 - project-scope install 시 board/monitor/`tmux`/`cmux` launcher seed 생성
+- first-class `launch` CLI 제공
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
 - `__codex_agents`에서 이관한 control-plane reference asset 보관
 
 후속 범위:
 
-- first-class launcher 실행 CLI
 - recovery / bootstrap 고도화
+- live pane/session status sync
 - live agent integration
 
 ## 실행
 
-프로젝트 루트에서:
+개발 중에는 프로젝트 루트에서 아래처럼 실행한다.
+
+`pip install -e .`로 설치하면 같은 명령을 `codex-orchestrator ...`로 사용할 수 있다.
+
+프로젝트 루트 기준 예시:
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator
+PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run
 PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue --project-root . --summary "Investigate the failing review flow"
 PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root . --dispatch-id dispatch-001 --outcome completed --summary "Done"
@@ -99,8 +105,11 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 
 - `board --role <role>`는 특정 orchestrator 또는 worker role의 read-only terminal board를 렌더링한다.
 - project install은 `.codex/orchestrator/launchers/run-board.sh`, `run-monitor.sh`, `launch-tmux.sh`, `launch-cmux.sh` seed를 생성한다.
+- `launch --backend tmux|cmux`는 generated launcher seed를 직접 실행하는 first-class entrypoint다.
+- `launch --dry-run`은 backend, launcher path, 최종 command를 실행 없이 출력한다.
+- `--no-attach`는 현재 `tmux` backend에만 지원된다.
 - generated `tmux` / `cmux` launcher는 backend가 없으면 `SKIP`으로 soft-fail 하도록 생성된다.
-- 아직 first-class `launch` CLI, live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결은 없다.
+- 아직 live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결은 없다.
 
 ## 현재 생성 포맷
 

@@ -30,6 +30,7 @@
 - queue command를 `ready` dispatch ticket으로 여는 최소 control-plane mutation
 - dispatch 결과를 queue / ledger / runtime state에 적용하는 최소 control-plane mutation
 - project-local board/monitor/`tmux`/`cmux` launcher seed
+- generated launcher를 실행하는 first-class `launch` CLI
 - `__codex_agents`에서 이관한 shell control-plane reference asset
 
 ## 최종 방향
@@ -55,7 +56,7 @@
 ## MVP 이후
 
 - role별 project-specific owner agent 생성기
-- first-class `tmux` / `cmux` launch CLI
+- actual `send_input` / `wait_agent` integration
 - queue / dispatch / recovery 통합
 - seeded panel을 live runtime control panel로 확장
 - reference shell asset에서 Python-native control-plane으로 점진 이관

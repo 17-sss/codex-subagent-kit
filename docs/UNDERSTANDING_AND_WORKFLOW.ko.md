@@ -36,12 +36,14 @@
 - `dispatch-open` 명령으로 queue command를 dispatch ledger로 승격 가능
 - `apply-result` 명령으로 dispatch outcome을 queue / ledger / runtime에 반영 가능
 - project-local launcher seed 생성
+- `launch` 명령으로 generated `tmux` / `cmux` launcher 실행 또는 dry-run 가능
 - CLI와 설치용 TUI 제공
 
 ### 아직 미구현
 
 - live runtime-aware terminal control panel
-- first-class `tmux` / `cmux` launch CLI
+- actual `spawn_agent` / `send_input` / `wait_agent` integration
+- live queue drain 및 pane/session status sync
 
 ## Workflow Diagram
 
@@ -102,5 +104,5 @@ flowchart LR
 
 ## 다음 구현 우선순위
 
-1. generated launcher seed를 first-class launch path로 연결한다.
+1. actual `send_input` / `wait_agent` integration 방향을 thin slice로 연결한다.
 2. 필요하면 built-in source도 portable file-based catalog로 정리한다.
