@@ -266,6 +266,74 @@ text = "custom helper instructions"
             self.assertIn("- claimed: 1", panel_stdout)
             self.assertIn("- ready: 1", panel_stdout)
 
+    def test_apply_result_updates_panel_counts_and_runtime(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            install_exit_code, _, install_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer",
+                ]
+            )
+            self.assertEqual(install_exit_code, 0)
+            self.assertEqual(install_stderr, "")
+
+            enqueue_exit_code, _, enqueue_stderr = self.run_cli(
+                [
+                    "enqueue",
+                    "--project-root",
+                    temp_dir,
+                    "--summary",
+                    "Review the regression report",
+                ]
+            )
+            self.assertEqual(enqueue_exit_code, 0)
+            self.assertEqual(enqueue_stderr, "")
+
+            dispatch_exit_code, _, dispatch_stderr = self.run_cli(
+                [
+                    "dispatch-open",
+                    "--project-root",
+                    temp_dir,
+                ]
+            )
+            self.assertEqual(dispatch_exit_code, 0)
+            self.assertEqual(dispatch_stderr, "")
+
+            result_exit_code, result_stdout, result_stderr = self.run_cli(
+                [
+                    "apply-result",
+                    "--project-root",
+                    temp_dir,
+                    "--dispatch-id",
+                    "dispatch-001",
+                    "--outcome",
+                    "completed",
+                    "--summary",
+                    "Review finished and reported back",
+                ]
+            )
+            self.assertEqual(result_exit_code, 0)
+            self.assertEqual(result_stderr, "")
+            self.assertIn("status: completed", result_stdout)
+
+            panel_exit_code, panel_stdout, panel_stderr = self.run_cli(
+                [
+                    "panel",
+                    "--project-root",
+                    temp_dir,
+                ]
+            )
+            self.assertEqual(panel_exit_code, 0)
+            self.assertEqual(panel_stderr, "")
+            self.assertIn("Orchestrator: cto-coordinator [idle]", panel_stdout)
+            self.assertIn("- completed: 1", panel_stdout)
+            self.assertIn("- ready: 0", panel_stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

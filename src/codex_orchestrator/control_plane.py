@@ -6,9 +6,11 @@ from pathlib import Path
 from .panel import (
     PanelError,
     _load_toml,
+    _load_optional_toml,
     load_team_manifest,
     resolve_dispatch_ledger_path,
     resolve_queue_path,
+    resolve_runtime_state_path,
 )
 
 
@@ -61,6 +63,26 @@ def _render_dispatches(dispatches: list[dict[str, str]]) -> str:
     lines = ["version = 1"]
     for dispatch in dispatches:
         lines.extend(["", _render_dispatch_block(dispatch)])
+    return "\n".join(lines) + "\n"
+
+
+def _render_runtime_agent_block(header: str, agent: dict[str, str]) -> list[str]:
+    lines = [
+        header,
+        f'key = "{_escape_toml_string(agent["key"])}"',
+        f'status = "{_escape_toml_string(agent["status"])}"',
+    ]
+    active_dispatch_id = agent.get("active_dispatch_id")
+    if active_dispatch_id:
+        lines.append(f'active_dispatch_id = "{_escape_toml_string(active_dispatch_id)}"')
+    return lines
+
+
+def _render_runtime_state(orchestrator: dict[str, str], workers: list[dict[str, str]]) -> str:
+    lines = ["version = 1", ""]
+    lines.extend(_render_runtime_agent_block("[orchestrator]", orchestrator))
+    for worker in workers:
+        lines.extend(["", *_render_runtime_agent_block("[[workers]]", worker)])
     return "\n".join(lines) + "\n"
 
 
@@ -143,6 +165,100 @@ def load_dispatches(project_root: Path) -> list[dict[str, str]]:
         if {"id", "command_id", "role", "status", "created_at"} <= dispatch.keys():
             dispatches.append(dispatch)
     return dispatches
+
+
+def load_runtime_agents(project_root: Path) -> tuple[dict[str, str], list[dict[str, str]]]:
+    try:
+        _, orchestrator_key, worker_keys = load_team_manifest(project_root)
+    except PanelError as exc:
+        raise ControlPlaneError(str(exc)) from exc
+
+    data = _load_optional_toml(resolve_runtime_state_path(project_root))
+    orchestrator_state = {
+        "key": orchestrator_key,
+        "status": "idle",
+    }
+    worker_states = [{"key": worker_key, "status": "idle"} for worker_key in worker_keys]
+
+    raw_orchestrator = data.get("orchestrator")
+    if isinstance(raw_orchestrator, dict):
+        if isinstance(raw_orchestrator.get("status"), str) and raw_orchestrator["status"].strip():
+            orchestrator_state["status"] = raw_orchestrator["status"].strip()
+        if isinstance(raw_orchestrator.get("active_dispatch_id"), str) and raw_orchestrator[
+            "active_dispatch_id"
+        ].strip():
+            orchestrator_state["active_dispatch_id"] = raw_orchestrator["active_dispatch_id"].strip()
+
+    worker_index = {worker["key"]: worker for worker in worker_states}
+    raw_workers = data.get("workers")
+    if isinstance(raw_workers, list):
+        for raw_worker in raw_workers:
+            if not isinstance(raw_worker, dict):
+                continue
+            key = raw_worker.get("key")
+            if not isinstance(key, str) or key not in worker_index:
+                continue
+            worker_state = worker_index[key]
+            status = raw_worker.get("status")
+            if isinstance(status, str) and status.strip():
+                worker_state["status"] = status.strip()
+            active_dispatch_id = raw_worker.get("active_dispatch_id")
+            if isinstance(active_dispatch_id, str) and active_dispatch_id.strip():
+                worker_state["active_dispatch_id"] = active_dispatch_id.strip()
+
+    return orchestrator_state, worker_states
+
+
+def _write_runtime_agents(
+    project_root: Path,
+    *,
+    orchestrator_state: dict[str, str],
+    worker_states: list[dict[str, str]],
+) -> Path:
+    runtime_path = resolve_runtime_state_path(project_root)
+    runtime_path.parent.mkdir(parents=True, exist_ok=True)
+    runtime_path.write_text(
+        _render_runtime_state(orchestrator_state, worker_states),
+        encoding="utf-8",
+    )
+    return runtime_path
+
+
+def _set_role_runtime_state(
+    project_root: Path,
+    *,
+    role_key: str,
+    status: str,
+    active_dispatch_id: str | None,
+) -> Path:
+    orchestrator_state, worker_states = load_runtime_agents(project_root)
+    if orchestrator_state["key"] == role_key:
+        orchestrator_state["status"] = status
+        if active_dispatch_id is None:
+            orchestrator_state.pop("active_dispatch_id", None)
+        else:
+            orchestrator_state["active_dispatch_id"] = active_dispatch_id
+        return _write_runtime_agents(
+            project_root,
+            orchestrator_state=orchestrator_state,
+            worker_states=worker_states,
+        )
+
+    for worker_state in worker_states:
+        if worker_state["key"] != role_key:
+            continue
+        worker_state["status"] = status
+        if active_dispatch_id is None:
+            worker_state.pop("active_dispatch_id", None)
+        else:
+            worker_state["active_dispatch_id"] = active_dispatch_id
+        return _write_runtime_agents(
+            project_root,
+            orchestrator_state=orchestrator_state,
+            worker_states=worker_states,
+        )
+
+    raise ControlPlaneError(f"runtime role not found: {role_key}")
 
 
 def resolve_target_role(project_root: Path, requested_role: str | None) -> str:
@@ -239,4 +355,66 @@ def open_dispatch(
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
     queue_path.write_text(_render_queue(commands), encoding="utf-8")
     ledger_path.write_text(_render_dispatches(dispatches), encoding="utf-8")
+    _set_role_runtime_state(
+        project_root,
+        role_key=selected_command["role"],
+        status="busy",
+        active_dispatch_id=dispatch_id,
+    )
     return dispatch_id, selected_command["id"], queue_path, ledger_path
+
+
+def apply_result(
+    *,
+    project_root: Path,
+    dispatch_id: str,
+    outcome: str,
+    summary: str,
+) -> tuple[str, str, Path, Path, Path]:
+    if outcome not in {"completed", "failed", "cancelled"}:
+        raise ControlPlaneError(f"unsupported outcome: {outcome}")
+
+    summary_text = summary.strip()
+    if not summary_text:
+        raise ControlPlaneError("summary must not be empty")
+
+    dispatches = load_dispatches(project_root)
+    target_dispatch: dict[str, str] | None = None
+    for dispatch in dispatches:
+        if dispatch["id"] != dispatch_id:
+            continue
+        target_dispatch = dispatch
+        break
+
+    if target_dispatch is None:
+        raise ControlPlaneError(f"dispatch not found: {dispatch_id}")
+    if target_dispatch["status"] not in {"ready", "dispatched"}:
+        raise ControlPlaneError(f"dispatch is not active: {dispatch_id}")
+
+    commands = load_queue_commands(project_root)
+    target_command: dict[str, str] | None = None
+    for command in commands:
+        if command.get("dispatch_id") == dispatch_id or command["id"] == target_dispatch["command_id"]:
+            target_command = command
+            break
+
+    if target_command is None:
+        raise ControlPlaneError(f"queue command not found for dispatch: {dispatch_id}")
+
+    target_dispatch["status"] = outcome
+    target_dispatch["result_summary"] = summary_text
+    target_command["status"] = outcome
+
+    queue_path = resolve_queue_path(project_root)
+    ledger_path = resolve_dispatch_ledger_path(project_root)
+    queue_path.write_text(_render_queue(commands), encoding="utf-8")
+    ledger_path.write_text(_render_dispatches(dispatches), encoding="utf-8")
+
+    runtime_status = "blocked" if outcome == "failed" else "idle"
+    runtime_path = _set_role_runtime_state(
+        project_root,
+        role_key=target_dispatch["role"],
+        status=runtime_status,
+        active_dispatch_id=None,
+    )
+    return dispatch_id, target_command["id"], queue_path, ledger_path, runtime_path

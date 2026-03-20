@@ -137,6 +137,8 @@ def render_panel(project_root: Path) -> str:
             _format_counter_line("pending", queue_counts.get("pending", 0)),
             _format_counter_line("claimed", queue_counts.get("claimed", 0)),
             _format_counter_line("completed", queue_counts.get("completed", 0)),
+            _format_counter_line("failed", queue_counts.get("failed", 0)),
+            _format_counter_line("cancelled", queue_counts.get("cancelled", 0)),
             "",
             "Dispatch Ledger",
             _format_counter_line("ready", dispatch_counts.get("ready", 0)),
