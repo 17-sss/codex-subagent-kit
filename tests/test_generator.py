@@ -64,6 +64,15 @@ class GeneratorTests(unittest.TestCase):
             )
             self.assertEqual(dispatch_seed, "version = 1\n")
 
+            tmux_launcher = resolve_scaffold_dir(project_root) / "launchers" / "launch-tmux.sh"
+            self.assertTrue(tmux_launcher.exists())
+            self.assertIn("run-board.sh cto-coordinator", tmux_launcher.read_text(encoding="utf-8"))
+            self.assertTrue(tmux_launcher.stat().st_mode & 0o111)
+
+            board_runner = resolve_scaffold_dir(project_root) / "launchers" / "run-board.sh"
+            self.assertTrue(board_runner.exists())
+            self.assertIn("codex-orchestrator", board_runner.read_text(encoding="utf-8"))
+
     def test_existing_agent_file_is_preserved_on_rerun(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
@@ -190,6 +199,10 @@ workers = ["reviewer"]
             self.assertIn(scaffold_root / "runtime" / "agents.toml", result.scaffold_created_paths)
             self.assertIn(scaffold_root / "queue" / "commands.toml", result.scaffold_created_paths)
             self.assertIn(scaffold_root / "ledger" / "dispatches.toml", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "launchers" / "run-board.sh", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "launchers" / "run-monitor.sh", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "launchers" / "launch-tmux.sh", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "launchers" / "launch-cmux.sh", result.scaffold_created_paths)
 
 
 if __name__ == "__main__":

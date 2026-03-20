@@ -3,6 +3,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from .catalog import get_agent_map
+from .launchers import (
+    render_cmux_launcher,
+    render_run_board_script,
+    render_run_monitor_script,
+    render_tmux_launcher,
+)
 from .models import AgentSpec, InstallResult
 
 
@@ -137,6 +143,7 @@ def _write_seed_file(
     *,
     created_paths: list[Path],
     preserved_paths: list[Path],
+    executable: bool = False,
 ) -> None:
     if path.exists():
         if path.is_dir():
@@ -145,6 +152,8 @@ def _write_seed_file(
         return
 
     path.write_text(content, encoding="utf-8")
+    if executable:
+        path.chmod(0o755)
     created_paths.append(path)
 
 
@@ -191,6 +200,42 @@ def generate_orchestrator_scaffold(*, project_root: Path, agent_keys: list[str])
         render_dispatch_ledger_seed(),
         created_paths=created_paths,
         preserved_paths=preserved_paths,
+    )
+    _write_seed_file(
+        scaffold_root / "launchers" / "run-board.sh",
+        render_run_board_script(project_root=project_root),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+        executable=True,
+    )
+    _write_seed_file(
+        scaffold_root / "launchers" / "run-monitor.sh",
+        render_run_monitor_script(project_root=project_root),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+        executable=True,
+    )
+    _write_seed_file(
+        scaffold_root / "launchers" / "launch-tmux.sh",
+        render_tmux_launcher(
+            project_root=project_root,
+            orchestrator_key=orchestrator_key,
+            worker_keys=worker_keys,
+        ),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+        executable=True,
+    )
+    _write_seed_file(
+        scaffold_root / "launchers" / "launch-cmux.sh",
+        render_cmux_launcher(
+            project_root=project_root,
+            orchestrator_key=orchestrator_key,
+            worker_keys=worker_keys,
+        ),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+        executable=True,
     )
 
     return orchestrator_key, created_paths, preserved_paths
