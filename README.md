@@ -8,6 +8,7 @@
 - 카테고리별 subagent catalog 제공
 - 다중 선택으로 `.codex/agents/*.toml` 생성
 - project-scope install 시 `.codex/orchestrator` scaffold와 `team.toml` seed 생성
+- project-scope install 시 runtime / queue / dispatch ledger seed 생성
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
 - `__codex_agents`에서 이관한 control-plane reference asset 보관
@@ -79,8 +80,10 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 
 ## 현재 panel 동작
 
-- `panel --project-root <path>`는 `.codex/orchestrator/team.toml`을 읽어 `operator -> orchestrator -> workers` topology를 텍스트 트리로 렌더링한다.
-- 아직 queue, runtime state, `tmux` / `cmux` pane 제어는 연결되지 않았다.
+- `panel --project-root <path>`는 `.codex/orchestrator/team.toml`과 seed state를 읽어 `operator -> orchestrator -> workers` topology를 텍스트 트리로 렌더링한다.
+- orchestrator / worker 상태는 `runtime/agents.toml` 기준으로 표시한다.
+- queue 요약은 `queue/commands.toml`, dispatch 요약은 `ledger/dispatches.toml` 기준으로 표시한다.
+- 아직 live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결, `tmux` / `cmux` pane 제어는 없다.
 
 ## 현재 생성 포맷
 

@@ -29,12 +29,13 @@
 - generated agent는 VoltAgent-style Codex-compatible TOML에 가깝게 출력
 - project-scope install 시 `.codex/orchestrator` scaffold 생성
 - root orchestrator가 들어간 `team.toml` seed 생성
-- `panel` 명령으로 최소 topology 렌더링 가능
+- runtime / queue / dispatch ledger seed 생성
+- `panel` 명령으로 topology + seeded runtime summary 렌더링 가능
 - CLI와 설치용 TUI 제공
 
 ### 아직 미구현
 
-- runtime-aware terminal control panel
+- live runtime-aware terminal control panel
 - `tmux` / `cmux` 연동
 
 ## Workflow Diagram
@@ -65,7 +66,7 @@ flowchart LR
     B[2. Discover Agent Definitions<br/>Built-in + external TOML]
     C[3. Select Team Composition<br/>root orchestrator + workers]
     D[4. Generate Assets<br/>.codex/agents + .codex/orchestrator]
-    E[5. Render Control Panel<br/>terminal topology view]
+    E[5. Render Control Panel<br/>terminal topology + state seed view]
     F[6. Runtime Delegation<br/>operator -> orchestrator -> workers]
 
     A --> B --> C --> D --> E --> F
@@ -90,12 +91,12 @@ flowchart LR
 
 ## 중요한 드리프트
 
-- terminal control panel은 최소 topology 렌더러까지만 있고, runtime state/queue/pane orchestration은 아직 없다.
+- terminal control panel은 seed file을 읽는 summary 단계까지만 있고, live runtime/queue drain/pane orchestration은 아직 없다.
 - built-in source는 여전히 Python 코드에 남아 있고, 아직 packaged TOML library로 옮겨지진 않았다.
 - 따라서 다음 단계는 generated team metadata를 panel runtime에 연결하고, 필요하면 built-in source도 파일 기반 구조로 옮기는 것이다.
 
 ## 다음 구현 우선순위
 
-1. generated `team.toml`을 terminal control panel 렌더링에 연결한다.
+1. seeded runtime / queue / ledger를 launcher 흐름과 연결한다.
 2. 이후 `tmux` / `cmux` launcher를 붙인다.
 3. 필요하면 built-in source도 portable file-based catalog로 정리한다.
