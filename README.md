@@ -7,17 +7,17 @@
 - `Project` 또는 `Global` 설치 위치 선택
 - 카테고리별 subagent catalog 제공
 - 다중 선택으로 `.codex/agents/*.toml` 생성
+- project-scope install 시 `.codex/orchestrator` scaffold와 `team.toml` seed 생성
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
 - `__codex_agents`에서 이관한 control-plane reference asset 보관
 
 후속 범위:
 
-- team manifest
-- queue / dispatch ledger
-- recovery / bootstrap
+- external `.toml` agent discovery
+- queue / dispatch ledger 확장
+- recovery / bootstrap 고도화
 - `tmux` / `cmux` control panel
-- install 이후 control-plane scaffold 생성
 
 ## 실행
 
@@ -58,10 +58,16 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --project-root .tmp-smoke \
-  --agents reviewer
+  --agents cto-coordinator,reviewer
 ```
 
 `curses` 기반 TUI를 수정한 경우에는 자동 테스트 외에 PTY 환경에서 수동 smoke도 함께 수행한다.
+
+## 현재 install 동작
+
+- `project` scope는 최소 1개의 meta-orchestration agent가 필요하다.
+- `project` scope는 `.codex/agents`와 `.codex/orchestrator`를 함께 만든다.
+- `global` scope는 `~/.codex/agents`만 다루고 project-local scaffold는 만들지 않는다.
 
 ## 현재 생성 포맷
 

@@ -7,7 +7,7 @@
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 ```
 
-## Validate project-scope install after implementation
+## Validate project-scope install
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
@@ -22,7 +22,7 @@ Expected outcomes:
 - `.tmp-smoke/.codex/orchestrator/` scaffold created
 - generated team manifest includes one root orchestrator and the remaining worker agents
 
-## Validate global install after implementation
+## Validate global install
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
@@ -35,7 +35,7 @@ Expected outcomes:
 - `~/.codex/agents/reviewer.toml` created
 - no project-local `.codex/orchestrator` scaffold generated
 
-## Validate TUI after implementation
+## Validate TUI
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui

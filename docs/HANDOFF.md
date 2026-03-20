@@ -6,56 +6,54 @@
 - Project ID: codex-orchestrator
 - Repo Root: /Users/hoyoungson/Code/Project/Personal/codex-orchestrator
 - Branch: 001-orchestrator-scaffold
-- Last Updated: 2026-03-20T11:42:00+09:00
+- Last Updated: 2026-03-20T13:46:00+09:00
 - Updated By: hoyoungson
 
 ## TL;DR
 
-- `codex-orchestrator`는 새 standalone 프로젝트로 분리됐고, 현재는 `.codex/agents/*.toml` 생성용 TUI/CLI MVP가 동작한다.
-- 기존 `__codex_agents`에서 재사용 가능한 자산은 `reference/legacy_shell_control_plane/`로 이관했고, 특정 workspace에 묶인 예시는 제거했다.
-- Spec Kit 기반 첫 feature/spec와 프로젝트 constitution을 정리했고, `unittest` 기반 테스트 workflow를 추가했다.
-- 다음 큰 단계는 installer가 끝난 뒤 `.codex/orchestrator` scaffold와 `tmux`/`cmux` control panel 생성 흐름을 붙이는 것이다.
+- `codex-orchestrator`는 standalone 프로젝트로 분리됐고, 현재는 project/global 설치, built-in catalog, canonical TOML agent 생성, project-scope orchestrator scaffold seed까지 동작한다.
+- built-in agent 출력은 VoltAgent-style Codex-compatible TOML의 `[instructions].text` 구조로 정렬됐다.
+- project-scope install은 이제 `.codex/agents/*.toml`과 함께 `.codex/orchestrator/team.toml` seed 및 control-plane scaffold 디렉터리를 만든다.
+- 다음 큰 단계는 external `.toml` discovery와 실제 terminal control panel 렌더링이다.
 
 ## Current Objective
 
-- install 결과를 바탕으로 `.codex/orchestrator` scaffold를 생성하고, 이후 `tmux` / `cmux` control panel과 queue/dispatch control-plane을 Python-native 방향으로 연결한다.
+- built-in catalog를 portable `.toml` source 중심 구조로 확장하고, generated team metadata를 terminal control panel 및 `tmux` / `cmux` 흐름에 연결한다.
 
 ## Current State
 
 Done
 - `src/codex_orchestrator/` 아래에 built-in subagent catalog, installer, curses TUI를 구현했다.
 - `Project` / `Global` scope 선택 후 `.codex/agents/*.toml`을 생성할 수 있다.
+- built-in agent TOML 출력은 VoltAgent-style Codex-compatible 구조로 정렬됐다.
+- project-scope install 시 root orchestrator가 있는 `.codex/orchestrator` scaffold와 `team.toml` seed를 생성한다.
+- project install은 rerun 시 기존 agent/scaffold seed를 preserve하고 결과를 출력한다.
 - `__codex_agents`에서 generic shell control-plane docs/scripts를 `reference/legacy_shell_control_plane/`로 이관했다.
-- catalog와 문서에서 특정 workspace에 묶인 고정 예시를 제거했다.
-- smoke 산출물과 `__pycache__`는 정리했다.
-- `specs/001-orchestrator-scaffold/spec.md`를 생성해 첫 SDD feature를 정의했다.
-- `.specify/memory/constitution.md`를 프로젝트 기준으로 구체화했다.
-- `tests/`, `scripts/test.sh`, `docs/TESTING.ko.md`를 추가해 기본 테스트/검증 workflow를 만들었다.
+- `specs/001-orchestrator-scaffold/` 아래 spec/plan/tasks/quickstart를 정리했다.
+- `.specify/memory/constitution.md`, `docs/TESTING.ko.md`, `scripts/test.sh`, `tests/`로 SDD + testing 기반을 마련했다.
 In progress
-- Python-native orchestrator scaffold 설계
-- install 이후 control panel 연결 방식 정리
+- external `.toml` source discovery 설계
+- generated team metadata를 actual control panel에 연결하는 방식 정리
 To confirm
-- team manifest 최종 포맷을 `toml`로 확정할지
-- control panel 생성을 installer 완료 직후 바로 붙일지, 별도 subcommand로 둘지
+- external `.toml` source와 built-in catalog의 precedence 규칙
 - `tmux` / `cmux` launcher를 shell asset 재사용으로 갈지 Python 생성기로 갈지
 
 ## Recent Changes
 
 Changes
-- `codex-orchestrator/` 프로젝트 생성
-- TUI/CLI MVP 구현
-- `__codex_agents` 자산 이관
-- PRD 및 migration 문서 작성
-- Spec Kit 기반 첫 feature spec 작성
+- Spec Kit 기반 첫 feature/spec/plan/tasks 정리
 - `unittest` 기반 테스트 workflow 및 검증 문서 추가
+- canonical agent TOML 정렬
+- project install scaffold 및 root orchestrator seed 구현
 Validation run
 - `python3 -m compileall src`
 - `./scripts/test.sh`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --project-root .tmp-smoke --agents cto-coordinator,reviewer,code-mapper`
-- PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui`를 키 입력으로 통과시켜 `.codex/agents/*.toml` 생성 확인
+- fresh path에서 `.codex/orchestrator/team.toml` seed 생성 확인
+- PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui`를 키 입력으로 통과시켜 install flow 확인
 Impact
-- 이제 새 repo 기준점은 `codex-orchestrator/`이고, `__codex_agents` 없이도 범용 설계 자산을 이 프로젝트에서 참조할 수 있다.
+- installer가 더 이상 단순 agent 파일 생성기에 머물지 않고 root orchestrator topology를 가진 scaffold seed까지 생성한다.
 - 이후 기능 작업은 SDD 문서와 기본 테스트 게이트를 따라 진행할 수 있다.
 
 ## Known Issues / Watch List
@@ -66,9 +64,10 @@ Risk
 - shell reference asset은 아직 `__codex_agents` 시대의 `.env` manifest와 경로 가정이 남아 있다.
 - 현재 reference 폴더는 “실행 엔트리포인트”가 아니라 “구현 seed”다.
 - TUI end-to-end는 아직 완전 자동화되지 않았고 PTY 수동 smoke에 의존한다.
+- catalog source는 아직 built-in Python 데이터 구조이며 외부 `.toml` discovery가 없다.
 Workaround
 - 실제 제품 로직은 `src/codex_orchestrator/`를 source of truth로 본다.
-- control panel 구현 시 reference shell asset을 그대로 재사용하지 말고, Python scaffold 기준으로 재생성하는 방향을 우선 검토한다.
+- control panel 구현 시 reference shell asset을 그대로 재사용하지 말고, generated scaffold와 team metadata를 기준으로 재구성하는 방향을 우선 검토한다.
 
 ## Quick Reference
 
@@ -76,20 +75,21 @@ Key files
 - `src/codex_orchestrator/cli.py`
 - `src/codex_orchestrator/tui.py`
 - `src/codex_orchestrator/catalog.py`
+- `src/codex_orchestrator/generator.py`
 - `tests/test_cli.py`
 - `tests/test_generator.py`
 - `docs/PRD.ko.md`
 - `docs/TESTING.ko.md`
-- `docs/MIGRATION_FROM__CODEX_AGENTS.ko.md`
+- `docs/UNDERSTANDING_AND_WORKFLOW.ko.md`
 - `reference/legacy_shell_control_plane/README.md`
 Commands
 - `cd codex-orchestrator`
 - `./scripts/test.sh`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli tui`
-- `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents reviewer`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`
 Links / dashboards
-- 아직 없음. control panel은 다음 단계 구현 대상이다.
+- 아직 없음. control panel 렌더링은 다음 단계 구현 대상이다.
 
 ## Validation
 
@@ -98,25 +98,27 @@ Checks run
 - `unittest` suite via `./scripts/test.sh`
 - catalog 출력
 - project-scope install
+- orchestrator scaffold seed 생성
 - curses TUI smoke flow
 Results
 - 모두 통과
-- `.toml` output 포맷은 VoltAgent 스타일을 참고한 최소 필드로 정상 생성됨
+- `.toml` output 포맷은 VoltAgent 스타일을 참고한 `[instructions].text` 구조로 정상 생성됨
+- project install은 root orchestrator가 있는 `team.toml` seed를 함께 생성함
 Not run yet
-- `.codex/orchestrator` scaffold 생성
-- `tmux` / `cmux` control panel 생성 흐름
+- terminal control panel 생성 흐름
+- external `.toml` source discovery
 
 ## Next Actions
 
-1. `install` 완료 직후 `.codex/orchestrator` 기본 scaffold를 생성하는 subcommand 또는 generator를 구현한다.
-2. team manifest를 `toml` 기준으로 정의하고, `tmux` / `cmux` control panel 생성 흐름을 installer와 연결한다.
+1. built-in catalog를 portable `.toml` source 기반으로 확장하고 precedence 규칙을 정한다.
+2. generated `team.toml`을 실제 terminal control panel 및 `tmux` / `cmux` launcher 흐름과 연결한다.
 
 ## Resume Checklist
 
-- `README.md`, `docs/PRD.ko.md`, `docs/MIGRATION_FROM__CODEX_AGENTS.ko.md`, `docs/HANDOFF.md`를 먼저 읽는다.
-- `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog` 또는 `tui`를 한 번 실행해 현재 상태를 확인한다.
-- `reference/legacy_shell_control_plane/`를 보고 어떤 자산을 scaffold 생성기로 끌어올지 결정한다.
+- `README.md`, `docs/PRD.ko.md`, `docs/UNDERSTANDING_AND_WORKFLOW.ko.md`, `docs/HANDOFF.md`를 먼저 읽는다.
+- `./scripts/test.sh`와 `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`로 현재 상태를 확인한다.
+- `reference/legacy_shell_control_plane/`를 보고 어떤 자산을 control panel 생성기로 끌어올지 결정한다.
 
 ## Resume Prompt
 
-Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the first unfinished next action: generate a `.codex/orchestrator` scaffold after install, using the migrated legacy control-plane assets only as reference, not as the primary runtime.
+Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: move agent discovery toward portable `.toml` sources and connect the generated `team.toml` topology to an actual terminal control panel, using the migrated legacy control-plane assets only as reference, not as the primary runtime.

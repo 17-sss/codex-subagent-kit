@@ -12,13 +12,16 @@
    - `Project`
    - `Global`
 2. 카테고리별 subagent 선택
-3. `.codex/agents/*.toml` 생성
+3. canonical `.codex/agents/*.toml` 생성
+4. project-scope `.codex/orchestrator` scaffold seed 생성
 
 현재 실제로 들어간 것:
 
 - curses 기반 TUI
 - 비대화형 install CLI
 - 카테고리형 built-in subagent catalog
+- VoltAgent-style Codex-compatible TOML output
+- root orchestrator가 포함된 project-scope `team.toml` seed
 - `__codex_agents`에서 이관한 shell control-plane reference asset
 
 ## 최종 방향
@@ -43,9 +46,9 @@
 
 ## MVP 이후
 
-- install 이후 즉시 control-plane 스캐폴드 생성
+- external `.toml` agent discovery
 - role별 project-specific owner agent 생성기
 - `tmux` / `cmux` control panel launcher
 - queue / dispatch / recovery 통합
-- `.env` 기반 legacy shell manifest를 `.toml` scaffold로 치환
+- generated `team.toml`을 runtime control panel에 연결
 - reference shell asset에서 Python-native control-plane으로 점진 이관

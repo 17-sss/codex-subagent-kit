@@ -26,16 +26,16 @@
 - `Project` / `Global` scope 선택
 - built-in catalog 기반 agent 선택
 - 선택한 agent를 `.codex/agents/*.toml`로 생성
+- generated agent는 VoltAgent-style Codex-compatible TOML에 가깝게 출력
+- project-scope install 시 `.codex/orchestrator` scaffold 생성
+- root orchestrator가 들어간 `team.toml` seed 생성
 - CLI와 설치용 TUI 제공
 
 ### 아직 미구현
 
-- `.codex/orchestrator` scaffold 생성
-- root orchestrator가 들어간 team manifest
 - terminal control panel
 - `operator/user -> orchestrator -> subagents` 시각화
 - 외부 `.toml` agent source를 읽는 구조
-- VoltAgent-compatible canonical TOML로의 정렬
 
 ## Workflow Diagram
 
@@ -90,14 +90,12 @@ flowchart LR
 
 ## 중요한 드리프트
 
-- canonical TOML shape는 VoltAgent-style Codex-compatible 방향으로 정렬한다.
 - 아직 외부 `.toml` agent source를 읽는 discovery 단계는 구현되지 않았다.
-- 따라서 scaffold 구현과 별개로, 이후 catalog source를 하드코딩 목록에서 파일 기반 구조로 확장해야 한다.
+- terminal control panel 자체는 아직 없고 현재는 team topology seed까지만 생성한다.
+- 따라서 다음 단계는 catalog source를 하드코딩 목록에서 파일 기반 구조로 확장하고, generated team metadata를 panel runtime에 연결하는 것이다.
 
 ## 다음 구현 우선순위
 
-1. canonical agent TOML shape를 확정한다.
-2. `.codex/orchestrator` scaffold와 team manifest seed를 만든다.
-3. team manifest에 root orchestrator topology를 반영한다.
-4. install 흐름이 `.codex/agents`와 `.codex/orchestrator`를 함께 생성하게 한다.
-5. 이후 terminal control panel을 붙인다.
+1. external `.toml` discovery를 추가한다.
+2. generated `team.toml`을 terminal control panel 렌더링에 연결한다.
+3. 이후 `tmux` / `cmux` launcher를 붙인다.
