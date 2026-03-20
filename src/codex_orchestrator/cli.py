@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from .control_plane import ControlPlaneError, enqueue_command
 from .catalog import get_agents, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
 from .panel import PanelError, render_panel
@@ -26,6 +27,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     panel_parser = subparsers.add_parser("panel", help="Render the current project control-panel topology.")
     panel_parser.add_argument("--project-root", default=".")
+
+    enqueue_parser = subparsers.add_parser("enqueue", help="Enqueue an operator command into the project queue.")
+    enqueue_parser.add_argument("--project-root", default=".")
+    enqueue_parser.add_argument("--summary", required=True)
+    enqueue_parser.add_argument("--role")
+    enqueue_parser.add_argument("--source", default="operator")
+    enqueue_parser.add_argument("--priority", choices=("low", "normal", "high"), default="normal")
 
     tui_parser = subparsers.add_parser("tui", help="Run the interactive TUI installer.")
     tui_parser.add_argument("--project-root", default=".")
@@ -97,6 +105,26 @@ def run_panel(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_enqueue(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        command_id, queue_path = enqueue_command(
+            project_root=project_root,
+            summary=args.summary,
+            role=args.role,
+            source=args.source,
+            priority=args.priority,
+        )
+    except ControlPlaneError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"queue: {queue_path}")
+    print(f"command-id: {command_id}")
+    print(f"status: pending")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -107,6 +135,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_install(args)
     if args.command == "panel":
         return run_panel(args)
+    if args.command == "enqueue":
+        return run_enqueue(args)
     if args.command == "tui":
         return run_tui(Path(args.project_root).resolve())
 
