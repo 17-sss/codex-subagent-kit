@@ -213,6 +213,59 @@ text = "custom helper instructions"
             self.assertEqual(panel_stderr, "")
             self.assertIn("- pending: 1", panel_stdout)
 
+    def test_dispatch_open_updates_queue_and_ledger_counts(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            install_exit_code, _, install_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer",
+                ]
+            )
+            self.assertEqual(install_exit_code, 0)
+            self.assertEqual(install_stderr, "")
+
+            enqueue_exit_code, _, enqueue_stderr = self.run_cli(
+                [
+                    "enqueue",
+                    "--project-root",
+                    temp_dir,
+                    "--summary",
+                    "Review the regression report",
+                ]
+            )
+            self.assertEqual(enqueue_exit_code, 0)
+            self.assertEqual(enqueue_stderr, "")
+
+            dispatch_exit_code, dispatch_stdout, dispatch_stderr = self.run_cli(
+                [
+                    "dispatch-open",
+                    "--project-root",
+                    temp_dir,
+                ]
+            )
+            self.assertEqual(dispatch_exit_code, 0)
+            self.assertEqual(dispatch_stderr, "")
+            self.assertIn("dispatch-id: dispatch-001", dispatch_stdout)
+            self.assertIn("status: ready", dispatch_stdout)
+
+            panel_exit_code, panel_stdout, panel_stderr = self.run_cli(
+                [
+                    "panel",
+                    "--project-root",
+                    temp_dir,
+                ]
+            )
+            self.assertEqual(panel_exit_code, 0)
+            self.assertEqual(panel_stderr, "")
+            self.assertIn("- pending: 0", panel_stdout)
+            self.assertIn("- claimed: 1", panel_stdout)
+            self.assertIn("- ready: 1", panel_stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

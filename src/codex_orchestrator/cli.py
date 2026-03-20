@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from .control_plane import ControlPlaneError, enqueue_command
+from .control_plane import ControlPlaneError, enqueue_command, open_dispatch
 from .catalog import get_agents, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
 from .panel import PanelError, render_panel
@@ -34,6 +34,13 @@ def build_parser() -> argparse.ArgumentParser:
     enqueue_parser.add_argument("--role")
     enqueue_parser.add_argument("--source", default="operator")
     enqueue_parser.add_argument("--priority", choices=("low", "normal", "high"), default="normal")
+
+    dispatch_open_parser = subparsers.add_parser(
+        "dispatch-open",
+        help="Promote a pending queue command into a dispatch ticket.",
+    )
+    dispatch_open_parser.add_argument("--project-root", default=".")
+    dispatch_open_parser.add_argument("--command-id")
 
     tui_parser = subparsers.add_parser("tui", help="Run the interactive TUI installer.")
     tui_parser.add_argument("--project-root", default=".")
@@ -125,6 +132,25 @@ def run_enqueue(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_dispatch_open(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        dispatch_id, command_id, queue_path, ledger_path = open_dispatch(
+            project_root=project_root,
+            command_id=args.command_id,
+        )
+    except ControlPlaneError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"queue: {queue_path}")
+    print(f"ledger: {ledger_path}")
+    print(f"command-id: {command_id}")
+    print(f"dispatch-id: {dispatch_id}")
+    print("status: ready")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -137,6 +163,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_panel(args)
     if args.command == "enqueue":
         return run_enqueue(args)
+    if args.command == "dispatch-open":
+        return run_dispatch_open(args)
     if args.command == "tui":
         return run_tui(Path(args.project_root).resolve())
 
