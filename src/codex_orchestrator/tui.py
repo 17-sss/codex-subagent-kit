@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .catalog import get_agents_by_category, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
+from .models import InstallResult
 
 
 HELP_TEXT = "Up/Down 이동  Space 토글  Enter 다음  b 뒤로  a 전체토글  q 종료"
@@ -121,10 +122,24 @@ def _summary_screen(
             return True
 
 
-def _result_screen(stdscr: curses.window, created_paths: list[Path]) -> None:
+def _result_screen(stdscr: curses.window, result: InstallResult) -> None:
     _draw_title(stdscr, "생성 완료", "아무 키나 누르면 종료됩니다.")
-    for idx, path in enumerate(created_paths[:12], start=5):
-        stdscr.addstr(idx, 4, str(path))
+    row = 5
+    for path in result.agent_paths[:8]:
+        stdscr.addstr(row, 4, str(path))
+        row += 1
+    for path in result.agent_preserved_paths[:4]:
+        stdscr.addstr(row, 4, f"agent preserved: {path}")
+        row += 1
+    if result.orchestrator_key:
+        stdscr.addstr(row, 4, f"orchestrator: {result.orchestrator_key}")
+        row += 1
+    for path in result.scaffold_created_paths[:4]:
+        stdscr.addstr(row, 4, f"created: {path}")
+        row += 1
+    for path in result.scaffold_preserved_paths[:4]:
+        stdscr.addstr(row, 4, f"preserved: {path}")
+        row += 1
     stdscr.refresh()
     stdscr.getch()
 
@@ -213,7 +228,7 @@ def run_tui(project_root: Path) -> int:
                 continue
 
             try:
-                created_paths = install_agents(
+                result = install_agents(
                     scope=scope,
                     project_root=project_root,
                     agent_keys=sorted(selected_agents),
@@ -222,7 +237,7 @@ def run_tui(project_root: Path) -> int:
                 _error_screen(stdscr, str(exc))
                 return 1
 
-            _result_screen(stdscr, created_paths)
+            _result_screen(stdscr, result)
             return 0
 
     try:

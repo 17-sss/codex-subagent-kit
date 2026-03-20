@@ -45,7 +45,7 @@ def run_install(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     agent_keys = [item.strip() for item in args.agents.split(",") if item.strip()]
     try:
-        created_paths = install_agents(
+        result = install_agents(
             scope=args.scope,
             project_root=project_root,
             agent_keys=agent_keys,
@@ -56,8 +56,16 @@ def run_install(args: argparse.Namespace) -> int:
         return 1
 
     print(f"target: {resolve_target_dir(args.scope, project_root)}")
-    for path in created_paths:
+    for path in result.agent_paths:
         print(path)
+    for path in result.agent_preserved_paths:
+        print(f"agent preserved: {path}")
+    if result.orchestrator_key:
+        print(f"orchestrator: {result.orchestrator_key}")
+    for path in result.scaffold_created_paths:
+        print(f"scaffold created: {path}")
+    for path in result.scaffold_preserved_paths:
+        print(f"scaffold preserved: {path}")
     return 0
 
 

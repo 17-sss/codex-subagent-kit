@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -21,3 +22,11 @@ class AgentSpec:
     sandbox_mode: str
     developer_instructions: str
 
+
+@dataclass(frozen=True)
+class InstallResult:
+    agent_paths: list[Path]
+    agent_preserved_paths: list[Path]
+    scaffold_created_paths: list[Path]
+    scaffold_preserved_paths: list[Path]
+    orchestrator_key: str | None

@@ -37,7 +37,7 @@ class CLITests(unittest.TestCase):
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "reviewer,code-mapper",
+                    "cto-coordinator,reviewer,code-mapper",
                 ]
             )
 
@@ -45,7 +45,25 @@ class CLITests(unittest.TestCase):
             self.assertEqual(stderr, "")
             self.assertIn("target:", stdout)
             self.assertIn("reviewer.toml", stdout)
+            self.assertIn("orchestrator: cto-coordinator", stdout)
+            self.assertIn("scaffold created:", stdout)
             self.assertTrue((Path(temp_dir) / ".codex" / "agents" / "reviewer.toml").exists())
+
+            second_exit_code, second_stdout, second_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer,code-mapper",
+                ]
+            )
+            self.assertEqual(second_exit_code, 0)
+            self.assertEqual(second_stderr, "")
+            self.assertIn("agent preserved:", second_stdout)
+            self.assertIn("scaffold preserved:", second_stdout)
 
     def test_install_command_returns_error_for_unknown_agent(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -64,6 +82,24 @@ class CLITests(unittest.TestCase):
             self.assertEqual(exit_code, 1)
             self.assertEqual(stdout, "")
             self.assertIn("unknown agent keys", stderr)
+
+    def test_project_install_without_orchestrator_returns_error(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "reviewer",
+                ]
+            )
+
+            self.assertEqual(exit_code, 1)
+            self.assertEqual(stdout, "")
+            self.assertIn("meta-orchestration agent", stderr)
 
 
 if __name__ == "__main__":
