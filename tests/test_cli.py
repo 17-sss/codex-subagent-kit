@@ -173,6 +173,59 @@ text = "custom helper instructions"
             self.assertIn("Queue", stdout)
             self.assertIn("Dispatch Ledger", stdout)
 
+    def test_board_command_renders_role_specific_view(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            install_exit_code, _, install_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer",
+                ]
+            )
+            self.assertEqual(install_exit_code, 0)
+            self.assertEqual(install_stderr, "")
+
+            enqueue_exit_code, _, enqueue_stderr = self.run_cli(
+                [
+                    "enqueue",
+                    "--project-root",
+                    temp_dir,
+                    "--summary",
+                    "Review the regression report",
+                ]
+            )
+            self.assertEqual(enqueue_exit_code, 0)
+            self.assertEqual(enqueue_stderr, "")
+
+            dispatch_exit_code, _, dispatch_stderr = self.run_cli(
+                [
+                    "dispatch-open",
+                    "--project-root",
+                    temp_dir,
+                ]
+            )
+            self.assertEqual(dispatch_exit_code, 0)
+            self.assertEqual(dispatch_stderr, "")
+
+            board_exit_code, board_stdout, board_stderr = self.run_cli(
+                [
+                    "board",
+                    "--project-root",
+                    temp_dir,
+                    "--role",
+                    "cto-coordinator",
+                ]
+            )
+            self.assertEqual(board_exit_code, 0)
+            self.assertEqual(board_stderr, "")
+            self.assertIn("Role: cto-coordinator", board_stdout)
+            self.assertIn("Kind: orchestrator", board_stdout)
+            self.assertIn("dispatch-001 [ready]", board_stdout)
+
     def test_enqueue_command_updates_queue_and_panel_counts(self) -> None:
         with TemporaryDirectory() as temp_dir:
             install_exit_code, _, install_stderr = self.run_cli(

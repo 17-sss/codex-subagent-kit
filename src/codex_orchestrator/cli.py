@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from .control_plane import ControlPlaneError, apply_result, enqueue_command, open_dispatch
+from .dashboard import DashboardError, render_role_board
 from .catalog import get_agents, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
 from .panel import PanelError, render_panel
@@ -27,6 +28,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     panel_parser = subparsers.add_parser("panel", help="Render the current project control-panel topology.")
     panel_parser.add_argument("--project-root", default=".")
+
+    board_parser = subparsers.add_parser("board", help="Render a role-specific terminal board.")
+    board_parser.add_argument("--project-root", default=".")
+    board_parser.add_argument("--role", required=True)
 
     enqueue_parser = subparsers.add_parser("enqueue", help="Enqueue an operator command into the project queue.")
     enqueue_parser.add_argument("--project-root", default=".")
@@ -121,6 +126,16 @@ def run_panel(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_board(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        print(render_role_board(project_root, args.role))
+    except DashboardError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def run_enqueue(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     try:
@@ -192,6 +207,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_install(args)
     if args.command == "panel":
         return run_panel(args)
+    if args.command == "board":
+        return run_board(args)
     if args.command == "enqueue":
         return run_enqueue(args)
     if args.command == "dispatch-open":
