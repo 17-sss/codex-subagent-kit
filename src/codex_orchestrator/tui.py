@@ -1,0 +1,231 @@
+from __future__ import annotations
+
+import curses
+from pathlib import Path
+
+from .catalog import get_agents_by_category, get_categories
+from .generator import GenerationError, install_agents, resolve_target_dir
+
+
+HELP_TEXT = "Up/Down 이동  Space 토글  Enter 다음  b 뒤로  a 전체토글  q 종료"
+
+
+def _draw_title(stdscr: curses.window, title: str, subtitle: str | None = None) -> None:
+    stdscr.clear()
+    stdscr.addstr(0, 2, "codex-orchestrator", curses.A_BOLD)
+    stdscr.addstr(2, 2, title, curses.A_UNDERLINE)
+    if subtitle:
+        stdscr.addstr(3, 2, subtitle)
+
+
+def _single_select(
+    stdscr: curses.window,
+    *,
+    title: str,
+    subtitle: str,
+    options: list[tuple[str, str]],
+) -> str:
+    index = 0
+    while True:
+        _draw_title(stdscr, title, subtitle)
+        for row, (_, label) in enumerate(options, start=5):
+            attr = curses.A_REVERSE if row - 5 == index else curses.A_NORMAL
+            stdscr.addstr(row, 4, label, attr)
+        stdscr.addstr(curses.LINES - 2, 2, "Enter 선택  q 종료")
+        stdscr.refresh()
+
+        key = stdscr.getch()
+        if key in (ord("q"), 27):
+            raise KeyboardInterrupt
+        if key in (curses.KEY_UP, ord("k")):
+            index = (index - 1) % len(options)
+        elif key in (curses.KEY_DOWN, ord("j")):
+            index = (index + 1) % len(options)
+        elif key in (curses.KEY_ENTER, 10, 13):
+            return options[index][0]
+
+
+def _multi_select(
+    stdscr: curses.window,
+    *,
+    title: str,
+    subtitle: str,
+    items: list[tuple[str, str]],
+    selected: set[str] | None = None,
+) -> set[str]:
+    index = 0
+    current = set(selected or set())
+    while True:
+        _draw_title(stdscr, title, subtitle)
+        for row, (value, label) in enumerate(items, start=5):
+            marker = "[x]" if value in current else "[ ]"
+            attr = curses.A_REVERSE if row - 5 == index else curses.A_NORMAL
+            stdscr.addstr(row, 4, f"{marker} {label}", attr)
+        stdscr.addstr(curses.LINES - 2, 2, HELP_TEXT)
+        stdscr.refresh()
+
+        key = stdscr.getch()
+        if key in (ord("q"), 27):
+            raise KeyboardInterrupt
+        if key in (curses.KEY_UP, ord("k")):
+            index = (index - 1) % len(items)
+        elif key in (curses.KEY_DOWN, ord("j")):
+            index = (index + 1) % len(items)
+        elif key == ord(" "):
+            value = items[index][0]
+            if value in current:
+                current.remove(value)
+            else:
+                current.add(value)
+        elif key == ord("a"):
+            values = {value for value, _ in items}
+            current = values if current != values else set()
+        elif key == ord("b"):
+            raise RuntimeError("back")
+        elif key in (curses.KEY_ENTER, 10, 13):
+            return current
+
+
+def _summary_screen(
+    stdscr: curses.window,
+    *,
+    scope: str,
+    project_root: Path,
+    category_titles: list[str],
+    agent_labels: list[str],
+) -> bool:
+    target_dir = resolve_target_dir(scope, project_root)
+    while True:
+        _draw_title(
+            stdscr,
+            "설치 요약",
+            "Enter로 생성, b로 뒤로, q로 종료",
+        )
+        stdscr.addstr(5, 4, f"scope: {scope}")
+        stdscr.addstr(6, 4, f"target: {target_dir}")
+        stdscr.addstr(8, 4, f"categories ({len(category_titles)}):")
+        for idx, label in enumerate(category_titles[:6], start=9):
+            stdscr.addstr(idx, 6, f"- {label}")
+        agent_row = 16
+        stdscr.addstr(agent_row, 4, f"agents ({len(agent_labels)}):")
+        for idx, label in enumerate(agent_labels[:10], start=agent_row + 1):
+            stdscr.addstr(idx, 6, f"- {label}")
+        stdscr.refresh()
+
+        key = stdscr.getch()
+        if key in (ord("q"), 27):
+            raise KeyboardInterrupt
+        if key == ord("b"):
+            return False
+        if key in (curses.KEY_ENTER, 10, 13):
+            return True
+
+
+def _result_screen(stdscr: curses.window, created_paths: list[Path]) -> None:
+    _draw_title(stdscr, "생성 완료", "아무 키나 누르면 종료됩니다.")
+    for idx, path in enumerate(created_paths[:12], start=5):
+        stdscr.addstr(idx, 4, str(path))
+    stdscr.refresh()
+    stdscr.getch()
+
+
+def _error_screen(stdscr: curses.window, message: str) -> None:
+    _draw_title(stdscr, "오류", "아무 키나 누르면 종료됩니다.")
+    stdscr.addstr(5, 4, message)
+    stdscr.refresh()
+    stdscr.getch()
+
+
+def run_tui(project_root: Path) -> int:
+    categories = list(get_categories())
+    category_items = [(item.key, f"{item.title} - {item.description}") for item in categories]
+    category_title_map = {item.key: item.title for item in categories}
+
+    def _app(stdscr: curses.window) -> int:
+        try:
+            curses.curs_set(0)
+        except curses.error:
+            pass
+        stdscr.keypad(True)
+
+        scope = _single_select(
+            stdscr,
+            title="설치 위치 선택",
+            subtitle=f"project root: {project_root}",
+            options=[
+                ("project", "Project (.codex/agents in current project)"),
+                ("global", "Global (~/.codex/agents)"),
+            ],
+        )
+
+        while True:
+            try:
+                selected_categories = _multi_select(
+                    stdscr,
+                    title="카테고리 선택",
+                    subtitle="필요한 카테고리를 고르세요. 선택이 없으면 전체 agent를 보여줍니다.",
+                    items=category_items,
+                )
+                break
+            except RuntimeError:
+                scope = _single_select(
+                    stdscr,
+                    title="설치 위치 선택",
+                    subtitle=f"project root: {project_root}",
+                    options=[
+                        ("project", "Project (.codex/agents in current project)"),
+                        ("global", "Global (~/.codex/agents)"),
+                    ],
+                )
+
+        while True:
+            agent_specs = get_agents_by_category(selected_categories)
+            agent_items = [(agent.key, f"{agent.name} - {agent.description}") for agent in agent_specs]
+            try:
+                selected_agents = _multi_select(
+                    stdscr,
+                    title="Subagent 선택",
+                    subtitle="Space로 토글하세요.",
+                    items=agent_items,
+                )
+            except RuntimeError:
+                selected_categories = _multi_select(
+                    stdscr,
+                    title="카테고리 선택",
+                    subtitle="필요한 카테고리를 고르세요. 선택이 없으면 전체 agent를 보여줍니다.",
+                    items=category_items,
+                    selected=selected_categories,
+                )
+                continue
+
+            if not selected_agents:
+                _error_screen(stdscr, "최소 1개 이상의 subagent를 선택해야 합니다.")
+                continue
+
+            confirmed = _summary_screen(
+                stdscr,
+                scope=scope,
+                project_root=project_root,
+                category_titles=[category_title_map[key] for key in sorted(selected_categories)],
+                agent_labels=[agent.key for agent in agent_specs if agent.key in selected_agents],
+            )
+            if not confirmed:
+                continue
+
+            try:
+                created_paths = install_agents(
+                    scope=scope,
+                    project_root=project_root,
+                    agent_keys=sorted(selected_agents),
+                )
+            except GenerationError as exc:
+                _error_screen(stdscr, str(exc))
+                return 1
+
+            _result_screen(stdscr, created_paths)
+            return 0
+
+    try:
+        return curses.wrapper(_app)
+    except KeyboardInterrupt:
+        return 130
