@@ -25,6 +25,7 @@
 - root orchestrator가 포함된 project-scope `team.toml` seed
 - runtime / queue / dispatch ledger seed
 - `team.toml` + seeded state 기반 terminal panel renderer
+- operator command를 queue에 넣는 최소 control-plane mutation
 - `__codex_agents`에서 이관한 shell control-plane reference asset
 
 ## 최종 방향
