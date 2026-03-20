@@ -6,7 +6,7 @@
 - Project ID: codex-orchestrator
 - Repo Root: /Users/hoyoungson/Code/Project/Personal/codex-orchestrator
 - Branch: 001-orchestrator-scaffold
-- Last Updated: 2026-03-20T16:14:38+09:00
+- Last Updated: 2026-03-20T17:33:47+09:00
 - Updated By: hoyoungson
 
 ## TL;DR
@@ -19,13 +19,15 @@
 - `board` 명령은 orchestrator 또는 worker role별 read-only terminal board를 렌더링한다.
 - `enqueue` 명령은 operator command를 project queue에 넣고, 기본 target을 root orchestrator로 둔다.
 - `dispatch-open` 명령은 다음 `pending` queue command를 `ready` dispatch ticket으로 열고 queue status를 `claimed`로 바꾼다.
+- `dispatch-prepare` 명령은 ready dispatch의 handoff brief와 suggested send_input payload를 렌더링한다.
+- `dispatch-begin` 명령은 실제 send 직후 queue/ledger/runtime를 `dispatched` 상태로 전환한다.
 - `apply-result` 명령은 dispatch outcome을 queue / ledger / runtime state에 반영하고 panel summary까지 갱신한다.
 - project install은 `.codex/orchestrator/launchers/` 아래 board/monitor/`tmux`/`cmux` launcher seed를 생성한다.
 - `launch` 명령은 generated `tmux` / `cmux` launcher seed를 직접 실행하거나 dry-run preview할 수 있다.
 
 ## Current Objective
 
-- file-based control-plane을 actual agent IO 방향으로 연결할 다음 thin slice를 정한다.
+- file-based control-plane handoff 이후의 actual agent IO 경계를 다음 thin slice로 연결한다.
 
 ## Current State
 
@@ -41,6 +43,8 @@ Done
 - `board --project-root <path> --role <role>`는 role-specific board를 렌더링한다.
 - `enqueue --project-root <path> --summary ...`는 project queue에 `pending` command를 적재한다.
 - `dispatch-open --project-root <path>`는 하나의 `pending` command를 `ready` dispatch ticket으로 승격한다.
+- `dispatch-prepare --project-root <path> --dispatch-id ...`는 ready dispatch를 main Codex conversation용 handoff package로 렌더링한다.
+- `dispatch-begin --project-root <path> --dispatch-id ...`는 실제 send 직후 dispatch를 `dispatched`로 전환한다.
 - `apply-result --project-root <path> --dispatch-id ... --outcome ... --summary ...`는 하나의 active dispatch를 terminal lifecycle 기준 완료 상태로 정리한다.
 - project install은 launcher seed를 backfill 가능하게 생성한다.
 - `launch --project-root <path> --backend tmux|cmux [--dry-run]`은 generated launcher seed를 first-class entrypoint로 승격한다.
@@ -51,6 +55,7 @@ In progress
 - actual `send_input` / `wait_agent` integration을 어디서 thin slice로 시작할지 정리
 To confirm
 - live Codex agent IO를 file-based queue/dispatch와 어떻게 매핑할지
+- live session binding이나 broker가 필요한 최소 기준
 
 ## Recent Changes
 
@@ -68,6 +73,7 @@ Changes
 - role-specific terminal board 추가
 - board/monitor/`tmux`/`cmux` launcher seed 추가
 - first-class `launch` CLI 추가
+- dispatch handoff bridge 추가
 Validation run
 - `python3 -m compileall src`
 - `./scripts/test.sh`
@@ -79,6 +85,8 @@ Validation run
 - fresh path에서 `runtime/agents.toml`, `queue/commands.toml`, `ledger/dispatches.toml` seed 생성 확인
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue --project-root <tmp-project> --summary "..."`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root <tmp-project>`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-prepare --project-root <tmp-project> --dispatch-id dispatch-001`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-begin --project-root <tmp-project> --dispatch-id dispatch-001`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root <tmp-project> --dispatch-id dispatch-001 --outcome completed --summary "..."`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root <tmp-project> --role <role>`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root <tmp-project> --backend tmux --dry-run`
@@ -91,6 +99,8 @@ Impact
 - generated scaffold seed를 바로 확인할 수 있는 terminal topology + state summary view가 생겼다.
 - operator command를 queue 파일에 적재하고 panel에서 바로 확인할 수 있게 됐다.
 - queue command를 dispatch ledger ticket으로 승격하고 panel에서 바로 확인할 수 있게 됐다.
+- ready dispatch를 main Codex conversation으로 넘길 handoff package가 생겼다.
+- 실제 send 직후 lifecycle을 `dispatched`로 명시할 수 있게 됐다.
 - dispatch 결과를 queue / ledger / runtime state에 반영하는 최소 lifecycle이 생겼다.
 - launcher pane/window가 보여줄 role-specific board가 생겼다.
 - project-local launcher seed가 생겨 optional dashboard backend와 연결할 발판이 마련됐다.
@@ -105,7 +115,7 @@ Risk
 - 현재 reference 폴더는 “실행 엔트리포인트”가 아니라 “구현 seed”다.
 - TUI end-to-end는 아직 완전 자동화되지 않았고 PTY 수동 smoke에 의존한다.
 - built-in source는 여전히 Python 데이터 구조에 남아 있고 packaged TOML library로는 아직 옮기지 않았다.
-- current panel/control-plane은 first-class launch CLI까지는 있지만, live pane 상태 / actual send_input-wait_agent 연동은 아직 없다.
+- current panel/control-plane은 handoff bridge와 first-class launch CLI까지는 있지만, live pane 상태 / actual send_input-wait_agent 연동은 아직 없다.
 Workaround
 - 실제 제품 로직은 `src/codex_orchestrator/`를 source of truth로 본다.
 - control panel 구현 시 reference shell asset을 그대로 재사용하지 말고, generated scaffold와 team metadata를 기준으로 재구성하는 방향을 우선 검토한다.
@@ -132,6 +142,8 @@ Commands
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-prepare --project-root . --dispatch-id dispatch-001`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-begin --project-root . --dispatch-id dispatch-001`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli tui`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`
 Links / dashboards
@@ -161,6 +173,8 @@ Results
 - `panel` 명령은 `operator -> orchestrator -> workers` topology와 seed 상태 요약을 렌더링함
 - `enqueue` 명령은 `queue/commands.toml`에 `pending` command를 기록하고 panel 카운트에 반영됨
 - `dispatch-open` 명령은 `queue/commands.toml`의 `pending` command를 `claimed`로 바꾸고 `ledger/dispatches.toml`에 `ready` dispatch를 기록함
+- `dispatch-prepare` 명령은 ready dispatch, queue command, role definition을 합쳐 handoff text를 렌더링함
+- `dispatch-begin` 명령은 queue/ledger/runtime를 `dispatched` in-flight 상태로 전환함
 - `dispatch-open` 중 target role은 `busy`로 바뀌고, `apply-result` 후 `idle` 또는 `blocked`로 정리됨
 - `apply-result` 명령은 queue/ledger/runtime를 함께 갱신하고 panel 카운트에 반영됨
 - `board` 명령은 role별 queue/dispatch/runtime 상태를 read-only terminal view로 렌더링함
@@ -179,9 +193,9 @@ Not run yet
 ## Resume Checklist
 
 - `README.md`, `docs/PRD.ko.md`, `docs/UNDERSTANDING_AND_WORKFLOW.ko.md`, `docs/HANDOFF.md`를 먼저 읽는다.
-- `./scripts/test.sh`, `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`, `PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator`, `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`, `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run`로 현재 상태를 확인한다.
-- `reference/legacy_shell_control_plane/`를 참고하되, 다음 thin slice는 actual agent IO 연결 관점에서 재정의한다.
+- `./scripts/test.sh`, `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`, `PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator`, `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`, `PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run`, `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-prepare --project-root . --dispatch-id dispatch-001`로 현재 상태를 확인한다.
+- `reference/legacy_shell_control_plane/`를 참고하되, 다음 thin slice는 actual agent IO 호출 방식이나 session binding 기준을 더 명확히 정하는 쪽으로 진행한다.
 
 ## Resume Prompt
 
-Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: connect the file-based queue/dispatch control-plane to a minimal actual agent IO path, using the migrated legacy control-plane assets only as reference, not as the primary runtime.
+Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: decide and implement the next minimal bridge from the file-based dispatch handoff into actual agent IO or session binding, using the migrated legacy control-plane assets only as reference, not as the primary runtime.

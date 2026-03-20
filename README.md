@@ -38,6 +38,8 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role c
 PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run
 PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue --project-root . --summary "Investigate the failing review flow"
 PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root .
+PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-prepare --project-root . --dispatch-id dispatch-001
+PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-begin --project-root . --dispatch-id dispatch-001
 PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root . --dispatch-id dispatch-001 --outcome completed --summary "Done"
 PYTHONPATH=src python3 -m codex_orchestrator.cli tui
 ```
@@ -98,8 +100,11 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - queue 요약은 `queue/commands.toml`, dispatch 요약은 `ledger/dispatches.toml` 기준으로 표시한다.
 - `enqueue --summary ...`는 operator command를 project queue에 넣고, 기본 target은 root orchestrator다.
 - `dispatch-open`은 다음 `pending` queue command를 `ready` dispatch ticket으로 올리고 queue status를 `claimed`로 바꾼다.
+- `dispatch-prepare --dispatch-id ...`는 ready dispatch의 brief와 suggested send_input payload를 렌더링한다.
+- `dispatch-begin --dispatch-id ...`는 실제 send 직후 queue/ledger/runtime를 `dispatched` in-flight 상태로 전환한다.
 - `apply-result`는 `completed`, `failed`, `cancelled` 중 하나의 결과를 반영해 queue, ledger, runtime state를 함께 갱신한다.
-- `dispatch-open` 중 target role은 `busy`, `apply-result` 이후에는 `idle` 또는 `blocked`로 정리된다.
+- `dispatch-open`과 `dispatch-begin` 중 target role은 `busy`, `apply-result` 이후에는 `idle` 또는 `blocked`로 정리된다.
+- 실제 `send_input` / `wait_agent` 호출은 아직 main Codex conversation 바깥 단계로 남아 있다.
 
 ## 현재 board / launcher 동작
 

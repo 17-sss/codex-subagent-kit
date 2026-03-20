@@ -34,6 +34,8 @@
 - `board` 명령으로 role-specific terminal board 렌더링 가능
 - `enqueue` 명령으로 operator command를 queue에 적재 가능
 - `dispatch-open` 명령으로 queue command를 dispatch ledger로 승격 가능
+- `dispatch-prepare` 명령으로 ready dispatch handoff package 렌더링 가능
+- `dispatch-begin` 명령으로 in-flight `dispatched` 상태 전환 가능
 - `apply-result` 명령으로 dispatch outcome을 queue / ledger / runtime에 반영 가능
 - project-local launcher seed 생성
 - `launch` 명령으로 generated `tmux` / `cmux` launcher 실행 또는 dry-run 가능

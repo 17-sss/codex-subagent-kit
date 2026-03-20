@@ -28,6 +28,7 @@
 - role-specific terminal board renderer
 - operator command를 queue에 넣는 최소 control-plane mutation
 - queue command를 `ready` dispatch ticket으로 여는 최소 control-plane mutation
+- ready dispatch의 handoff package와 `dispatched` state 전환
 - dispatch 결과를 queue / ledger / runtime state에 적용하는 최소 control-plane mutation
 - project-local board/monitor/`tmux`/`cmux` launcher seed
 - generated launcher를 실행하는 first-class `launch` CLI
@@ -57,6 +58,7 @@
 
 - role별 project-specific owner agent 생성기
 - actual `send_input` / `wait_agent` integration
+- live session binding / broker 계층
 - queue / dispatch / recovery 통합
 - seeded panel을 live runtime control panel로 확장
 - reference shell asset에서 Python-native control-plane으로 점진 이관
