@@ -29,6 +29,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scop
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue --project-root . --summary "Investigate the failing review flow"
 PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root .
+PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root . --dispatch-id dispatch-001 --outcome completed --summary "Done"
 PYTHONPATH=src python3 -m codex_orchestrator.cli tui
 ```
 
@@ -87,7 +88,9 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - queue 요약은 `queue/commands.toml`, dispatch 요약은 `ledger/dispatches.toml` 기준으로 표시한다.
 - `enqueue --summary ...`는 operator command를 project queue에 넣고, 기본 target은 root orchestrator다.
 - `dispatch-open`은 다음 `pending` queue command를 `ready` dispatch ticket으로 올리고 queue status를 `claimed`로 바꾼다.
-- 아직 result apply, live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결, `tmux` / `cmux` pane 제어는 없다.
+- `apply-result`는 `completed`, `failed`, `cancelled` 중 하나의 결과를 반영해 queue, ledger, runtime state를 함께 갱신한다.
+- `dispatch-open` 중 target role은 `busy`, `apply-result` 이후에는 `idle` 또는 `blocked`로 정리된다.
+- 아직 live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결, `tmux` / `cmux` pane 제어는 없다.
 
 ## 현재 생성 포맷
 

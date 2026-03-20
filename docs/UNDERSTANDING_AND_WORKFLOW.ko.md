@@ -33,6 +33,7 @@
 - `panel` 명령으로 topology + seeded runtime summary 렌더링 가능
 - `enqueue` 명령으로 operator command를 queue에 적재 가능
 - `dispatch-open` 명령으로 queue command를 dispatch ledger로 승격 가능
+- `apply-result` 명령으로 dispatch outcome을 queue / ledger / runtime에 반영 가능
 - CLI와 설치용 TUI 제공
 
 ### 아직 미구현
@@ -99,7 +100,6 @@ flowchart LR
 
 ## 다음 구현 우선순위
 
-1. dispatch 결과를 queue / ledger / runtime state에 반영하는 흐름을 붙인다.
-2. 이후 seeded runtime / queue / ledger를 launcher 흐름과 연결한다.
-3. `tmux` / `cmux` launcher를 붙인다.
-4. 필요하면 built-in source도 portable file-based catalog로 정리한다.
+1. seeded runtime / queue / ledger를 launcher 흐름과 연결한다.
+2. `tmux` / `cmux` launcher를 붙인다.
+3. 필요하면 built-in source도 portable file-based catalog로 정리한다.

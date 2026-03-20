@@ -27,6 +27,7 @@
 - `team.toml` + seeded state 기반 terminal panel renderer
 - operator command를 queue에 넣는 최소 control-plane mutation
 - queue command를 `ready` dispatch ticket으로 여는 최소 control-plane mutation
+- dispatch 결과를 queue / ledger / runtime state에 적용하는 최소 control-plane mutation
 - `__codex_agents`에서 이관한 shell control-plane reference asset
 
 ## 최종 방향

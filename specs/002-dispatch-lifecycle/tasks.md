@@ -13,12 +13,12 @@
 
 ## Phase 2: Result Apply
 
-- [ ] T006 Extend `src/codex_orchestrator/control_plane.py` with result-apply transitions for `completed`, `failed`, and `cancelled`.
-- [ ] T007 Update runtime-state mutation so active roles return to the correct post-result status.
-- [ ] T008 Add CLI surface in `src/codex_orchestrator/cli.py` for applying a dispatch result.
-- [ ] T009 Update automated tests for ledger, queue, runtime, and panel consistency after result application.
-- [ ] T010 Run `./scripts/test.sh` and smoke `install -> enqueue -> dispatch-open -> apply-result -> panel`.
-- [ ] T011 Commit the result-apply slice as a second isolated reviewable unit.
+- [x] T006 Extend `src/codex_orchestrator/control_plane.py` with result-apply transitions for `completed`, `failed`, and `cancelled`.
+- [x] T007 Update runtime-state mutation so active roles return to the correct post-result status.
+- [x] T008 Add CLI surface in `src/codex_orchestrator/cli.py` for applying a dispatch result.
+- [x] T009 Update automated tests for ledger, queue, runtime, and panel consistency after result application.
+- [x] T010 Run `./scripts/test.sh` and smoke `install -> enqueue -> dispatch-open -> apply-result -> panel`.
+- [x] T011 Commit the result-apply slice as a second isolated reviewable unit.
 
 ## Phase 3: Docs Sync
 
