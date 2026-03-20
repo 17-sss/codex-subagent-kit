@@ -19,13 +19,15 @@ def resolve_target_dir(scope: str, project_root: Path) -> Path:
 
 
 def render_agent_file(agent: AgentSpec) -> str:
+    instructions_text = agent.developer_instructions.rstrip()
     return f"""name = "{agent.name}"
 description = "{agent.description}"
 model = "{agent.model}"
 model_reasoning_effort = "{agent.reasoning_effort}"
 sandbox_mode = "{agent.sandbox_mode}"
-developer_instructions = \"\"\"
-{agent.developer_instructions}
+[instructions]
+text = \"\"\"
+{instructions_text}
 \"\"\"
 """
 

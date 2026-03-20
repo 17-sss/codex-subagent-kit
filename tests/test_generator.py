@@ -27,6 +27,11 @@ class GeneratorTests(unittest.TestCase):
             )
             self.assertTrue(all(path.exists() for path in created_paths))
 
+            reviewer_contents = created_paths[0].read_text(encoding="utf-8")
+            self.assertIn("[instructions]", reviewer_contents)
+            self.assertIn('text = """', reviewer_contents)
+            self.assertNotIn("developer_instructions =", reviewer_contents)
+
     def test_existing_file_requires_overwrite(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)

@@ -90,9 +90,9 @@ flowchart LR
 
 ## 중요한 드리프트
 
-- 현재 코드가 생성하는 agent TOML은 top-level `developer_instructions`를 쓰고 있다.
-- 목표 방향은 VoltAgent-style Codex-compatible TOML에 가깝게 맞추는 것이다.
-- 따라서 scaffold 구현 전에 canonical TOML shape를 먼저 확정하는 것이 맞다.
+- canonical TOML shape는 VoltAgent-style Codex-compatible 방향으로 정렬한다.
+- 아직 외부 `.toml` agent source를 읽는 discovery 단계는 구현되지 않았다.
+- 따라서 scaffold 구현과 별개로, 이후 catalog source를 하드코딩 목록에서 파일 기반 구조로 확장해야 한다.
 
 ## 다음 구현 우선순위
 
