@@ -9,15 +9,17 @@
 - 다중 선택으로 `.codex/agents/*.toml` 생성
 - project-scope install 시 `.codex/orchestrator` scaffold와 `team.toml` seed 생성
 - project-scope install 시 runtime / queue / dispatch ledger seed 생성
+- role-specific terminal board 제공
+- project-scope install 시 board/monitor/`tmux`/`cmux` launcher seed 생성
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
 - `__codex_agents`에서 이관한 control-plane reference asset 보관
 
 후속 범위:
 
-- queue / dispatch ledger 확장
+- first-class launcher 실행 CLI
 - recovery / bootstrap 고도화
-- `tmux` / `cmux` control panel
+- live agent integration
 
 ## 실행
 
@@ -27,6 +29,7 @@
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
+PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator
 PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue --project-root . --summary "Investigate the failing review flow"
 PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root . --dispatch-id dispatch-001 --outcome completed --summary "Done"
@@ -72,6 +75,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 
 - `project` scope는 최소 1개의 meta-orchestration agent가 필요하다.
 - `project` scope는 `.codex/agents`와 `.codex/orchestrator`를 함께 만든다.
+- `project` scope는 `.codex/orchestrator/launchers/` 아래 board/monitor/backend launcher seed도 함께 만든다.
 - `global` scope는 `~/.codex/agents`만 다루고 project-local scaffold는 만들지 않는다.
 
 ## 현재 discovery 동작
@@ -90,7 +94,13 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - `dispatch-open`은 다음 `pending` queue command를 `ready` dispatch ticket으로 올리고 queue status를 `claimed`로 바꾼다.
 - `apply-result`는 `completed`, `failed`, `cancelled` 중 하나의 결과를 반영해 queue, ledger, runtime state를 함께 갱신한다.
 - `dispatch-open` 중 target role은 `busy`, `apply-result` 이후에는 `idle` 또는 `blocked`로 정리된다.
-- 아직 live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결, `tmux` / `cmux` pane 제어는 없다.
+
+## 현재 board / launcher 동작
+
+- `board --role <role>`는 특정 orchestrator 또는 worker role의 read-only terminal board를 렌더링한다.
+- project install은 `.codex/orchestrator/launchers/run-board.sh`, `run-monitor.sh`, `launch-tmux.sh`, `launch-cmux.sh` seed를 생성한다.
+- generated `tmux` / `cmux` launcher는 backend가 없으면 `SKIP`으로 soft-fail 하도록 생성된다.
+- 아직 first-class `launch` CLI, live queue drain, `spawn_agent` / `send_input` / `wait_agent` 연결은 없다.
 
 ## 현재 생성 포맷
 

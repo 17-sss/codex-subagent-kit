@@ -22,5 +22,5 @@
 
 ## Phase 3: Docs Sync
 
-- [ ] T012 Sync README, HANDOFF, and relevant feature docs with the implemented dispatch lifecycle behavior.
-- [ ] T013 Commit the lifecycle docs sync as a final isolated reviewable unit.
+- [x] T012 Sync README, HANDOFF, and relevant feature docs with the implemented dispatch lifecycle behavior.
+- [x] T013 Commit the lifecycle docs sync as a final isolated reviewable unit.

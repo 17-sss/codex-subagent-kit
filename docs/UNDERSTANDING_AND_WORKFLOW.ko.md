@@ -31,15 +31,17 @@
 - root orchestrator가 들어간 `team.toml` seed 생성
 - runtime / queue / dispatch ledger seed 생성
 - `panel` 명령으로 topology + seeded runtime summary 렌더링 가능
+- `board` 명령으로 role-specific terminal board 렌더링 가능
 - `enqueue` 명령으로 operator command를 queue에 적재 가능
 - `dispatch-open` 명령으로 queue command를 dispatch ledger로 승격 가능
 - `apply-result` 명령으로 dispatch outcome을 queue / ledger / runtime에 반영 가능
+- project-local launcher seed 생성
 - CLI와 설치용 TUI 제공
 
 ### 아직 미구현
 
 - live runtime-aware terminal control panel
-- `tmux` / `cmux` 연동
+- first-class `tmux` / `cmux` launch CLI
 
 ## Workflow Diagram
 
@@ -100,6 +102,5 @@ flowchart LR
 
 ## 다음 구현 우선순위
 
-1. seeded runtime / queue / ledger를 launcher 흐름과 연결한다.
-2. `tmux` / `cmux` launcher를 붙인다.
-3. 필요하면 built-in source도 portable file-based catalog로 정리한다.
+1. generated launcher seed를 first-class launch path로 연결한다.
+2. 필요하면 built-in source도 portable file-based catalog로 정리한다.
