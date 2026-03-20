@@ -140,6 +140,37 @@ text = "custom helper instructions"
             self.assertEqual(stdout, "")
             self.assertIn("meta-orchestration agent", stderr)
 
+    def test_panel_command_renders_generated_team_manifest(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            install_exit_code, _, install_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer,code-mapper",
+                ]
+            )
+            self.assertEqual(install_exit_code, 0)
+            self.assertEqual(install_stderr, "")
+
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "panel",
+                    "--project-root",
+                    temp_dir,
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("Operator: user", stdout)
+            self.assertIn("Orchestrator: cto-coordinator", stdout)
+            self.assertIn("reviewer", stdout)
+            self.assertIn("code-mapper", stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
