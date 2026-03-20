@@ -5,11 +5,11 @@
 
 ## Phase 1: Dispatch Open
 
-- [ ] T001 Extend `src/codex_orchestrator/control_plane.py` with queue-command selection and dispatch-ticket creation.
-- [ ] T002 Add CLI surface in `src/codex_orchestrator/cli.py` for opening a dispatch from the current queue state.
-- [ ] T003 Update tests in `tests/test_control_plane.py`, `tests/test_cli.py`, and `tests/test_panel.py` for queue-to-dispatch transitions.
-- [ ] T004 Run `./scripts/test.sh` and smoke `install -> enqueue -> dispatch-open -> panel`.
-- [ ] T005 Commit the dispatch-open slice as an isolated reviewable unit.
+- [x] T001 Extend `src/codex_orchestrator/control_plane.py` with queue-command selection and dispatch-ticket creation.
+- [x] T002 Add CLI surface in `src/codex_orchestrator/cli.py` for opening a dispatch from the current queue state.
+- [x] T003 Update tests in `tests/test_control_plane.py`, `tests/test_cli.py`, and `tests/test_panel.py` for queue-to-dispatch transitions.
+- [x] T004 Run `./scripts/test.sh` and smoke `install -> enqueue -> dispatch-open -> panel`.
+- [x] T005 Commit the dispatch-open slice as an isolated reviewable unit.
 
 ## Phase 2: Result Apply
 

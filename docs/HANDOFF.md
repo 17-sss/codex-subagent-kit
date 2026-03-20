@@ -6,7 +6,7 @@
 - Project ID: codex-orchestrator
 - Repo Root: /Users/hoyoungson/Code/Project/Personal/codex-orchestrator
 - Branch: 001-orchestrator-scaffold
-- Last Updated: 2026-03-20T15:08:00+09:00
+- Last Updated: 2026-03-20T15:25:18+09:00
 - Updated By: hoyoungson
 
 ## TL;DR
@@ -17,10 +17,11 @@
 - `catalog`와 선택 로직은 project/global `.toml` source를 함께 발견하고 precedence(`project > global > built-in`)를 적용한다.
 - `panel` 명령은 이제 `team.toml`, `runtime/agents.toml`, `queue/commands.toml`, `ledger/dispatches.toml`을 읽어 seeded runtime summary를 렌더링한다.
 - `enqueue` 명령은 operator command를 project queue에 넣고, 기본 target을 root orchestrator로 둔다.
+- `dispatch-open` 명령은 다음 `pending` queue command를 `ready` dispatch ticket으로 열고 queue status를 `claimed`로 바꾼다.
 
 ## Current Objective
 
-- queue command를 dispatch ledger와 runtime state 갱신 흐름으로 이어서, live control-plane 방향으로 한 단계 더 확장한다.
+- open된 dispatch의 결과를 queue / ledger / runtime state에 반영해서, 최소 lifecycle을 `result apply`까지 닫는다.
 
 ## Current State
 
@@ -34,11 +35,12 @@ Done
 - project/global `.toml` agent source discovery와 precedence(`project > global > built-in`)가 동작한다.
 - `panel --project-root <path>`는 generated team/state seed를 읽어 topology + queue/dispatch summary를 렌더링한다.
 - `enqueue --project-root <path> --summary ...`는 project queue에 `pending` command를 적재한다.
+- `dispatch-open --project-root <path>`는 하나의 `pending` command를 `ready` dispatch ticket으로 승격한다.
 - `__codex_agents`에서 generic shell control-plane docs/scripts를 `reference/legacy_shell_control_plane/`로 이관했다.
 - `specs/001-orchestrator-scaffold/` 아래 spec/plan/tasks/quickstart를 정리했다.
 - `.specify/memory/constitution.md`, `docs/TESTING.ko.md`, `scripts/test.sh`, `tests/`로 SDD + testing 기반을 마련했다.
 In progress
-- queue command에서 dispatch ledger로 이어지는 mutation 흐름 정리
+- dispatch 결과를 queue / ledger / runtime state에 적용하는 mutation 흐름 정리
 To confirm
 - `tmux` / `cmux` launcher를 shell asset 재사용으로 갈지 Python 생성기로 갈지
 
@@ -53,6 +55,7 @@ Changes
 - runtime / queue / dispatch seed 추가
 - seeded runtime summary terminal panel renderer 추가
 - project queue enqueue 흐름 추가
+- queue-to-dispatch open 흐름 추가
 Validation run
 - `python3 -m compileall src`
 - `./scripts/test.sh`
@@ -63,12 +66,14 @@ Validation run
 - fresh path에서 `.codex/orchestrator/team.toml` seed 생성 확인
 - fresh path에서 `runtime/agents.toml`, `queue/commands.toml`, `ledger/dispatches.toml` seed 생성 확인
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue --project-root <tmp-project> --summary "..."`
+- `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open --project-root <tmp-project>`
 - PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui`를 키 입력으로 통과시켜 install flow 확인
 Impact
 - installer가 더 이상 단순 agent 파일 생성기에 머물지 않고 root orchestrator topology를 가진 scaffold seed까지 생성한다.
 - built-in agent와 외부 `.toml` agent가 같은 catalog 생태계에서 공존할 수 있게 됐다.
 - generated scaffold seed를 바로 확인할 수 있는 terminal topology + state summary view가 생겼다.
 - operator command를 queue 파일에 적재하고 panel에서 바로 확인할 수 있게 됐다.
+- queue command를 dispatch ledger ticket으로 승격하고 panel에서 바로 확인할 수 있게 됐다.
 
 ## Known Issues / Watch List
 
@@ -79,7 +84,7 @@ Risk
 - 현재 reference 폴더는 “실행 엔트리포인트”가 아니라 “구현 seed”다.
 - TUI end-to-end는 아직 완전 자동화되지 않았고 PTY 수동 smoke에 의존한다.
 - built-in source는 여전히 Python 데이터 구조에 남아 있고 packaged TOML library로는 아직 옮기지 않았다.
-- current panel/control-plane은 queue enqueue까지는 되지만, dispatch opening / runtime transition / pane 상태는 아직 없다.
+- current panel/control-plane은 dispatch open까지는 되지만, result apply / runtime transition / pane 상태는 아직 없다.
 Workaround
 - 실제 제품 로직은 `src/codex_orchestrator/`를 source of truth로 본다.
 - control panel 구현 시 reference shell asset을 그대로 재사용하지 말고, generated scaffold와 team metadata를 기준으로 재구성하는 방향을 우선 검토한다.
@@ -121,6 +126,7 @@ Checks run
 - orchestrator scaffold seed 생성
 - seeded runtime summary terminal panel renderer
 - queue enqueue flow
+- dispatch-open flow
 - curses TUI smoke flow
 Results
 - 모두 통과
@@ -129,23 +135,23 @@ Results
 - project install은 runtime / queue / dispatch seed를 함께 생성함
 - `panel` 명령은 `operator -> orchestrator -> workers` topology와 seed 상태 요약을 렌더링함
 - `enqueue` 명령은 `queue/commands.toml`에 `pending` command를 기록하고 panel 카운트에 반영됨
+- `dispatch-open` 명령은 `queue/commands.toml`의 `pending` command를 `claimed`로 바꾸고 `ledger/dispatches.toml`에 `ready` dispatch를 기록함
 Not run yet
 - `tmux` / `cmux` launcher flow
-- dispatch opening / result-apply flow
+- result-apply flow
 
 ## Next Actions
 
-1. queue command를 dispatch ledger ticket으로 여는 mutation 흐름을 구현한다.
-2. dispatch 결과가 runtime/queue 상태를 갱신하도록 잇는다.
-3. seeded runtime / queue / ledger를 launcher flow와 연결한다.
-4. 필요하면 built-in catalog도 portable file-based source로 정리한다.
+1. dispatch 결과가 queue / ledger / runtime state를 갱신하도록 잇는다.
+2. seeded runtime / queue / ledger를 launcher flow와 연결한다.
+3. 필요하면 built-in catalog도 portable file-based source로 정리한다.
 
 ## Resume Checklist
 
 - `README.md`, `docs/PRD.ko.md`, `docs/UNDERSTANDING_AND_WORKFLOW.ko.md`, `docs/HANDOFF.md`를 먼저 읽는다.
 - `./scripts/test.sh`, `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`, `PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .`로 현재 상태를 확인한다.
-- `reference/legacy_shell_control_plane/`를 보고 dispatch open / result apply / launcher를 어떤 순서로 붙일지 결정한다.
+- `reference/legacy_shell_control_plane/`를 보고 result apply / launcher를 어떤 순서로 붙일지 결정한다.
 
 ## Resume Prompt
 
-Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: add dispatch-opening and result-apply flows on top of the current queue/panel scaffold, using the migrated legacy control-plane assets only as reference, not as the primary runtime.
+Continue this project from `docs/HANDOFF.md`. First verify the repo still matches the notes, then implement the next unfinished action: add result-apply flow on top of the current queue/panel scaffold so queue, ledger, and runtime state converge after one dispatch outcome, using the migrated legacy control-plane assets only as reference, not as the primary runtime.
