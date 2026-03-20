@@ -36,6 +36,33 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --agents cto-coordinator,reviewer,code-mapper
 ```
 
+## 테스트 / 검증
+
+이 저장소의 기본 자동 검증 명령:
+
+```bash
+./scripts/test.sh
+```
+
+개별 명령으로 실행하려면:
+
+```bash
+python3 -m compileall src
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+```
+
+수동 smoke 검증:
+
+```bash
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+  --scope project \
+  --project-root .tmp-smoke \
+  --agents reviewer
+```
+
+`curses` 기반 TUI를 수정한 경우에는 자동 테스트 외에 PTY 환경에서 수동 smoke도 함께 수행한다.
+
 ## 현재 생성 포맷
 
 생성되는 subagent 파일은 VoltAgent가 사용하는 `.toml` 스타일을 참고해 아래 필드를 쓴다.
@@ -51,5 +78,6 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 
 - 제품 방향 문서: [docs/PRD.ko.md](./docs/PRD.ko.md)
 - 이관 메모: [docs/MIGRATION_FROM__CODEX_AGENTS.ko.md](./docs/MIGRATION_FROM__CODEX_AGENTS.ko.md)
+- 테스트 workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
 - shell control-plane 참고 자산: [reference/legacy_shell_control_plane/README.md](./reference/legacy_shell_control_plane/README.md)
 - 이 저장소는 특정 회사/제품명을 전제로 한 예시 자산을 포함하지 않는다.

@@ -5,14 +5,15 @@
 - Project: codex-orchestrator
 - Project ID: codex-orchestrator
 - Repo Root: /Users/hoyoungson/Code/Project/Personal/codex-orchestrator
-- Branch: unknown
-- Last Updated: 2026-03-20T11:19:00+09:00
+- Branch: 001-orchestrator-scaffold
+- Last Updated: 2026-03-20T11:42:00+09:00
 - Updated By: hoyoungson
 
 ## TL;DR
 
 - `codex-orchestrator`는 새 standalone 프로젝트로 분리됐고, 현재는 `.codex/agents/*.toml` 생성용 TUI/CLI MVP가 동작한다.
 - 기존 `__codex_agents`에서 재사용 가능한 자산은 `reference/legacy_shell_control_plane/`로 이관했고, 특정 workspace에 묶인 예시는 제거했다.
+- Spec Kit 기반 첫 feature/spec와 프로젝트 constitution을 정리했고, `unittest` 기반 테스트 workflow를 추가했다.
 - 다음 큰 단계는 installer가 끝난 뒤 `.codex/orchestrator` scaffold와 `tmux`/`cmux` control panel 생성 흐름을 붙이는 것이다.
 
 ## Current Objective
@@ -27,6 +28,9 @@ Done
 - `__codex_agents`에서 generic shell control-plane docs/scripts를 `reference/legacy_shell_control_plane/`로 이관했다.
 - catalog와 문서에서 특정 workspace에 묶인 고정 예시를 제거했다.
 - smoke 산출물과 `__pycache__`는 정리했다.
+- `specs/001-orchestrator-scaffold/spec.md`를 생성해 첫 SDD feature를 정의했다.
+- `.specify/memory/constitution.md`를 프로젝트 기준으로 구체화했다.
+- `tests/`, `scripts/test.sh`, `docs/TESTING.ko.md`를 추가해 기본 테스트/검증 workflow를 만들었다.
 In progress
 - Python-native orchestrator scaffold 설계
 - install 이후 control panel 연결 방식 정리
@@ -42,13 +46,17 @@ Changes
 - TUI/CLI MVP 구현
 - `__codex_agents` 자산 이관
 - PRD 및 migration 문서 작성
+- Spec Kit 기반 첫 feature spec 작성
+- `unittest` 기반 테스트 workflow 및 검증 문서 추가
 Validation run
 - `python3 -m compileall src`
+- `./scripts/test.sh`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --project-root .tmp-smoke --agents cto-coordinator,reviewer,code-mapper`
 - PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui`를 키 입력으로 통과시켜 `.codex/agents/*.toml` 생성 확인
 Impact
 - 이제 새 repo 기준점은 `codex-orchestrator/`이고, `__codex_agents` 없이도 범용 설계 자산을 이 프로젝트에서 참조할 수 있다.
+- 이후 기능 작업은 SDD 문서와 기본 테스트 게이트를 따라 진행할 수 있다.
 
 ## Known Issues / Watch List
 
@@ -57,6 +65,7 @@ Issue
 Risk
 - shell reference asset은 아직 `__codex_agents` 시대의 `.env` manifest와 경로 가정이 남아 있다.
 - 현재 reference 폴더는 “실행 엔트리포인트”가 아니라 “구현 seed”다.
+- TUI end-to-end는 아직 완전 자동화되지 않았고 PTY 수동 smoke에 의존한다.
 Workaround
 - 실제 제품 로직은 `src/codex_orchestrator/`를 source of truth로 본다.
 - control panel 구현 시 reference shell asset을 그대로 재사용하지 말고, Python scaffold 기준으로 재생성하는 방향을 우선 검토한다.
@@ -67,11 +76,15 @@ Key files
 - `src/codex_orchestrator/cli.py`
 - `src/codex_orchestrator/tui.py`
 - `src/codex_orchestrator/catalog.py`
+- `tests/test_cli.py`
+- `tests/test_generator.py`
 - `docs/PRD.ko.md`
+- `docs/TESTING.ko.md`
 - `docs/MIGRATION_FROM__CODEX_AGENTS.ko.md`
 - `reference/legacy_shell_control_plane/README.md`
 Commands
 - `cd codex-orchestrator`
+- `./scripts/test.sh`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli catalog`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli tui`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents reviewer`
@@ -82,6 +95,7 @@ Links / dashboards
 
 Checks run
 - `compileall`
+- `unittest` suite via `./scripts/test.sh`
 - catalog 출력
 - project-scope install
 - curses TUI smoke flow
@@ -89,7 +103,6 @@ Results
 - 모두 통과
 - `.toml` output 포맷은 VoltAgent 스타일을 참고한 최소 필드로 정상 생성됨
 Not run yet
-- git repo 초기화 후 lint/test 체계
 - `.codex/orchestrator` scaffold 생성
 - `tmux` / `cmux` control panel 생성 흐름
 
