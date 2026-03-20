@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
+from .catalog import get_agent_map
 from .panel import (
     PanelError,
     _load_toml,
@@ -110,6 +111,36 @@ def _next_dispatch_id(dispatches: list[dict[str, str]]) -> str:
     return f"dispatch-{max_suffix + 1:03d}"
 
 
+def _find_dispatch_record(dispatches: list[dict[str, str]], dispatch_id: str) -> dict[str, str]:
+    for dispatch in dispatches:
+        if dispatch["id"] == dispatch_id:
+            return dispatch
+    raise ControlPlaneError(f"dispatch not found: {dispatch_id}")
+
+
+def _find_command_for_dispatch(
+    commands: list[dict[str, str]],
+    dispatch: dict[str, str],
+) -> dict[str, str]:
+    for command in commands:
+        if command.get("dispatch_id") == dispatch["id"] or command["id"] == dispatch["command_id"]:
+            return command
+    raise ControlPlaneError(f"queue command not found for dispatch: {dispatch['id']}")
+
+
+def _resolve_role_context(project_root: Path, role: str) -> tuple[str, str, str]:
+    try:
+        operator_label, orchestrator_key, worker_keys = load_team_manifest(project_root)
+    except PanelError as exc:
+        raise ControlPlaneError(str(exc)) from exc
+
+    if role == orchestrator_key:
+        return operator_label, orchestrator_key, "orchestrator"
+    if role in set(worker_keys):
+        return operator_label, orchestrator_key, "worker"
+    raise ControlPlaneError(f"unknown role for this team: {role}")
+
+
 def load_queue_commands(project_root: Path) -> list[dict[str, str]]:
     queue_path = resolve_queue_path(project_root)
     if not queue_path.exists():
@@ -207,6 +238,67 @@ def load_runtime_agents(project_root: Path) -> tuple[dict[str, str], list[dict[s
                 worker_state["active_dispatch_id"] = active_dispatch_id.strip()
 
     return orchestrator_state, worker_states
+
+
+def render_dispatch_handoff(project_root: Path, *, dispatch_id: str) -> str:
+    dispatches = load_dispatches(project_root)
+    target_dispatch = _find_dispatch_record(dispatches, dispatch_id)
+    if target_dispatch["status"] not in {"ready", "dispatched"}:
+        raise ControlPlaneError(f"dispatch is not handoff-ready: {dispatch_id}")
+
+    commands = load_queue_commands(project_root)
+    target_command = _find_command_for_dispatch(commands, target_dispatch)
+
+    role = target_dispatch["role"]
+    operator_label, orchestrator_key, role_kind = _resolve_role_context(project_root, role)
+    agent_map = get_agent_map(
+        project_root=project_root,
+        include_project=True,
+        include_global=True,
+    )
+    agent = agent_map.get(role)
+    if agent is None:
+        raise ControlPlaneError(f"agent definition not found for role: {role}")
+
+    role_definition = str(agent.definition_path) if agent.definition_path is not None else "(builtin catalog)"
+    role_label = "root orchestrator" if role_kind == "orchestrator" else "worker"
+    lines = [
+        "[dispatch]",
+        target_dispatch["id"],
+        "",
+        "[brief]",
+        f"operator: {operator_label}",
+        f"role: {role}",
+        f"role-kind: {role_kind}",
+        f"dispatch-status: {target_dispatch['status']}",
+        f"command-id: {target_command['id']}",
+        f"priority: {target_command.get('priority', 'normal')}",
+        f"source: {target_command.get('source', 'operator')}",
+        f"project-root: {project_root}",
+        f"role-definition: {role_definition}",
+        f"role-description: {agent.description}",
+        "",
+        "[suggested send_input message]",
+        f"You own the `{role}` {role_label} role for this project-local codex-orchestrator team.",
+        f"Operator: {operator_label}",
+        f"Root orchestrator: {orchestrator_key}",
+        f"Project root: {project_root}",
+        f"Role definition: {role_definition}",
+        f"Role description: {agent.description}",
+        f"Dispatch id: {target_dispatch['id']}",
+        f"Command id: {target_command['id']}",
+        f"Priority: {target_command.get('priority', 'normal')}",
+        f"Source: {target_command.get('source', 'operator')}",
+        "",
+        "New command:",
+        target_command["summary"],
+        "",
+        "Reply with:",
+        "- what you checked or changed",
+        "- blockers or contract mismatches",
+        "- files touched and verification run",
+    ]
+    return "\n".join(lines)
 
 
 def _write_runtime_agents(
@@ -364,6 +456,36 @@ def open_dispatch(
     return dispatch_id, selected_command["id"], queue_path, ledger_path
 
 
+def begin_dispatch(
+    *,
+    project_root: Path,
+    dispatch_id: str,
+) -> tuple[str, str, Path, Path, Path]:
+    dispatches = load_dispatches(project_root)
+    target_dispatch = _find_dispatch_record(dispatches, dispatch_id)
+    if target_dispatch["status"] != "ready":
+        raise ControlPlaneError(f"dispatch is not ready: {dispatch_id}")
+
+    commands = load_queue_commands(project_root)
+    target_command = _find_command_for_dispatch(commands, target_dispatch)
+
+    target_dispatch["status"] = "dispatched"
+    target_command["status"] = "dispatched"
+
+    queue_path = resolve_queue_path(project_root)
+    ledger_path = resolve_dispatch_ledger_path(project_root)
+    queue_path.write_text(_render_queue(commands), encoding="utf-8")
+    ledger_path.write_text(_render_dispatches(dispatches), encoding="utf-8")
+
+    runtime_path = _set_role_runtime_state(
+        project_root,
+        role_key=target_dispatch["role"],
+        status="busy",
+        active_dispatch_id=dispatch_id,
+    )
+    return dispatch_id, target_command["id"], queue_path, ledger_path, runtime_path
+
+
 def apply_result(
     *,
     project_root: Path,
@@ -379,27 +501,12 @@ def apply_result(
         raise ControlPlaneError("summary must not be empty")
 
     dispatches = load_dispatches(project_root)
-    target_dispatch: dict[str, str] | None = None
-    for dispatch in dispatches:
-        if dispatch["id"] != dispatch_id:
-            continue
-        target_dispatch = dispatch
-        break
-
-    if target_dispatch is None:
-        raise ControlPlaneError(f"dispatch not found: {dispatch_id}")
+    target_dispatch = _find_dispatch_record(dispatches, dispatch_id)
     if target_dispatch["status"] not in {"ready", "dispatched"}:
         raise ControlPlaneError(f"dispatch is not active: {dispatch_id}")
 
     commands = load_queue_commands(project_root)
-    target_command: dict[str, str] | None = None
-    for command in commands:
-        if command.get("dispatch_id") == dispatch_id or command["id"] == target_dispatch["command_id"]:
-            target_command = command
-            break
-
-    if target_command is None:
-        raise ControlPlaneError(f"queue command not found for dispatch: {dispatch_id}")
+    target_command = _find_command_for_dispatch(commands, target_dispatch)
 
     target_dispatch["status"] = outcome
     target_dispatch["result_summary"] = summary_text

@@ -36,6 +36,7 @@ workers = ["reviewer", "code-mapper"]
             self.assertIn("code-mapper [idle]", rendered)
             self.assertIn("Queue", rendered)
             self.assertIn("- pending: 0", rendered)
+            self.assertIn("- dispatched: 0", rendered)
             self.assertIn("- failed: 0", rendered)
             self.assertIn("- cancelled: 0", rendered)
             self.assertIn("Dispatch Ledger", rendered)
@@ -98,6 +99,11 @@ status = "claimed"
 [[commands]]
 id = "cmd-3"
 role = "reviewer"
+status = "dispatched"
+
+[[commands]]
+id = "cmd-4"
+role = "reviewer"
 status = "completed"
 """.strip()
                 + "\n",
@@ -138,6 +144,7 @@ status = "failed"
             self.assertIn("code-mapper [idle]", rendered)
             self.assertIn("- pending: 1", rendered)
             self.assertIn("- claimed: 1", rendered)
+            self.assertIn("- dispatched: 1", rendered)
             self.assertIn("- completed: 1", rendered)
             self.assertIn("- failed: 0", rendered)
             self.assertIn("- cancelled: 0", rendered)

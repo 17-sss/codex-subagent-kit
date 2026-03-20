@@ -4,7 +4,14 @@ import argparse
 import sys
 from pathlib import Path
 
-from .control_plane import ControlPlaneError, apply_result, enqueue_command, open_dispatch
+from .control_plane import (
+    ControlPlaneError,
+    apply_result,
+    begin_dispatch,
+    enqueue_command,
+    open_dispatch,
+    render_dispatch_handoff,
+)
 from .dashboard import DashboardError, render_role_board
 from .catalog import get_agents, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
@@ -40,6 +47,20 @@ def build_parser() -> argparse.ArgumentParser:
     launch_parser.add_argument("--name")
     launch_parser.add_argument("--no-attach", action="store_true")
     launch_parser.add_argument("--dry-run", action="store_true")
+
+    dispatch_prepare_parser = subparsers.add_parser(
+        "dispatch-prepare",
+        help="Render the handoff package for a ready dispatch.",
+    )
+    dispatch_prepare_parser.add_argument("--project-root", default=".")
+    dispatch_prepare_parser.add_argument("--dispatch-id", required=True)
+
+    dispatch_begin_parser = subparsers.add_parser(
+        "dispatch-begin",
+        help="Mark a ready dispatch as in-flight after the real send step.",
+    )
+    dispatch_begin_parser.add_argument("--project-root", default=".")
+    dispatch_begin_parser.add_argument("--dispatch-id", required=True)
 
     enqueue_parser = subparsers.add_parser("enqueue", help="Enqueue an operator command into the project queue.")
     enqueue_parser.add_argument("--project-root", default=".")
@@ -168,6 +189,36 @@ def run_launch(args: argparse.Namespace) -> int:
         return 1
 
 
+def run_dispatch_prepare(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        print(render_dispatch_handoff(project_root, dispatch_id=args.dispatch_id))
+    except ControlPlaneError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def run_dispatch_begin(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        dispatch_id, command_id, queue_path, ledger_path, runtime_path = begin_dispatch(
+            project_root=project_root,
+            dispatch_id=args.dispatch_id,
+        )
+    except ControlPlaneError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"queue: {queue_path}")
+    print(f"ledger: {ledger_path}")
+    print(f"runtime: {runtime_path}")
+    print(f"command-id: {command_id}")
+    print(f"dispatch-id: {dispatch_id}")
+    print("status: dispatched")
+    return 0
+
+
 def run_enqueue(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     try:
@@ -243,6 +294,10 @@ def main(argv: list[str] | None = None) -> int:
         return run_board(args)
     if args.command == "launch":
         return run_launch(args)
+    if args.command == "dispatch-prepare":
+        return run_dispatch_prepare(args)
+    if args.command == "dispatch-begin":
+        return run_dispatch_begin(args)
     if args.command == "enqueue":
         return run_enqueue(args)
     if args.command == "dispatch-open":
