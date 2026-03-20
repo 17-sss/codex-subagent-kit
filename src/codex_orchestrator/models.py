@@ -32,3 +32,10 @@ class InstallResult:
     scaffold_created_paths: list[Path]
     scaffold_preserved_paths: list[Path]
     orchestrator_key: str | None
+
+
+@dataclass(frozen=True)
+class LaunchPlan:
+    backend: str
+    script_path: Path
+    argv: list[str]

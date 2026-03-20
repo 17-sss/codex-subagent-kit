@@ -8,6 +8,7 @@ from .control_plane import ControlPlaneError, apply_result, enqueue_command, ope
 from .dashboard import DashboardError, render_role_board
 from .catalog import get_agents, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
+from .launch_runtime import LaunchError, build_launch_plan, execute_launch_plan, render_launch_preview
 from .panel import PanelError, render_panel
 from .tui import run_tui
 
@@ -32,6 +33,13 @@ def build_parser() -> argparse.ArgumentParser:
     board_parser = subparsers.add_parser("board", help="Render a role-specific terminal board.")
     board_parser.add_argument("--project-root", default=".")
     board_parser.add_argument("--role", required=True)
+
+    launch_parser = subparsers.add_parser("launch", help="Launch a project-local terminal backend.")
+    launch_parser.add_argument("--project-root", default=".")
+    launch_parser.add_argument("--backend", choices=("tmux", "cmux"), required=True)
+    launch_parser.add_argument("--name")
+    launch_parser.add_argument("--no-attach", action="store_true")
+    launch_parser.add_argument("--dry-run", action="store_true")
 
     enqueue_parser = subparsers.add_parser("enqueue", help="Enqueue an operator command into the project queue.")
     enqueue_parser.add_argument("--project-root", default=".")
@@ -136,6 +144,30 @@ def run_board(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_launch(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        plan = build_launch_plan(
+            project_root=project_root,
+            backend=args.backend,
+            name=args.name,
+            attach=not args.no_attach,
+        )
+    except LaunchError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    if args.dry_run:
+        print(render_launch_preview(plan))
+        return 0
+
+    try:
+        return execute_launch_plan(plan, project_root=project_root)
+    except LaunchError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
 def run_enqueue(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     try:
@@ -209,6 +241,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_panel(args)
     if args.command == "board":
         return run_board(args)
+    if args.command == "launch":
+        return run_launch(args)
     if args.command == "enqueue":
         return run_enqueue(args)
     if args.command == "dispatch-open":

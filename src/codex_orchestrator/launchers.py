@@ -17,6 +17,10 @@ def _default_backend_title(project_root: Path) -> str:
     return f"codex-orchestrator-{name}"
 
 
+def default_backend_title(project_root: Path) -> str:
+    return _default_backend_title(project_root)
+
+
 def _quote(value: str) -> str:
     return shlex.quote(value)
 

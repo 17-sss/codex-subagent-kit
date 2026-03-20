@@ -226,6 +226,87 @@ text = "custom helper instructions"
             self.assertIn("Kind: orchestrator", board_stdout)
             self.assertIn("dispatch-001 [ready]", board_stdout)
 
+    def test_launch_command_supports_dry_run_preview(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            install_exit_code, _, install_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer",
+                ]
+            )
+            self.assertEqual(install_exit_code, 0)
+            self.assertEqual(install_stderr, "")
+
+            launch_exit_code, launch_stdout, launch_stderr = self.run_cli(
+                [
+                    "launch",
+                    "--project-root",
+                    temp_dir,
+                    "--backend",
+                    "tmux",
+                    "--dry-run",
+                ]
+            )
+
+            self.assertEqual(launch_exit_code, 0)
+            self.assertEqual(launch_stderr, "")
+            self.assertIn("backend: tmux", launch_stdout)
+            self.assertIn("launch-tmux.sh", launch_stdout)
+            self.assertIn("command:", launch_stdout)
+
+    def test_launch_command_rejects_backend_incompatible_option(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            install_exit_code, _, install_stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--agents",
+                    "cto-coordinator,reviewer",
+                ]
+            )
+            self.assertEqual(install_exit_code, 0)
+            self.assertEqual(install_stderr, "")
+
+            launch_exit_code, launch_stdout, launch_stderr = self.run_cli(
+                [
+                    "launch",
+                    "--project-root",
+                    temp_dir,
+                    "--backend",
+                    "cmux",
+                    "--no-attach",
+                ]
+            )
+
+            self.assertEqual(launch_exit_code, 1)
+            self.assertEqual(launch_stdout, "")
+            self.assertIn("--no-attach", launch_stderr)
+
+    def test_launch_command_requires_project_launcher_scaffold(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            launch_exit_code, launch_stdout, launch_stderr = self.run_cli(
+                [
+                    "launch",
+                    "--project-root",
+                    temp_dir,
+                    "--backend",
+                    "tmux",
+                    "--dry-run",
+                ]
+            )
+
+            self.assertEqual(launch_exit_code, 1)
+            self.assertEqual(launch_stdout, "")
+            self.assertIn("project install first", launch_stderr)
+
     def test_enqueue_command_updates_queue_and_panel_counts(self) -> None:
         with TemporaryDirectory() as temp_dir:
             install_exit_code, _, install_stderr = self.run_cli(
