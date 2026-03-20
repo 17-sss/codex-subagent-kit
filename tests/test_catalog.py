@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from codex_orchestrator.catalog import (
     get_agent_map,
@@ -27,6 +30,74 @@ class CatalogTests(unittest.TestCase):
 
         self.assertTrue(filtered)
         self.assertTrue(all(agent.category == "quality-safety" for agent in filtered))
+
+    def test_external_agents_are_discovered_with_project_precedence(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            global_agents_dir = temp_home / ".codex" / "agents"
+            project_agents_dir = project_root / ".codex" / "agents"
+            global_agents_dir.mkdir(parents=True)
+            project_agents_dir.mkdir(parents=True)
+
+            (global_agents_dir / "reviewer.toml").write_text(
+                """
+name = "reviewer"
+description = "Global reviewer override"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+[instructions]
+text = "global instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (project_agents_dir / "reviewer.toml").write_text(
+                """
+name = "reviewer"
+description = "Project reviewer override"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+[instructions]
+text = "project instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (project_agents_dir / "custom-helper.toml").write_text(
+                """
+name = "custom-helper"
+description = "Project custom helper"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+[instructions]
+text = "custom helper instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with patch.object(Path, "home", return_value=temp_home):
+                agent_map = get_agent_map(
+                    project_root=project_root,
+                    include_project=True,
+                    include_global=True,
+                )
+                categories = get_categories(
+                    project_root=project_root,
+                    include_project=True,
+                    include_global=True,
+                )
+
+            self.assertEqual(agent_map["reviewer"].description, "Project reviewer override")
+            self.assertEqual(agent_map["reviewer"].source, "project")
+            self.assertEqual(agent_map["reviewer"].category, "quality-safety")
+            self.assertEqual(agent_map["custom-helper"].source, "project")
+            self.assertEqual(agent_map["custom-helper"].category, "imported-agents")
+            self.assertIn("imported-agents", {category.key for category in categories})
 
 
 if __name__ == "__main__":

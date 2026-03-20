@@ -152,9 +152,18 @@ def _error_screen(stdscr: curses.window, message: str) -> None:
 
 
 def run_tui(project_root: Path) -> int:
-    categories = list(get_categories())
-    category_items = [(item.key, f"{item.title} - {item.description}") for item in categories]
-    category_title_map = {item.key: item.title for item in categories}
+    def _catalog_for_scope(scope: str) -> tuple[list[tuple[str, str]], dict[str, str]]:
+        include_project = scope == "project"
+        categories = list(
+            get_categories(
+                project_root=project_root,
+                include_project=include_project,
+                include_global=True,
+            )
+        )
+        items = [(item.key, f"{item.title} - {item.description}") for item in categories]
+        title_map = {item.key: item.title for item in categories}
+        return items, title_map
 
     def _app(stdscr: curses.window) -> int:
         try:
@@ -172,6 +181,7 @@ def run_tui(project_root: Path) -> int:
                 ("global", "Global (~/.codex/agents)"),
             ],
         )
+        category_items, category_title_map = _catalog_for_scope(scope)
 
         while True:
             try:
@@ -192,9 +202,15 @@ def run_tui(project_root: Path) -> int:
                         ("global", "Global (~/.codex/agents)"),
                     ],
                 )
+                category_items, category_title_map = _catalog_for_scope(scope)
 
         while True:
-            agent_specs = get_agents_by_category(selected_categories)
+            agent_specs = get_agents_by_category(
+                selected_categories,
+                project_root=project_root,
+                include_project=(scope == "project"),
+                include_global=True,
+            )
             agent_items = [(agent.key, f"{agent.name} - {agent.description}") for agent in agent_specs]
             try:
                 selected_agents = _multi_select(

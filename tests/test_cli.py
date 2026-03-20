@@ -5,6 +5,7 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from codex_orchestrator import cli
 
@@ -26,6 +27,44 @@ class CLITests(unittest.TestCase):
         self.assertEqual(stderr, "")
         self.assertIn("[Meta & Orchestration]", stdout)
         self.assertIn("reviewer", stdout)
+
+    def test_catalog_command_discovers_external_agents(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            project_agents_dir = project_root / ".codex" / "agents"
+            project_agents_dir.mkdir(parents=True)
+            temp_home.mkdir()
+            (project_agents_dir / "custom-helper.toml").write_text(
+                """
+name = "custom-helper"
+description = "Project custom helper"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+[instructions]
+text = "custom helper instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with patch.object(Path, "home", return_value=temp_home):
+                exit_code, stdout, stderr = self.run_cli(
+                    [
+                        "catalog",
+                        "--project-root",
+                        temp_dir,
+                        "--scope",
+                        "project",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("[Imported & External]", stdout)
+            self.assertIn("custom-helper", stdout)
+            self.assertIn("[project]", stdout)
 
     def test_install_command_creates_files_and_reports_target(self) -> None:
         with TemporaryDirectory() as temp_dir:

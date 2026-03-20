@@ -13,7 +13,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="codex-orchestrator")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("catalog", help="Print the built-in subagent catalog.")
+    catalog_parser = subparsers.add_parser("catalog", help="Print the available subagent catalog.")
+    catalog_parser.add_argument("--project-root", default=".")
+    catalog_parser.add_argument("--scope", choices=("project", "global"), default="project")
 
     install_parser = subparsers.add_parser("install", help="Install selected subagents without the TUI.")
     install_parser.add_argument("--scope", choices=("project", "global"), required=True)
@@ -27,16 +29,28 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def run_catalog() -> int:
-    categories = {category.key: category for category in get_categories()}
-    for category in get_categories():
+def run_catalog(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    include_project = args.scope == "project"
+    categories = get_categories(
+        project_root=project_root,
+        include_project=include_project,
+        include_global=True,
+    )
+    agents = get_agents(
+        project_root=project_root,
+        include_project=include_project,
+        include_global=True,
+    )
+    for category in categories:
         print(f"[{category.title}]")
         print(f"  key: {category.key}")
         print(f"  description: {category.description}")
-        for agent in get_agents():
+        for agent in agents:
             if agent.category != category.key:
                 continue
-            print(f"  - {agent.key}: {agent.description}")
+            source_suffix = f" [{agent.source}]" if agent.source != "builtin" else ""
+            print(f"  - {agent.key}: {agent.description}{source_suffix}")
         print()
     return 0
 
@@ -74,7 +88,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "catalog":
-        return run_catalog()
+        return run_catalog(args)
     if args.command == "install":
         return run_install(args)
     if args.command == "tui":

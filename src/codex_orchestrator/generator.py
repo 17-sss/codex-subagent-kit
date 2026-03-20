@@ -158,7 +158,11 @@ def install_agents(
     agent_keys: list[str],
     overwrite: bool = False,
 ) -> InstallResult:
-    agent_map = get_agent_map()
+    agent_map = get_agent_map(
+        project_root=project_root,
+        include_project=(scope == "project"),
+        include_global=True,
+    )
     missing = [key for key in agent_keys if key not in agent_map]
     if missing:
         raise GenerationError(f"unknown agent keys: {', '.join(missing)}")

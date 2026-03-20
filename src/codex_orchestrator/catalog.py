@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import tomllib
+from pathlib import Path
+
 from .models import AgentSpec, Category
 
 
@@ -28,6 +31,11 @@ CATEGORIES: tuple[Category, ...] = (
         key="platform-ops",
         title="Platform & Ops",
         description="Infra, runtime, debugging, deployment-facing tasks.",
+    ),
+    Category(
+        key="imported-agents",
+        title="Imported & External",
+        description="Portable TOML agent definitions discovered from project/global agent directories.",
     ),
 )
 
@@ -214,19 +222,154 @@ Return changed files, operational impact, and verification run.""",
 )
 
 
-def get_categories() -> tuple[Category, ...]:
-    return CATEGORIES
+def _resolve_project_agents_dir(project_root: Path) -> Path:
+    return project_root / ".codex" / "agents"
 
 
-def get_agents() -> tuple[AgentSpec, ...]:
-    return AGENTS
+def _resolve_global_agents_dir() -> Path:
+    return Path.home() / ".codex" / "agents"
 
 
-def get_agents_by_category(category_keys: set[str] | None = None) -> list[AgentSpec]:
+def _parse_external_agent(
+    path: Path,
+    *,
+    inherited_category: str | None = None,
+    source: str,
+) -> AgentSpec:
+    with path.open("rb") as handle:
+        data = tomllib.load(handle)
+
+    instructions = data.get("instructions", {}).get("text") or data.get("developer_instructions")
+    if not isinstance(instructions, str) or not instructions.strip():
+        raise ValueError("missing instructions text")
+
+    name = data.get("name")
+    description = data.get("description")
+    model = data.get("model")
+    reasoning_effort = data.get("model_reasoning_effort")
+    sandbox_mode = data.get("sandbox_mode")
+    if not all(
+        isinstance(value, str) and value.strip()
+        for value in (name, description, model, reasoning_effort, sandbox_mode)
+    ):
+        raise ValueError("missing required string fields")
+
+    category = inherited_category or data.get("codex_orchestrator_category") or "imported-agents"
+    return AgentSpec(
+        key=path.stem,
+        category=category,
+        name=name.strip(),
+        description=description.strip(),
+        model=model.strip(),
+        reasoning_effort=reasoning_effort.strip(),
+        sandbox_mode=sandbox_mode.strip(),
+        developer_instructions=instructions.rstrip(),
+        source=source,
+        definition_path=path,
+    )
+
+
+def _load_external_agents(
+    *,
+    directory: Path,
+    source: str,
+    builtins: dict[str, AgentSpec],
+) -> list[AgentSpec]:
+    if not directory.exists():
+        return []
+
+    loaded: list[AgentSpec] = []
+    for path in sorted(directory.glob("*.toml")):
+        inherited_category = builtins.get(path.stem).category if path.stem in builtins else None
+        try:
+            loaded.append(_parse_external_agent(path, inherited_category=inherited_category, source=source))
+        except (OSError, ValueError, tomllib.TOMLDecodeError):
+            continue
+    return loaded
+
+
+def get_agent_map(
+    *,
+    project_root: Path | None = None,
+    include_project: bool = False,
+    include_global: bool = False,
+) -> dict[str, AgentSpec]:
+    agent_map = {agent.key: agent for agent in AGENTS}
+
+    if include_global:
+        for agent in _load_external_agents(
+            directory=_resolve_global_agents_dir(),
+            source="global",
+            builtins=agent_map,
+        ):
+            agent_map[agent.key] = agent
+
+    if include_project and project_root is not None:
+        for agent in _load_external_agents(
+            directory=_resolve_project_agents_dir(project_root),
+            source="project",
+            builtins=agent_map,
+        ):
+            agent_map[agent.key] = agent
+
+    return agent_map
+
+
+def get_agents(
+    *,
+    project_root: Path | None = None,
+    include_project: bool = False,
+    include_global: bool = False,
+) -> tuple[AgentSpec, ...]:
+    agent_map = get_agent_map(
+        project_root=project_root,
+        include_project=include_project,
+        include_global=include_global,
+    )
+    category_order = {category.key: index for index, category in enumerate(CATEGORIES)}
+    return tuple(
+        sorted(
+            agent_map.values(),
+            key=lambda agent: (
+                category_order.get(agent.category, len(category_order)),
+                agent.name.lower(),
+                agent.key,
+            ),
+        )
+    )
+
+
+def get_categories(
+    *,
+    project_root: Path | None = None,
+    include_project: bool = False,
+    include_global: bool = False,
+) -> tuple[Category, ...]:
+    used_categories = {
+        agent.category
+        for agent in get_agents(
+            project_root=project_root,
+            include_project=include_project,
+            include_global=include_global,
+        )
+    }
+    return tuple(category for category in CATEGORIES if category.key in used_categories)
+
+
+def get_agents_by_category(
+    category_keys: set[str] | None = None,
+    *,
+    project_root: Path | None = None,
+    include_project: bool = False,
+    include_global: bool = False,
+) -> list[AgentSpec]:
+    agents = list(
+        get_agents(
+            project_root=project_root,
+            include_project=include_project,
+            include_global=include_global,
+        )
+    )
     if not category_keys:
-        return list(AGENTS)
-    return [agent for agent in AGENTS if agent.category in category_keys]
-
-
-def get_agent_map() -> dict[str, AgentSpec]:
-    return {agent.key: agent for agent in AGENTS}
+        return agents
+    return [agent for agent in agents if agent.category in category_keys]

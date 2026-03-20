@@ -21,6 +21,8 @@ class AgentSpec:
     reasoning_effort: str
     sandbox_mode: str
     developer_instructions: str
+    source: str = "builtin"
+    definition_path: Path | None = None
 
 
 @dataclass(frozen=True)
