@@ -48,6 +48,22 @@ class GeneratorTests(unittest.TestCase):
             self.assertIn('"reviewer"', team_manifest)
             self.assertIn('"code-mapper"', team_manifest)
 
+            runtime_state = (resolve_scaffold_dir(project_root) / "runtime" / "agents.toml").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn('key = "cto-coordinator"', runtime_state)
+            self.assertIn('status = "idle"', runtime_state)
+
+            queue_seed = (resolve_scaffold_dir(project_root) / "queue" / "commands.toml").read_text(
+                encoding="utf-8"
+            )
+            self.assertEqual(queue_seed, "version = 1\n")
+
+            dispatch_seed = (resolve_scaffold_dir(project_root) / "ledger" / "dispatches.toml").read_text(
+                encoding="utf-8"
+            )
+            self.assertEqual(dispatch_seed, "version = 1\n")
+
     def test_existing_agent_file_is_preserved_on_rerun(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
@@ -140,6 +156,40 @@ class GeneratorTests(unittest.TestCase):
             )
             self.assertFalse(second_result.scaffold_created_paths)
             self.assertTrue(second_result.scaffold_preserved_paths)
+
+    def test_rerun_backfills_new_runtime_seed_files(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            scaffold_root = resolve_scaffold_dir(project_root)
+            (scaffold_root / "runtime").mkdir(parents=True)
+            (scaffold_root / "queue").mkdir()
+            (scaffold_root / "ledger").mkdir()
+            (scaffold_root / "launchers").mkdir()
+            (scaffold_root / "team.toml").write_text(
+                """
+version = 1
+
+[operator]
+label = "user"
+
+[team]
+orchestrator = "cto-coordinator"
+workers = ["reviewer"]
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+            (scaffold_root / "README.md").write_text("legacy\n", encoding="utf-8")
+
+            result = install_agents(
+                scope="project",
+                project_root=project_root,
+                agent_keys=["cto-coordinator", "reviewer"],
+            )
+
+            self.assertIn(scaffold_root / "runtime" / "agents.toml", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "queue" / "commands.toml", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "ledger" / "dispatches.toml", result.scaffold_created_paths)
 
 
 if __name__ == "__main__":

@@ -170,6 +170,8 @@ text = "custom helper instructions"
             self.assertIn("Orchestrator: cto-coordinator", stdout)
             self.assertIn("reviewer", stdout)
             self.assertIn("code-mapper", stdout)
+            self.assertIn("Queue", stdout)
+            self.assertIn("Dispatch Ledger", stdout)
 
 
 if __name__ == "__main__":

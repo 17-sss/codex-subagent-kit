@@ -59,6 +59,31 @@ topology = "operator-orchestrator-workers"
 """
 
 
+def render_runtime_state(*, orchestrator_key: str, worker_keys: list[str]) -> str:
+    worker_blocks = "\n".join(
+        f'[[workers]]\nkey = "{worker_key}"\nstatus = "idle"\n'
+        for worker_key in worker_keys
+    )
+    if worker_blocks:
+        worker_blocks = "\n" + worker_blocks.rstrip() + "\n"
+    return f"""version = 1
+
+[orchestrator]
+key = "{orchestrator_key}"
+status = "idle"
+{worker_blocks}"""
+
+
+def render_queue_seed() -> str:
+    return """version = 1
+"""
+
+
+def render_dispatch_ledger_seed() -> str:
+    return """version = 1
+"""
+
+
 def render_scaffold_readme(*, orchestrator_key: str, worker_keys: list[str]) -> str:
     worker_summary = ", ".join(f"`{worker_key}`" for worker_key in worker_keys) or "none yet"
     return f"""# orchestrator scaffold
@@ -75,7 +100,9 @@ This folder is the project-local seed for the future control-plane.
 
 - `.codex/agents/` keeps static agent definitions.
 - `.codex/orchestrator/` keeps team and runtime-oriented assets.
-- This scaffold is a seed for future terminal control-panel work.
+- `runtime/agents.toml` tracks orchestrator/worker runtime status.
+- `queue/commands.toml` is the queue seed for future operator commands.
+- `ledger/dispatches.toml` is the dispatch ledger seed.
 """
 
 
@@ -144,6 +171,24 @@ def generate_orchestrator_scaffold(*, project_root: Path, agent_keys: list[str])
     _write_seed_file(
         scaffold_root / "README.md",
         render_scaffold_readme(orchestrator_key=orchestrator_key, worker_keys=worker_keys),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+    )
+    _write_seed_file(
+        scaffold_root / "runtime" / "agents.toml",
+        render_runtime_state(orchestrator_key=orchestrator_key, worker_keys=worker_keys),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+    )
+    _write_seed_file(
+        scaffold_root / "queue" / "commands.toml",
+        render_queue_seed(),
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+    )
+    _write_seed_file(
+        scaffold_root / "ledger" / "dispatches.toml",
+        render_dispatch_ledger_seed(),
         created_paths=created_paths,
         preserved_paths=preserved_paths,
     )
