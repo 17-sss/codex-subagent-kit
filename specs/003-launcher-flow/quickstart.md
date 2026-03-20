@@ -1,0 +1,42 @@
+# Quickstart: Launcher Flow
+
+## Validate current baseline
+
+```bash
+./scripts/test.sh
+```
+
+## Prepare a fresh project
+
+```bash
+PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+  --scope project \
+  --project-root .tmp-launcher \
+  --agents cto-coordinator,reviewer,code-mapper
+```
+
+## Render a role board
+
+```bash
+PYTHONPATH=src python3 -m codex_orchestrator.cli board \
+  --project-root .tmp-launcher \
+  --role cto-coordinator
+```
+
+Expected outcomes:
+
+- the role board shows orchestrator status
+- related queue/dispatch items are listed
+
+## Inspect generated launchers
+
+```bash
+ls .tmp-launcher/.codex/orchestrator/launchers
+sed -n '1,120p' .tmp-launcher/.codex/orchestrator/launchers/launch-tmux.sh
+```
+
+Expected outcomes:
+
+- board/monitor launcher helpers exist
+- optional backend scripts exist for `tmux` and `cmux`
+- scripts refer to the current team topology
