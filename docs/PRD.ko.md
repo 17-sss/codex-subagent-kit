@@ -23,6 +23,7 @@
 - project/global `.toml` source discovery와 precedence
 - VoltAgent-style Codex-compatible TOML output
 - root orchestrator가 포함된 project-scope `team.toml` seed
+- `team.toml` 기반 minimal terminal panel renderer
 - `__codex_agents`에서 이관한 shell control-plane reference asset
 
 ## 최종 방향
@@ -50,5 +51,5 @@
 - role별 project-specific owner agent 생성기
 - `tmux` / `cmux` control panel launcher
 - queue / dispatch / recovery 통합
-- generated `team.toml`을 runtime control panel에 연결
+- minimal panel을 runtime control panel로 확장
 - reference shell asset에서 Python-native control-plane으로 점진 이관

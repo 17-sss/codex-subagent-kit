@@ -25,6 +25,7 @@
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
+PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli tui
 ```
 
@@ -75,6 +76,11 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - `catalog --scope global`는 built-in + global `.toml` agent를 보여준다.
 - 같은 key가 겹치면 `project > global > built-in` precedence를 따른다.
 - 외부 `.toml`이 built-in key를 override하면 기존 category를 유지하고, 새 key면 `Imported & External` category로 분류한다.
+
+## 현재 panel 동작
+
+- `panel --project-root <path>`는 `.codex/orchestrator/team.toml`을 읽어 `operator -> orchestrator -> workers` topology를 텍스트 트리로 렌더링한다.
+- 아직 queue, runtime state, `tmux` / `cmux` pane 제어는 연결되지 않았다.
 
 ## 현재 생성 포맷
 

@@ -29,12 +29,13 @@
 - generated agent는 VoltAgent-style Codex-compatible TOML에 가깝게 출력
 - project-scope install 시 `.codex/orchestrator` scaffold 생성
 - root orchestrator가 들어간 `team.toml` seed 생성
+- `panel` 명령으로 최소 topology 렌더링 가능
 - CLI와 설치용 TUI 제공
 
 ### 아직 미구현
 
-- terminal control panel
-- `operator/user -> orchestrator -> subagents` 시각화
+- runtime-aware terminal control panel
+- `tmux` / `cmux` 연동
 
 ## Workflow Diagram
 
@@ -89,7 +90,7 @@ flowchart LR
 
 ## 중요한 드리프트
 
-- terminal control panel 자체는 아직 없고 현재는 team topology seed까지만 생성한다.
+- terminal control panel은 최소 topology 렌더러까지만 있고, runtime state/queue/pane orchestration은 아직 없다.
 - built-in source는 여전히 Python 코드에 남아 있고, 아직 packaged TOML library로 옮겨지진 않았다.
 - 따라서 다음 단계는 generated team metadata를 panel runtime에 연결하고, 필요하면 built-in source도 파일 기반 구조로 옮기는 것이다.
 
