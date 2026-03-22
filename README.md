@@ -24,7 +24,13 @@
 
 ## 실행
 
-개발 중에는 프로젝트 루트에서 아래처럼 실행한다.
+기본적으로 `codex-orchestrator`를 bare command로 실행하면 TUI가 열린다.
+
+```bash
+codex-orchestrator
+```
+
+개발 중에는 프로젝트 루트에서 아래처럼도 실행할 수 있다.
 
 `pip install -e .`로 설치하면 같은 명령을 `codex-orchestrator ...`로 사용할 수 있다.
 
@@ -101,6 +107,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - `project` scope는 최소 1개의 meta-orchestration agent가 필요하다.
 - `project` scope는 `.codex/agents`와 `.codex/orchestrator`를 함께 만든다.
 - `project` scope는 `.codex/orchestrator/launchers/` 아래 board/monitor/backend launcher seed도 함께 만든다.
+- TUI에서 project install을 고르면 기본적으로 root orchestrator 후보를 미리 선택하고, 누락 시 종료 대신 선택 화면으로 되돌린다.
 - `global` scope는 `~/.codex/agents`만 다루고 project-local scaffold는 만들지 않는다.
 
 ## 현재 discovery 동작

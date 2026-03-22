@@ -6,7 +6,7 @@
 - Project ID: codex-orchestrator
 - Repo Root: /Users/hoyoungson/Code/Project/Personal/codex-orchestrator
 - Branch: 001-orchestrator-scaffold
-- Last Updated: 2026-03-23T00:08:14+09:00
+- Last Updated: 2026-03-23T00:16:05+09:00
 - Updated By: hoyoungson
 
 ## TL;DR
@@ -25,6 +25,7 @@
 - project install은 `.codex/orchestrator/launchers/` 아래 board/monitor/`tmux`/`cmux` launcher seed를 생성한다.
 - `launch` 명령은 generated `tmux` / `cmux` launcher seed를 직접 실행하거나 dry-run preview할 수 있다.
 - `scripts/install.sh`와 `scripts/uninstall.sh`로 repo-local editable install과 제거를 표준화했다.
+- bare `codex-orchestrator` 실행은 이제 기본적으로 TUI로 진입한다.
 
 ## Current Objective
 
@@ -51,6 +52,7 @@ Done
 - `launch --project-root <path> --backend tmux|cmux [--dry-run]`은 generated launcher seed를 first-class entrypoint로 승격한다.
 - `./scripts/install.sh`는 `.venv` editable install과 optional `~/.local/bin/codex-orchestrator` symlink를 만든다.
 - `./scripts/uninstall.sh`는 repo-managed symlink와 `.venv`를 정리한다.
+- TUI는 project install에서 root orchestrator 누락 시 종료하지 않고 선택 화면으로 되돌린다.
 - `__codex_agents`에서 generic shell control-plane docs/scripts를 `reference/legacy_shell_control_plane/`로 이관했다.
 - `specs/001-orchestrator-scaffold/` 아래 spec/plan/tasks/quickstart를 정리했다.
 - `.specify/memory/constitution.md`, `docs/TESTING.ko.md`, `scripts/test.sh`, `tests/`로 SDD + testing 기반을 마련했다.
@@ -78,6 +80,7 @@ Changes
 - first-class `launch` CLI 추가
 - dispatch handoff bridge 추가
 - development install/uninstall scripts 추가
+- bare-command TUI default와 project-scope TUI validation 개선
 Validation run
 - `python3 -m compileall src`
 - `./scripts/test.sh`
@@ -98,6 +101,7 @@ Validation run
 - `bash -n scripts/install.sh`
 - `bash -n scripts/uninstall.sh`
 - temp venv/link dir 기준 `./scripts/install.sh -> codex-orchestrator --help -> ./scripts/uninstall.sh` smoke
+- CLI unit test로 bare `codex-orchestrator`가 TUI로 연결되는지 확인
 - generated launcher scripts에 대해 `bash -n` syntax check
 - PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui`를 키 입력으로 통과시켜 install flow 확인
 Impact
@@ -113,6 +117,7 @@ Impact
 - project-local launcher seed가 생겨 optional dashboard backend와 연결할 발판이 마련됐다.
 - generated launcher seed를 직접 실행하는 first-class CLI entrypoint가 생겼다.
 - 개발자가 repo-local editable install을 스크립트 한 번으로 준비할 수 있게 됐다.
+- bare command UX가 설치기 진입점에 맞게 정리됐고, project TUI validation이 덜 거칠어졌다.
 
 ## Known Issues / Watch List
 
@@ -154,6 +159,7 @@ Commands
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-begin --project-root . --dispatch-id dispatch-001`
 - `./scripts/install.sh`
 - `./scripts/uninstall.sh`
+- `codex-orchestrator`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli tui`
 - `PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer`
 Links / dashboards
