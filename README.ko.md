@@ -150,7 +150,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - `model`
 - `model_reasoning_effort`
 - `sandbox_mode`
-- `instructions`
+- `developer_instructions`
 
 ## 참고
 

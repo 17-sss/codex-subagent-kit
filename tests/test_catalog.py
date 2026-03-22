@@ -47,7 +47,7 @@ description = "Global reviewer override"
 model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
-instructions = "global instructions"
+developer_instructions = "global instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -59,7 +59,7 @@ description = "Project reviewer override"
 model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
-instructions = "project instructions"
+developer_instructions = "project instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -71,7 +71,7 @@ description = "Project custom helper"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
-instructions = "custom helper instructions"
+developer_instructions = "custom helper instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -95,6 +95,33 @@ instructions = "custom helper instructions"
             self.assertEqual(agent_map["custom-helper"].source, "project")
             self.assertEqual(agent_map["custom-helper"].category, "imported-agents")
             self.assertIn("imported-agents", {category.key for category in categories})
+
+    def test_flat_instructions_string_is_still_supported(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            project_agents_dir = project_root / ".codex" / "agents"
+            project_agents_dir.mkdir(parents=True)
+
+            (project_agents_dir / "flat-helper.toml").write_text(
+                """
+name = "flat-helper"
+description = "Flat instructions field"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+instructions = "flat instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            agent_map = get_agent_map(
+                project_root=project_root,
+                include_project=True,
+                include_global=False,
+            )
+
+            self.assertEqual(agent_map["flat-helper"].developer_instructions, "flat instructions")
 
     def test_legacy_nested_instructions_are_still_supported(self) -> None:
         with TemporaryDirectory() as temp_dir:

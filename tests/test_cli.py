@@ -51,7 +51,7 @@ description = "Project custom helper"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
-instructions = "custom helper instructions"
+developer_instructions = "custom helper instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
