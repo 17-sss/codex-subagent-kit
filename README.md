@@ -44,6 +44,23 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result --project-root . -
 PYTHONPATH=src python3 -m codex_orchestrator.cli tui
 ```
 
+## 개발용 설치 / 제거
+
+개발용으로는 repo-local editable install을 바로 쓸 수 있다.
+
+```bash
+./scripts/install.sh
+codex-orchestrator --help
+./scripts/uninstall.sh
+```
+
+기본 동작:
+
+- `install.sh`는 repo 루트에 `.venv/`를 만들고 `pip install -e .`를 수행한다.
+- 기본적으로 `~/.local/bin/codex-orchestrator` symlink 생성을 시도한다.
+- `~/.local/bin`이 현재 `PATH`에 없으면 `source .venv/bin/activate` 또는 `.venv/bin/codex-orchestrator`로 실행하면 된다.
+- `install.sh --dry-run`, `install.sh --no-link`, `uninstall.sh --keep-venv` 같은 옵션이 있다.
+
 비대화형 설치:
 
 ```bash
