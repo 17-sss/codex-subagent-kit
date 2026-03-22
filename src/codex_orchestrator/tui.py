@@ -4,8 +4,8 @@ import curses
 from pathlib import Path
 
 from .catalog import get_agents_by_category, get_categories
-from .generator import GenerationError, install_agents, resolve_target_dir
-from .models import InstallResult
+from .generator import GenerationError, ORCHESTRATOR_CATEGORY, install_agents, resolve_target_dir
+from .models import AgentSpec, InstallResult
 
 
 HELP_TEXT = "Up/Down 이동  Space 토글  Enter 다음  b 뒤로  a 전체토글  q 종료"
@@ -145,10 +145,44 @@ def _result_screen(stdscr: curses.window, result: InstallResult) -> None:
 
 
 def _error_screen(stdscr: curses.window, message: str) -> None:
-    _draw_title(stdscr, "오류", "아무 키나 누르면 종료됩니다.")
+    _draw_title(stdscr, "오류", "아무 키나 누르면 이전 화면으로 돌아갑니다.")
     stdscr.addstr(5, 4, message)
     stdscr.refresh()
     stdscr.getch()
+
+
+def _default_agent_selection(scope: str, agent_specs: list[AgentSpec]) -> set[str]:
+    if scope != "project":
+        return set()
+
+    preferred = [agent.key for agent in agent_specs if agent.category == ORCHESTRATOR_CATEGORY]
+    if "cto-coordinator" in preferred:
+        return {"cto-coordinator"}
+    if preferred:
+        return {preferred[0]}
+    return set()
+
+
+def _validate_agent_selection(scope: str, agent_specs: list[AgentSpec], selected_agents: set[str]) -> str | None:
+    if not selected_agents:
+        return "최소 1개 이상의 subagent를 선택해야 합니다."
+
+    if scope != "project":
+        return None
+
+    selected_meta = [
+        agent.key
+        for agent in agent_specs
+        if agent.key in selected_agents and agent.category == ORCHESTRATOR_CATEGORY
+    ]
+    if selected_meta:
+        return None
+
+    return (
+        "project 설치에는 최소 1개의 meta-orchestration agent가 필요합니다.\n"
+        "예: cto-coordinator\n"
+        "필요하면 b로 돌아가 Meta & Orchestration 카테고리를 포함하세요."
+    )
 
 
 def run_tui(project_root: Path) -> int:
@@ -212,12 +246,15 @@ def run_tui(project_root: Path) -> int:
                 include_global=True,
             )
             agent_items = [(agent.key, f"{agent.name} - {agent.description}") for agent in agent_specs]
+            default_selected_agents = _default_agent_selection(scope, agent_specs)
+            selected_agents = default_selected_agents
             try:
                 selected_agents = _multi_select(
                     stdscr,
                     title="Subagent 선택",
-                    subtitle="Space로 토글하세요.",
+                    subtitle="Space로 토글하세요. project 설치는 root orchestrator가 필요합니다.",
                     items=agent_items,
+                    selected=selected_agents,
                 )
             except RuntimeError:
                 selected_categories = _multi_select(
@@ -229,8 +266,9 @@ def run_tui(project_root: Path) -> int:
                 )
                 continue
 
-            if not selected_agents:
-                _error_screen(stdscr, "최소 1개 이상의 subagent를 선택해야 합니다.")
+            validation_error = _validate_agent_selection(scope, agent_specs, selected_agents)
+            if validation_error:
+                _error_screen(stdscr, validation_error)
                 continue
 
             confirmed = _summary_screen(
@@ -251,7 +289,7 @@ def run_tui(project_root: Path) -> int:
                 )
             except GenerationError as exc:
                 _error_screen(stdscr, str(exc))
-                return 1
+                continue
 
             _result_screen(stdscr, result)
             return 0

@@ -22,7 +22,7 @@ from .tui import run_tui
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="codex-orchestrator")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command")
 
     catalog_parser = subparsers.add_parser("catalog", help="Print the available subagent catalog.")
     catalog_parser.add_argument("--project-root", default=".")
@@ -283,6 +283,9 @@ def run_apply_result(args: argparse.Namespace) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    if args.command is None:
+        return run_tui(Path(".").resolve())
 
     if args.command == "catalog":
         return run_catalog(args)

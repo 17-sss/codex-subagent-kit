@@ -28,6 +28,15 @@ class CLITests(unittest.TestCase):
         self.assertIn("[Meta & Orchestration]", stdout)
         self.assertIn("reviewer", stdout)
 
+    def test_empty_command_defaults_to_tui(self) -> None:
+        with patch("codex_orchestrator.cli.run_tui", return_value=0) as run_tui_mock:
+            exit_code, stdout, stderr = self.run_cli([])
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stdout, "")
+        self.assertEqual(stderr, "")
+        run_tui_mock.assert_called_once()
+
     def test_catalog_command_discovers_external_agents(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
