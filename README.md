@@ -43,6 +43,7 @@ Examples from the project root:
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --catalog-root /path/to/categories
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
+PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator
 PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run
@@ -78,6 +79,21 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --catalog-root /path/to/categories \
   --agents cto-coordinator,reviewer,code-mapper
+```
+
+Template scaffolding:
+
+```bash
+PYTHONPATH=src python3 -m codex_orchestrator.cli template init \
+  --project-root . \
+  --category custom-ops \
+  --agent custom-coordinator
+
+PYTHONPATH=src python3 -m codex_orchestrator.cli template init \
+  --catalog-root /path/to/categories \
+  --category custom-ops \
+  --agent custom-coordinator \
+  --orchestrator
 ```
 
 ## Testing / Validation
@@ -122,6 +138,7 @@ If you touch the curses TUI, keep a PTY-based manual smoke in addition to automa
 - project installs expose `.codex/orchestrator/catalog/categories/` as a project-local catalog injection path
 - global custom catalog templates can live under `~/.codex/orchestrator/catalog/categories/`
 - `--catalog-root <path>` lets you inject any awesome-style `categories/` tree directly
+- `template init` can scaffold a new category README and agent TOML into either the project-local path, the global path, or an explicit `--catalog-root`
 - `catalog --scope project` shows built-in, global, and project `.toml` agents together
 - `catalog --scope global` shows built-in and global `.toml` agents
 - conflicts follow `project > global > built-in` precedence

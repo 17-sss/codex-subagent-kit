@@ -43,6 +43,7 @@ codex-orchestrator
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --catalog-root /path/to/categories
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
+PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator
 PYTHONPATH=src python3 -m codex_orchestrator.cli launch --project-root . --backend tmux --dry-run
@@ -78,6 +79,21 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --catalog-root /path/to/categories \
   --agents cto-coordinator,reviewer,code-mapper
+```
+
+템플릿 scaffold 생성:
+
+```bash
+PYTHONPATH=src python3 -m codex_orchestrator.cli template init \
+  --project-root . \
+  --category custom-ops \
+  --agent custom-coordinator
+
+PYTHONPATH=src python3 -m codex_orchestrator.cli template init \
+  --catalog-root /path/to/categories \
+  --category custom-ops \
+  --agent custom-coordinator \
+  --orchestrator
 ```
 
 ## 테스트 / 검증
@@ -122,6 +138,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - project install 후 `.codex/orchestrator/catalog/categories/`가 project-local catalog injection 경로로 생긴다.
 - global custom catalog template은 `~/.codex/orchestrator/catalog/categories/` 아래 둘 수 있다.
 - `--catalog-root <path>`로 awesome 스타일 `categories/` 트리를 직접 주입할 수 있다.
+- `template init`으로 project-local 경로, global 경로, 또는 명시적 `--catalog-root` 아래에 새 category README와 agent TOML 골격을 자동 생성할 수 있다.
 - `catalog --scope project`는 built-in + global + project `.toml` agent를 함께 보여준다.
 - `catalog --scope global`는 built-in + global `.toml` agent를 보여준다.
 - 같은 key가 겹치면 `project > global > built-in` precedence를 따른다.
