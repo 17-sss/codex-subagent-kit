@@ -16,7 +16,8 @@
 - first-class `launch` CLI 제공
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
-- `awesome-codex-subagents`를 vendoring한 built-in catalog와 소수의 project-specific overlay를 함께 제공
+- 앱 소유의 built-in template TOML 제공
+- awesome 스타일 `categories/` 트리 외부 주입 지원
 
 후속 범위:
 
@@ -40,6 +41,7 @@ codex-orchestrator
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --catalog-root /path/to/categories
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator
@@ -74,6 +76,7 @@ codex-orchestrator --help
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
+  --catalog-root /path/to/categories \
   --agents cto-coordinator,reviewer,code-mapper
 ```
 
@@ -114,10 +117,16 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 
 ## 현재 discovery 동작
 
+- built-in catalog template은 앱 패키지 안에 들어 있다.
+- 앱은 `awesome-codex-subagents` 전체를 vendoring하지 않고, 소수의 app-owned built-in catalog만 기본 제공한다.
+- project install 후 `.codex/orchestrator/catalog/categories/`가 project-local catalog injection 경로로 생긴다.
+- global custom catalog template은 `~/.codex/orchestrator/catalog/categories/` 아래 둘 수 있다.
+- `--catalog-root <path>`로 awesome 스타일 `categories/` 트리를 직접 주입할 수 있다.
 - `catalog --scope project`는 built-in + global + project `.toml` agent를 함께 보여준다.
 - `catalog --scope global`는 built-in + global `.toml` agent를 보여준다.
 - 같은 key가 겹치면 `project > global > built-in` precedence를 따른다.
-- 외부 `.toml`이 built-in key를 override하면 기존 category를 유지하고, 새 key면 `Imported & External` category로 분류한다.
+- 외부 catalog 템플릿은 기본적으로 디렉터리 category를 따르지만, `codex_orchestrator_category`를 쓰면 `meta-orchestration` 같은 다른 control-plane role로 명시적으로 override할 수 있다.
+- 설치된 `.codex/agents/*.toml` override는 가능하면 기존 category를 유지하고, 완전히 새로운 key면 `Imported & External` category로 분류한다.
 
 ## 현재 panel 동작
 

@@ -16,7 +16,8 @@ Current MVP scope:
 - provide a first-class `launch` CLI
 - provide a curses-based TUI
 - provide a non-interactive install CLI
-- ship a vendored built-in catalog sourced from `awesome-codex-subagents` plus a small project-specific overlay
+- ship app-owned built-in template TOML files
+- accept external catalog injection from awesome-style `categories/` trees
 
 Next scope:
 
@@ -40,6 +41,7 @@ Examples from the project root:
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --catalog-root /path/to/categories
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog --project-root . --scope project
 PYTHONPATH=src python3 -m codex_orchestrator.cli panel --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli board --project-root . --role cto-coordinator
@@ -74,6 +76,7 @@ Non-interactive install:
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
+  --catalog-root /path/to/categories \
   --agents cto-coordinator,reviewer,code-mapper
 ```
 
@@ -114,10 +117,16 @@ If you touch the curses TUI, keep a PTY-based manual smoke in addition to automa
 
 ## Current Discovery Behavior
 
+- built-in catalog templates live inside the app package
+- the app ships a small app-owned built-in catalog, not a vendored copy of `awesome-codex-subagents`
+- project installs expose `.codex/orchestrator/catalog/categories/` as a project-local catalog injection path
+- global custom catalog templates can live under `~/.codex/orchestrator/catalog/categories/`
+- `--catalog-root <path>` lets you inject any awesome-style `categories/` tree directly
 - `catalog --scope project` shows built-in, global, and project `.toml` agents together
 - `catalog --scope global` shows built-in and global `.toml` agents
 - conflicts follow `project > global > built-in` precedence
-- if an external `.toml` overrides a built-in key, it keeps the inherited category; new keys land under `Imported & External`
+- external catalog files inherit the directory category by default, but `codex_orchestrator_category` can override it when a template should participate in a different control-plane role such as `meta-orchestration`
+- installed `.codex/agents/*.toml` overrides inherit the previous category when possible; brand-new installed keys land under `Imported & External`
 
 ## Current Panel Behavior
 
