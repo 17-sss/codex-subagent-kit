@@ -8,6 +8,7 @@ from unittest.mock import patch
 from codex_orchestrator.generator import (
     GenerationError,
     install_agents,
+    resolve_scaffold_catalog_dir,
     resolve_scaffold_dir,
     resolve_target_dir,
 )
@@ -72,6 +73,8 @@ class GeneratorTests(unittest.TestCase):
             board_runner = resolve_scaffold_dir(project_root) / "launchers" / "run-board.sh"
             self.assertTrue(board_runner.exists())
             self.assertIn("codex-orchestrator", board_runner.read_text(encoding="utf-8"))
+
+            self.assertTrue(resolve_scaffold_catalog_dir(project_root).exists())
 
     def test_existing_agent_file_is_preserved_on_rerun(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -203,6 +206,7 @@ workers = ["reviewer"]
             self.assertIn(scaffold_root / "launchers" / "run-monitor.sh", result.scaffold_created_paths)
             self.assertIn(scaffold_root / "launchers" / "launch-tmux.sh", result.scaffold_created_paths)
             self.assertIn(scaffold_root / "launchers" / "launch-cmux.sh", result.scaffold_created_paths)
+            self.assertIn(scaffold_root / "catalog" / "categories", result.scaffold_created_paths)
 
 
 if __name__ == "__main__":

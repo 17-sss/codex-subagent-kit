@@ -31,14 +31,71 @@ class CatalogTests(unittest.TestCase):
         self.assertTrue(filtered)
         self.assertTrue(all(agent.category == "quality-security" for agent in filtered))
 
-    def test_vendored_awesome_catalog_agents_are_available(self) -> None:
+    def test_builtin_template_agents_are_available(self) -> None:
         agent_map = get_agent_map()
         categories = get_categories()
 
-        self.assertIn("erlang-expert", agent_map)
-        self.assertIn("multi-agent-coordinator", agent_map)
-        self.assertIn("language-specialists", {category.key for category in categories})
+        self.assertIn("cto-coordinator", agent_map)
+        self.assertIn("backend-owner", agent_map)
         self.assertIn("meta-orchestration", {category.key for category in categories})
+        self.assertIn("core-development", {category.key for category in categories})
+
+    def test_catalog_root_directory_is_loaded(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            catalog_root = Path(temp_dir) / "categories"
+            category_dir = catalog_root / "11-custom-ops"
+            category_dir.mkdir(parents=True)
+            (category_dir / "README.md").write_text(
+                "# 11. Custom Ops\n\nCustom externally injected operators.\n",
+                encoding="utf-8",
+            )
+            (category_dir / "custom-operator.toml").write_text(
+                """
+name = "custom-operator"
+description = "Custom injected agent"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+developer_instructions = "custom injected instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            agent_map = get_agent_map(catalog_roots=(catalog_root,))
+            categories = get_categories(catalog_roots=(catalog_root,))
+
+            self.assertEqual(agent_map["custom-operator"].source, "catalog-root")
+            self.assertEqual(agent_map["custom-operator"].category, "custom-ops")
+            self.assertIn("custom-ops", {category.key for category in categories})
+        self.assertIn("meta-orchestration", {category.key for category in categories})
+
+    def test_explicit_category_override_beats_directory_category(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            catalog_root = Path(temp_dir) / "categories"
+            category_dir = catalog_root / "11-custom-ops"
+            category_dir.mkdir(parents=True)
+            (category_dir / "README.md").write_text(
+                "# 11. Custom Ops\n\nCustom externally injected operators.\n",
+                encoding="utf-8",
+            )
+            (category_dir / "custom-coordinator.toml").write_text(
+                """
+name = "custom-coordinator"
+description = "Custom orchestrator"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = "Coordinate custom injected work."
+codex_orchestrator_category = "meta-orchestration"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            agent_map = get_agent_map(catalog_roots=(catalog_root,))
+
+            self.assertEqual(agent_map["custom-coordinator"].category, "meta-orchestration")
 
     def test_external_agents_are_discovered_with_project_precedence(self) -> None:
         with TemporaryDirectory() as temp_dir:

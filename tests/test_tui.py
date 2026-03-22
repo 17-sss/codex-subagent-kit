@@ -83,6 +83,40 @@ class TuiTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertEqual(single_select_mock.call_count, 2)
 
+    def test_tui_forwards_catalog_roots_to_install(self) -> None:
+        fake_result = InstallResult(
+            agent_paths=[],
+            agent_preserved_paths=[],
+            scaffold_created_paths=[],
+            scaffold_preserved_paths=[],
+            orchestrator_key="cto-coordinator",
+        )
+        catalog_root = Path("/tmp/custom-catalog")
+
+        def fake_wrapper(func):
+            return func(_FakeWindow())
+
+        with (
+            patch("codex_orchestrator.tui.curses.wrapper", side_effect=fake_wrapper),
+            patch("codex_orchestrator.tui.curses.curs_set", return_value=None),
+            patch("codex_orchestrator.tui._single_select", return_value="project"),
+            patch(
+                "codex_orchestrator.tui._multi_select",
+                side_effect=[
+                    {"meta-orchestration"},
+                    {"cto-coordinator"},
+                ],
+            ),
+            patch("codex_orchestrator.tui._summary_screen", return_value=True),
+            patch("codex_orchestrator.tui.install_agents", return_value=fake_result) as install_mock,
+            patch("codex_orchestrator.tui._result_screen", return_value=None),
+        ):
+            exit_code = run_tui(Path("/tmp/project"), catalog_roots=(catalog_root,))
+
+        self.assertEqual(exit_code, 0)
+        install_mock.assert_called_once()
+        self.assertEqual(install_mock.call_args.kwargs["catalog_roots"], (catalog_root,))
+
 
 if __name__ == "__main__":
     unittest.main()

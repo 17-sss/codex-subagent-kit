@@ -27,11 +27,13 @@ def build_parser() -> argparse.ArgumentParser:
     catalog_parser = subparsers.add_parser("catalog", help="Print the available subagent catalog.")
     catalog_parser.add_argument("--project-root", default=".")
     catalog_parser.add_argument("--scope", choices=("project", "global"), default="project")
+    catalog_parser.add_argument("--catalog-root", action="append", default=[])
 
     install_parser = subparsers.add_parser("install", help="Install selected subagents without the TUI.")
     install_parser.add_argument("--scope", choices=("project", "global"), required=True)
     install_parser.add_argument("--agents", required=True, help="Comma-separated agent keys.")
     install_parser.add_argument("--project-root", default=".")
+    install_parser.add_argument("--catalog-root", action="append", default=[])
     install_parser.add_argument("--overwrite", action="store_true")
 
     panel_parser = subparsers.add_parser("panel", help="Render the current project control-panel topology.")
@@ -87,22 +89,30 @@ def build_parser() -> argparse.ArgumentParser:
 
     tui_parser = subparsers.add_parser("tui", help="Run the interactive TUI installer.")
     tui_parser.add_argument("--project-root", default=".")
+    tui_parser.add_argument("--catalog-root", action="append", default=[])
 
     return parser
+
+
+def _resolve_catalog_roots(raw_paths: list[str]) -> tuple[Path, ...]:
+    return tuple(Path(path).resolve() for path in raw_paths if path.strip())
 
 
 def run_catalog(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     include_project = args.scope == "project"
+    catalog_roots = _resolve_catalog_roots(args.catalog_root)
     categories = get_categories(
         project_root=project_root,
         include_project=include_project,
         include_global=True,
+        catalog_roots=catalog_roots,
     )
     agents = get_agents(
         project_root=project_root,
         include_project=include_project,
         include_global=True,
+        catalog_roots=catalog_roots,
     )
     for category in categories:
         print(f"[{category.title}]")
@@ -120,11 +130,13 @@ def run_catalog(args: argparse.Namespace) -> int:
 def run_install(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     agent_keys = [item.strip() for item in args.agents.split(",") if item.strip()]
+    catalog_roots = _resolve_catalog_roots(args.catalog_root)
     try:
         result = install_agents(
             scope=args.scope,
             project_root=project_root,
             agent_keys=agent_keys,
+            catalog_roots=catalog_roots,
             overwrite=args.overwrite,
         )
     except GenerationError as exc:
@@ -285,7 +297,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command is None:
-        return run_tui(Path(".").resolve())
+        return run_tui(Path(".").resolve(), catalog_roots=())
 
     if args.command == "catalog":
         return run_catalog(args)
@@ -308,7 +320,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "apply-result":
         return run_apply_result(args)
     if args.command == "tui":
-        return run_tui(Path(args.project_root).resolve())
+        return run_tui(
+            Path(args.project_root).resolve(),
+            catalog_roots=_resolve_catalog_roots(args.catalog_root),
+        )
 
     parser.error(f"unsupported command: {args.command}")
     return 2

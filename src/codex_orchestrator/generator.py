@@ -32,6 +32,10 @@ def resolve_scaffold_dir(project_root: Path) -> Path:
     return project_root / ".codex" / "orchestrator"
 
 
+def resolve_scaffold_catalog_dir(project_root: Path) -> Path:
+    return resolve_scaffold_dir(project_root) / "catalog" / "categories"
+
+
 def render_agent_file(agent: AgentSpec) -> str:
     instructions_text = agent.developer_instructions.rstrip()
     return f"""name = "{agent.name}"
@@ -105,14 +109,14 @@ This folder is the project-local seed for the future control-plane.
 
 - `.codex/agents/` keeps static agent definitions.
 - `.codex/orchestrator/` keeps team and runtime-oriented assets.
+- `.codex/orchestrator/catalog/categories/` is the project-local catalog injection point for custom category directories and agent templates.
 - `runtime/agents.toml` tracks orchestrator/worker runtime status.
 - `queue/commands.toml` is the queue seed for future operator commands.
 - `ledger/dispatches.toml` is the dispatch ledger seed.
 """
 
 
-def resolve_orchestrator_key(agent_keys: list[str]) -> str:
-    agent_map = get_agent_map()
+def resolve_orchestrator_key(*, agent_map: dict[str, AgentSpec], agent_keys: list[str]) -> str:
     candidates = sorted(
         key for key in agent_keys if agent_map[key].category == ORCHESTRATOR_CATEGORY
     )
@@ -156,8 +160,13 @@ def _write_seed_file(
     created_paths.append(path)
 
 
-def generate_orchestrator_scaffold(*, project_root: Path, agent_keys: list[str]) -> tuple[str, list[Path], list[Path]]:
-    orchestrator_key = resolve_orchestrator_key(agent_keys)
+def generate_orchestrator_scaffold(
+    *,
+    project_root: Path,
+    agent_map: dict[str, AgentSpec],
+    agent_keys: list[str],
+) -> tuple[str, list[Path], list[Path]]:
+    orchestrator_key = resolve_orchestrator_key(agent_map=agent_map, agent_keys=agent_keys)
     worker_keys = [key for key in sorted(agent_keys) if key != orchestrator_key]
 
     scaffold_root = resolve_scaffold_dir(project_root)
@@ -169,6 +178,12 @@ def generate_orchestrator_scaffold(*, project_root: Path, agent_keys: list[str])
     _ensure_directory(scaffold_root / "queue", created_paths=created_paths, preserved_paths=preserved_paths)
     _ensure_directory(scaffold_root / "ledger", created_paths=created_paths, preserved_paths=preserved_paths)
     _ensure_directory(scaffold_root / "launchers", created_paths=created_paths, preserved_paths=preserved_paths)
+    _ensure_directory(scaffold_root / "catalog", created_paths=created_paths, preserved_paths=preserved_paths)
+    _ensure_directory(
+        scaffold_root / "catalog" / "categories",
+        created_paths=created_paths,
+        preserved_paths=preserved_paths,
+    )
 
     _write_seed_file(
         scaffold_root / "team.toml",
@@ -245,12 +260,14 @@ def install_agents(
     scope: str,
     project_root: Path,
     agent_keys: list[str],
+    catalog_roots: tuple[Path, ...] = (),
     overwrite: bool = False,
 ) -> InstallResult:
     agent_map = get_agent_map(
         project_root=project_root,
         include_project=(scope == "project"),
         include_global=True,
+        catalog_roots=catalog_roots,
     )
     missing = [key for key in agent_keys if key not in agent_map]
     if missing:
@@ -276,6 +293,7 @@ def install_agents(
     if scope == "project":
         orchestrator_key, scaffold_created_paths, scaffold_preserved_paths = generate_orchestrator_scaffold(
             project_root=project_root,
+            agent_map=agent_map,
             agent_keys=agent_keys,
         )
 

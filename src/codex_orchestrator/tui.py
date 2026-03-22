@@ -189,7 +189,7 @@ def _validate_agent_selection(scope: str, agent_specs: list[AgentSpec], selected
     )
 
 
-def run_tui(project_root: Path) -> int:
+def run_tui(project_root: Path, *, catalog_roots: tuple[Path, ...] = ()) -> int:
     def _catalog_for_scope(scope: str) -> tuple[list[tuple[str, str]], dict[str, str]]:
         include_project = scope == "project"
         categories = list(
@@ -197,6 +197,7 @@ def run_tui(project_root: Path) -> int:
                 project_root=project_root,
                 include_project=include_project,
                 include_global=True,
+                catalog_roots=catalog_roots,
             )
         )
         items = [(item.key, f"{item.title} - {item.description}") for item in categories]
@@ -250,6 +251,7 @@ def run_tui(project_root: Path) -> int:
                 project_root=project_root,
                 include_project=(scope == "project"),
                 include_global=True,
+                catalog_roots=catalog_roots,
             )
             agent_items = [(agent.key, f"{agent.name} - {agent.description}") for agent in agent_specs]
             selected_agents = _default_agent_selection(scope, agent_specs)
@@ -285,6 +287,7 @@ def run_tui(project_root: Path) -> int:
                         scope=scope,
                         project_root=project_root,
                         agent_keys=sorted(selected_agents),
+                        catalog_roots=catalog_roots,
                     )
                 except GenerationError as exc:
                     _error_screen(stdscr, str(exc))

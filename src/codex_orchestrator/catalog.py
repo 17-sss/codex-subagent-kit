@@ -7,10 +7,7 @@ from pathlib import Path
 from .models import AgentSpec, Category
 
 
-BUILTIN_CATALOG_ROOT = (
-    Path(__file__).resolve().parent / "builtin_catalog" / "awesome-codex-subagents"
-)
-BUILTIN_CATEGORIES_DIR = BUILTIN_CATALOG_ROOT / "categories"
+BUILTIN_CATEGORIES_DIR = Path(__file__).resolve().parent / "builtin_catalog" / "categories"
 IMPORTED_AGENTS_CATEGORY = Category(
     key="imported-agents",
     title="Imported & External",
@@ -18,116 +15,26 @@ IMPORTED_AGENTS_CATEGORY = Category(
 )
 
 
-EXTRA_BUILTIN_AGENTS: tuple[AgentSpec, ...] = (
-    AgentSpec(
-        key="cto-coordinator",
-        category="meta-orchestration",
-        name="cto-coordinator",
-        description="Use when a parent agent must coordinate multi-repo work, preserve the critical path, and delegate bounded tasks to owner agents.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="read-only",
-        developer_instructions="""Act as the coordinator for a multi-agent software team.
-Own sequencing, critical-path decisions, role assignment, and result integration.
-Prefer local execution for urgent blockers.
-Delegate only bounded, materially useful tasks with explicit ownership and non-overlapping write scopes.
-Always return:
-- local vs delegated split
-- per-agent objective
-- dependency and wait points
-- integration checklist
-- top coordination risk and mitigation""",
-    ),
-    AgentSpec(
-        key="backend-owner",
-        category="core-development",
-        name="backend-owner",
-        description="Use when work belongs to API, service, schema, or domain logic on the backend side.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own backend implementation within the assigned service or module.
-Preserve API contracts unless the task explicitly includes contract change.
-Call out migration or compatibility risk early.
-Return changed files, contract impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="frontend-owner",
-        category="core-development",
-        name="frontend-owner",
-        description="Use when work belongs to a React or web UI surface with local ownership and validation responsibility.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own frontend implementation within the assigned repo or package.
-Respect existing design and state-management patterns.
-Do not touch backend or shared contracts unless explicitly assigned.
-Return changed files, user-visible impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="core-owner",
-        category="core-development",
-        name="core-owner",
-        description="Use when work belongs to shared core modules, schema source-of-truth, or foundational domain logic.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own shared core logic and schema-first changes.
-Prefer source-of-truth handling over downstream patching.
-Surface downstream synchronization needs explicitly.
-Return changed files, downstream impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="api-owner",
-        category="core-development",
-        name="api-owner",
-        description="Use when work belongs to an external API service, integration adapter, or infrastructure-facing application API.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own API-facing implementation with attention to runtime behavior, credentials, and integration contracts.
-Surface operational risks early.
-Return changed files, runtime impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="release-guard",
-        category="quality-security",
-        name="release-guard",
-        description="Use when a change needs a release checklist across build, test, contracts, and runtime assumptions.",
-        model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="read-only",
-        developer_instructions="""Evaluate whether a change is release-safe.
-Check:
-- build/test coverage
-- contract drift risk
-- environment assumptions
-- rollback visibility
-- missing release notes
-Return a ship / hold recommendation with reasons.""",
-    ),
-    AgentSpec(
-        key="platform-ops",
-        category="infrastructure",
-        name="platform-ops",
-        description="Use when work touches runtime configuration, environment setup, scripts, containers, or deployment-facing tooling.",
-        model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own platform and tooling changes.
-Prefer explicit, reversible changes.
-Call out environment assumptions, secrets handling, and rollback path.
-Return changed files, operational impact, and verification run.""",
-    ),
-)
-
-
-def _resolve_project_agents_dir(project_root: Path) -> Path:
+def resolve_project_agents_dir(project_root: Path) -> Path:
     return project_root / ".codex" / "agents"
 
 
-def _resolve_global_agents_dir() -> Path:
+def resolve_global_agents_dir() -> Path:
     return Path.home() / ".codex" / "agents"
+
+
+def resolve_project_catalog_dir(project_root: Path) -> Path:
+    return project_root / ".codex" / "orchestrator" / "catalog" / "categories"
+
+
+def resolve_global_catalog_dir() -> Path:
+    return Path.home() / ".codex" / "orchestrator" / "catalog" / "categories"
+
+
+def normalize_catalog_roots(catalog_roots: tuple[Path, ...] | None = None) -> tuple[Path, ...]:
+    if not catalog_roots:
+        return ()
+    return tuple(root.resolve() for root in catalog_roots)
 
 
 def _category_key_from_dir(directory_name: str) -> str:
@@ -141,7 +48,7 @@ def _fallback_title_from_key(key: str) -> str:
     return " ".join(part.capitalize() for part in key.split("-"))
 
 
-def _parse_builtin_category(category_dir: Path) -> Category:
+def _parse_category_dir(category_dir: Path) -> Category:
     key = _category_key_from_dir(category_dir.name)
     title = _fallback_title_from_key(key)
     description = title
@@ -169,7 +76,7 @@ def _parse_builtin_category(category_dir: Path) -> Category:
     return Category(key=key, title=title, description=description)
 
 
-def _parse_external_agent(
+def _parse_agent_file(
     path: Path,
     *,
     inherited_category: str | None = None,
@@ -203,7 +110,15 @@ def _parse_external_agent(
     ):
         raise ValueError("missing required string fields")
 
-    category = inherited_category or data.get("codex_orchestrator_category") or "imported-agents"
+    explicit_category = data.get("codex_orchestrator_category")
+    if explicit_category is not None and (not isinstance(explicit_category, str) or not explicit_category.strip()):
+        raise ValueError("invalid codex_orchestrator_category")
+
+    category = (
+        explicit_category.strip()
+        if isinstance(explicit_category, str) and explicit_category.strip()
+        else inherited_category or IMPORTED_AGENTS_CATEGORY.key
+    )
     return AgentSpec(
         key=path.stem,
         category=category,
@@ -218,71 +133,88 @@ def _parse_external_agent(
     )
 
 
-@lru_cache(maxsize=1)
-def _get_builtin_categories() -> tuple[Category, ...]:
-    categories = [
-        _parse_builtin_category(category_dir)
-        for category_dir in sorted(BUILTIN_CATEGORIES_DIR.iterdir())
-        if category_dir.is_dir()
-    ]
-    categories.append(IMPORTED_AGENTS_CATEGORY)
-    return tuple(categories)
+def _load_catalog_root(
+    root: Path,
+    *,
+    source: str,
+) -> tuple[dict[str, Category], dict[str, AgentSpec]]:
+    if not root.exists():
+        return {}, {}
 
-
-@lru_cache(maxsize=1)
-def _get_builtin_agents() -> tuple[AgentSpec, ...]:
-    loaded: dict[str, AgentSpec] = {}
-
-    for category_dir in sorted(BUILTIN_CATEGORIES_DIR.iterdir()):
+    categories: dict[str, Category] = {}
+    agents: dict[str, AgentSpec] = {}
+    for category_dir in sorted(root.iterdir()):
         if not category_dir.is_dir():
             continue
-        category_key = _category_key_from_dir(category_dir.name)
+        category = _parse_category_dir(category_dir)
+        categories[category.key] = category
         for path in sorted(category_dir.glob("*.toml")):
-            try:
-                agent = _parse_external_agent(
-                    path,
-                    inherited_category=category_key,
-                    source="builtin",
-                )
-            except (OSError, ValueError, tomllib.TOMLDecodeError) as exc:
-                raise RuntimeError(f"invalid vendored builtin agent at {path}: {exc}") from exc
-            loaded[agent.key] = agent
+            agent = _parse_agent_file(path, inherited_category=category.key, source=source)
+            agents[agent.key] = agent
+    return categories, agents
 
-    for agent in EXTRA_BUILTIN_AGENTS:
-        loaded[agent.key] = agent
 
-    category_order = {
-        category.key: index for index, category in enumerate(_get_builtin_categories())
-    }
-    return tuple(
-        sorted(
-            loaded.values(),
-            key=lambda agent: (
-                category_order.get(agent.category, len(category_order)),
-                agent.name.lower(),
-                agent.key,
-            ),
-        )
-    )
+@lru_cache(maxsize=1)
+def _get_builtin_catalog() -> tuple[dict[str, Category], dict[str, AgentSpec]]:
+    categories, agents = _load_catalog_root(BUILTIN_CATEGORIES_DIR, source="builtin")
+    if not categories:
+        raise RuntimeError(f"builtin catalog is empty: {BUILTIN_CATEGORIES_DIR}")
+    return categories, agents
 
 
 def _load_external_agents(
     *,
     directory: Path,
     source: str,
-    builtins: dict[str, AgentSpec],
+    inherited_agents: dict[str, AgentSpec],
 ) -> list[AgentSpec]:
     if not directory.exists():
         return []
 
     loaded: list[AgentSpec] = []
     for path in sorted(directory.glob("*.toml")):
-        inherited_category = builtins.get(path.stem).category if path.stem in builtins else None
+        inherited_category = inherited_agents.get(path.stem).category if path.stem in inherited_agents else None
         try:
-            loaded.append(_parse_external_agent(path, inherited_category=inherited_category, source=source))
+            loaded.append(_parse_agent_file(path, inherited_category=inherited_category, source=source))
         except (OSError, ValueError, tomllib.TOMLDecodeError):
             continue
     return loaded
+
+
+def _merge_catalog_roots(
+    *,
+    project_root: Path | None,
+    include_project: bool,
+    include_global: bool,
+    catalog_roots: tuple[Path, ...],
+) -> tuple[dict[str, Category], dict[str, AgentSpec]]:
+    builtin_categories, builtin_agents = _get_builtin_catalog()
+    categories: dict[str, Category] = dict(builtin_categories)
+    agents: dict[str, AgentSpec] = dict(builtin_agents)
+
+    if include_global:
+        extra_categories, extra_agents = _load_catalog_root(
+            resolve_global_catalog_dir(),
+            source="global-catalog",
+        )
+        categories.update(extra_categories)
+        agents.update(extra_agents)
+
+    if include_project and project_root is not None:
+        extra_categories, extra_agents = _load_catalog_root(
+            resolve_project_catalog_dir(project_root),
+            source="project-catalog",
+        )
+        categories.update(extra_categories)
+        agents.update(extra_agents)
+
+    for root in catalog_roots:
+        extra_categories, extra_agents = _load_catalog_root(root, source="catalog-root")
+        categories.update(extra_categories)
+        agents.update(extra_agents)
+
+    categories[IMPORTED_AGENTS_CATEGORY.key] = IMPORTED_AGENTS_CATEGORY
+    return categories, agents
 
 
 def get_agent_map(
@@ -290,22 +222,30 @@ def get_agent_map(
     project_root: Path | None = None,
     include_project: bool = False,
     include_global: bool = False,
+    catalog_roots: tuple[Path, ...] | None = None,
 ) -> dict[str, AgentSpec]:
-    agent_map = {agent.key: agent for agent in _get_builtin_agents()}
+    normalized_catalog_roots = normalize_catalog_roots(catalog_roots)
+    categories, agent_map = _merge_catalog_roots(
+        project_root=project_root,
+        include_project=include_project,
+        include_global=include_global,
+        catalog_roots=normalized_catalog_roots,
+    )
+    del categories
 
     if include_global:
         for agent in _load_external_agents(
-            directory=_resolve_global_agents_dir(),
+            directory=resolve_global_agents_dir(),
             source="global",
-            builtins=agent_map,
+            inherited_agents=agent_map,
         ):
             agent_map[agent.key] = agent
 
     if include_project and project_root is not None:
         for agent in _load_external_agents(
-            directory=_resolve_project_agents_dir(project_root),
+            directory=resolve_project_agents_dir(project_root),
             source="project",
-            builtins=agent_map,
+            inherited_agents=agent_map,
         ):
             agent_map[agent.key] = agent
 
@@ -317,15 +257,22 @@ def get_agents(
     project_root: Path | None = None,
     include_project: bool = False,
     include_global: bool = False,
+    catalog_roots: tuple[Path, ...] | None = None,
 ) -> tuple[AgentSpec, ...]:
+    normalized_catalog_roots = normalize_catalog_roots(catalog_roots)
+    categories = get_categories(
+        project_root=project_root,
+        include_project=include_project,
+        include_global=include_global,
+        catalog_roots=normalized_catalog_roots,
+    )
     agent_map = get_agent_map(
         project_root=project_root,
         include_project=include_project,
         include_global=include_global,
+        catalog_roots=normalized_catalog_roots,
     )
-    category_order = {
-        category.key: index for index, category in enumerate(_get_builtin_categories())
-    }
+    category_order = {category.key: index for index, category in enumerate(categories)}
     return tuple(
         sorted(
             agent_map.values(),
@@ -343,16 +290,25 @@ def get_categories(
     project_root: Path | None = None,
     include_project: bool = False,
     include_global: bool = False,
+    catalog_roots: tuple[Path, ...] | None = None,
 ) -> tuple[Category, ...]:
+    normalized_catalog_roots = normalize_catalog_roots(catalog_roots)
+    categories, _ = _merge_catalog_roots(
+        project_root=project_root,
+        include_project=include_project,
+        include_global=include_global,
+        catalog_roots=normalized_catalog_roots,
+    )
     used_categories = {
         agent.category
-        for agent in get_agents(
+        for agent in get_agent_map(
             project_root=project_root,
             include_project=include_project,
             include_global=include_global,
-        )
+            catalog_roots=normalized_catalog_roots,
+        ).values()
     }
-    return tuple(category for category in _get_builtin_categories() if category.key in used_categories)
+    return tuple(category for key, category in categories.items() if key in used_categories)
 
 
 def get_agents_by_category(
@@ -361,12 +317,14 @@ def get_agents_by_category(
     project_root: Path | None = None,
     include_project: bool = False,
     include_global: bool = False,
+    catalog_roots: tuple[Path, ...] | None = None,
 ) -> list[AgentSpec]:
     agents = list(
         get_agents(
             project_root=project_root,
             include_project=include_project,
             include_global=include_global,
+            catalog_roots=catalog_roots,
         )
     )
     if not category_keys:

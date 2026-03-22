@@ -74,6 +74,84 @@ developer_instructions = "custom helper instructions"
             self.assertIn("custom-helper", stdout)
             self.assertIn("[project]", stdout)
 
+    def test_catalog_command_supports_catalog_root(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            catalog_root = Path(temp_dir) / "categories"
+            category_dir = catalog_root / "11-custom-ops"
+            category_dir.mkdir(parents=True)
+            (category_dir / "README.md").write_text(
+                "# 11. Custom Ops\n\nCustom externally injected operators.\n",
+                encoding="utf-8",
+            )
+            (category_dir / "custom-operator.toml").write_text(
+                """
+name = "custom-operator"
+description = "Custom injected agent"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+developer_instructions = "custom injected instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "catalog",
+                    "--catalog-root",
+                    str(catalog_root),
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("[Custom Ops]", stdout)
+            self.assertIn("custom-operator", stdout)
+
+    def test_install_command_can_use_catalog_root(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            catalog_root = project_root / "categories"
+            category_dir = catalog_root / "11-custom-ops"
+            category_dir.mkdir(parents=True)
+            (category_dir / "README.md").write_text(
+                "# 11. Custom Ops\n\nCustom externally injected operators.\n",
+                encoding="utf-8",
+            )
+            (category_dir / "custom-coordinator.toml").write_text(
+                """
+name = "custom-coordinator"
+description = "Custom orchestrator"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = "Coordinate custom injected work."
+codex_orchestrator_category = "meta-orchestration"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "install",
+                    "--scope",
+                    "project",
+                    "--project-root",
+                    temp_dir,
+                    "--catalog-root",
+                    str(catalog_root),
+                    "--agents",
+                    "custom-coordinator",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("custom-coordinator.toml", stdout)
+            self.assertTrue((project_root / ".codex" / "agents" / "custom-coordinator.toml").exists())
+
     def test_install_command_creates_files_and_reports_target(self) -> None:
         with TemporaryDirectory() as temp_dir:
             exit_code, stdout, stderr = self.run_cli(

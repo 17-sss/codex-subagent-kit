@@ -21,8 +21,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 codex_orchestrator = [
-  "builtin_catalog/awesome-codex-subagents/README.md",
-  "builtin_catalog/awesome-codex-subagents/LICENSE",
-  "builtin_catalog/awesome-codex-subagents/categories/*/*.md",
-  "builtin_catalog/awesome-codex-subagents/categories/*/*.toml",
+  "builtin_catalog/categories/*/*.md",
+  "builtin_catalog/categories/*/*.toml",
 ]
