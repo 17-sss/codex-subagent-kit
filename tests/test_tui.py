@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from codex_orchestrator.catalog import get_agents_by_category
-from codex_orchestrator.tui import _default_agent_selection, _validate_agent_selection
+from codex_orchestrator.models import InstallResult
+from codex_orchestrator.tui import BackNavigation, _default_agent_selection, _validate_agent_selection, run_tui
+
+
+class _FakeWindow:
+    def keypad(self, _flag: bool) -> None:
+        return None
 
 
 class TuiTests(unittest.TestCase):
@@ -36,6 +44,44 @@ class TuiTests(unittest.TestCase):
         message = _validate_agent_selection("global", agent_specs, {"reviewer"})
 
         self.assertIsNone(message)
+
+    def test_back_navigation_from_agents_to_scope_does_not_crash(self) -> None:
+        fake_result = InstallResult(
+            agent_paths=[],
+            agent_preserved_paths=[],
+            scaffold_created_paths=[],
+            scaffold_preserved_paths=[],
+            orchestrator_key=None,
+        )
+
+        def fake_wrapper(func):
+            return func(_FakeWindow())
+
+        with (
+            patch("codex_orchestrator.tui.curses.wrapper", side_effect=fake_wrapper),
+            patch("codex_orchestrator.tui.curses.curs_set", return_value=None),
+            patch(
+                "codex_orchestrator.tui._single_select",
+                side_effect=["project", "global"],
+            ) as single_select_mock,
+            patch(
+                "codex_orchestrator.tui._multi_select",
+                side_effect=[
+                    set(),
+                    BackNavigation("back"),
+                    BackNavigation("back"),
+                    set(),
+                    {"reviewer"},
+                ],
+            ),
+            patch("codex_orchestrator.tui._summary_screen", return_value=True),
+            patch("codex_orchestrator.tui.install_agents", return_value=fake_result),
+            patch("codex_orchestrator.tui._result_screen", return_value=None),
+        ):
+            exit_code = run_tui(Path("/tmp/project"))
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(single_select_mock.call_count, 2)
 
 
 if __name__ == "__main__":

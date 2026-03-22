@@ -11,6 +11,10 @@ from .models import AgentSpec, InstallResult
 HELP_TEXT = "Up/Down 이동  Space 토글  Enter 다음  b 뒤로  a 전체토글  q 종료"
 
 
+class BackNavigation(RuntimeError):
+    """Raised when the user navigates to the previous TUI step."""
+
+
 def _draw_title(stdscr: curses.window, title: str, subtitle: str | None = None) -> None:
     stdscr.clear()
     stdscr.addstr(0, 2, "codex-orchestrator", curses.A_BOLD)
@@ -82,7 +86,7 @@ def _multi_select(
             values = {value for value, _ in items}
             current = values if current != values else set()
         elif key == ord("b"):
-            raise RuntimeError("back")
+            raise BackNavigation("back")
         elif key in (curses.KEY_ENTER, 10, 13):
             return current
 
@@ -216,6 +220,7 @@ def run_tui(project_root: Path) -> int:
             ],
         )
         category_items, category_title_map = _catalog_for_scope(scope)
+        selected_categories: set[str] = set()
 
         while True:
             try:
@@ -224,9 +229,9 @@ def run_tui(project_root: Path) -> int:
                     title="카테고리 선택",
                     subtitle="필요한 카테고리를 고르세요. 선택이 없으면 전체 agent를 보여줍니다.",
                     items=category_items,
+                    selected=selected_categories,
                 )
-                break
-            except RuntimeError:
+            except BackNavigation:
                 scope = _single_select(
                     stdscr,
                     title="설치 위치 선택",
@@ -237,8 +242,9 @@ def run_tui(project_root: Path) -> int:
                     ],
                 )
                 category_items, category_title_map = _catalog_for_scope(scope)
+                selected_categories = set()
+                continue
 
-        while True:
             agent_specs = get_agents_by_category(
                 selected_categories,
                 project_root=project_root,
@@ -246,53 +252,46 @@ def run_tui(project_root: Path) -> int:
                 include_global=True,
             )
             agent_items = [(agent.key, f"{agent.name} - {agent.description}") for agent in agent_specs]
-            default_selected_agents = _default_agent_selection(scope, agent_specs)
-            selected_agents = default_selected_agents
-            try:
-                selected_agents = _multi_select(
+            selected_agents = _default_agent_selection(scope, agent_specs)
+            while True:
+                try:
+                    selected_agents = _multi_select(
+                        stdscr,
+                        title="Subagent 선택",
+                        subtitle="Space로 토글하세요. project 설치는 root orchestrator가 필요합니다.",
+                        items=agent_items,
+                        selected=selected_agents,
+                    )
+                except BackNavigation:
+                    break
+
+                validation_error = _validate_agent_selection(scope, agent_specs, selected_agents)
+                if validation_error:
+                    _error_screen(stdscr, validation_error)
+                    continue
+
+                confirmed = _summary_screen(
                     stdscr,
-                    title="Subagent 선택",
-                    subtitle="Space로 토글하세요. project 설치는 root orchestrator가 필요합니다.",
-                    items=agent_items,
-                    selected=selected_agents,
-                )
-            except RuntimeError:
-                selected_categories = _multi_select(
-                    stdscr,
-                    title="카테고리 선택",
-                    subtitle="필요한 카테고리를 고르세요. 선택이 없으면 전체 agent를 보여줍니다.",
-                    items=category_items,
-                    selected=selected_categories,
-                )
-                continue
-
-            validation_error = _validate_agent_selection(scope, agent_specs, selected_agents)
-            if validation_error:
-                _error_screen(stdscr, validation_error)
-                continue
-
-            confirmed = _summary_screen(
-                stdscr,
-                scope=scope,
-                project_root=project_root,
-                category_titles=[category_title_map[key] for key in sorted(selected_categories)],
-                agent_labels=[agent.key for agent in agent_specs if agent.key in selected_agents],
-            )
-            if not confirmed:
-                continue
-
-            try:
-                result = install_agents(
                     scope=scope,
                     project_root=project_root,
-                    agent_keys=sorted(selected_agents),
+                    category_titles=[category_title_map[key] for key in sorted(selected_categories)],
+                    agent_labels=[agent.key for agent in agent_specs if agent.key in selected_agents],
                 )
-            except GenerationError as exc:
-                _error_screen(stdscr, str(exc))
-                continue
+                if not confirmed:
+                    continue
 
-            _result_screen(stdscr, result)
-            return 0
+                try:
+                    result = install_agents(
+                        scope=scope,
+                        project_root=project_root,
+                        agent_keys=sorted(selected_agents),
+                    )
+                except GenerationError as exc:
+                    _error_screen(stdscr, str(exc))
+                    continue
+
+                _result_screen(stdscr, result)
+                return 0
 
     try:
         return curses.wrapper(_app)
