@@ -16,6 +16,7 @@ Current MVP scope:
 - provide a first-class `launch` CLI
 - provide a curses-based TUI
 - provide a non-interactive install CLI
+- ship a vendored built-in catalog sourced from `awesome-codex-subagents` plus a small project-specific overlay
 
 Next scope:
 

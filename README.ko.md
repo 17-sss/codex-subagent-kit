@@ -16,6 +16,7 @@
 - first-class `launch` CLI 제공
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
+- `awesome-codex-subagents`를 vendoring한 built-in catalog와 소수의 project-specific overlay를 함께 제공
 
 후속 범위:
 

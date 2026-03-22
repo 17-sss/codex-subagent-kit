@@ -1,46 +1,24 @@
 from __future__ import annotations
 
 import tomllib
+from functools import lru_cache
 from pathlib import Path
 
 from .models import AgentSpec, Category
 
 
-CATEGORIES: tuple[Category, ...] = (
-    Category(
-        key="meta-orchestration",
-        title="Meta & Orchestration",
-        description="Coordinator, task routing, parallel work planning.",
-    ),
-    Category(
-        key="code-understanding",
-        title="Code Understanding",
-        description="Code mapping, docs research, architecture reading.",
-    ),
-    Category(
-        key="product-engineering",
-        title="Product Engineering",
-        description="Project-specific implementation owners across frontend/backend/core/api.",
-    ),
-    Category(
-        key="quality-safety",
-        title="Quality & Safety",
-        description="Review, release validation, regression checks.",
-    ),
-    Category(
-        key="platform-ops",
-        title="Platform & Ops",
-        description="Infra, runtime, debugging, deployment-facing tasks.",
-    ),
-    Category(
-        key="imported-agents",
-        title="Imported & External",
-        description="Portable TOML agent definitions discovered from project/global agent directories.",
-    ),
+BUILTIN_CATALOG_ROOT = (
+    Path(__file__).resolve().parent / "builtin_catalog" / "awesome-codex-subagents"
+)
+BUILTIN_CATEGORIES_DIR = BUILTIN_CATALOG_ROOT / "categories"
+IMPORTED_AGENTS_CATEGORY = Category(
+    key="imported-agents",
+    title="Imported & External",
+    description="Portable TOML agent definitions discovered from project/global agent directories.",
 )
 
 
-AGENTS: tuple[AgentSpec, ...] = (
+EXTRA_BUILTIN_AGENTS: tuple[AgentSpec, ...] = (
     AgentSpec(
         key="cto-coordinator",
         category="meta-orchestration",
@@ -61,70 +39,59 @@ Always return:
 - top coordination risk and mitigation""",
     ),
     AgentSpec(
-        key="task-distributor",
-        category="meta-orchestration",
-        name="task-distributor",
-        description="Use when a large implementation or review task needs to be split into safe, disjoint sub-tasks.",
+        key="backend-owner",
+        category="core-development",
+        name="backend-owner",
+        description="Use when work belongs to API, service, schema, or domain logic on the backend side.",
         model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="read-only",
-        developer_instructions="""Break a parent task into parallelizable sub-tasks.
-Optimize for disjoint ownership, low merge conflict risk, and clear output contracts.
-Do not write code. Produce an execution plan with:
-- task slices
-- suggested owner type
-- dependencies
-- validation checkpoints""",
+        reasoning_effort="xhigh",
+        sandbox_mode="workspace-write",
+        developer_instructions="""Own backend implementation within the assigned service or module.
+Preserve API contracts unless the task explicitly includes contract change.
+Call out migration or compatibility risk early.
+Return changed files, contract impact, and verification run.""",
     ),
     AgentSpec(
-        key="code-mapper",
-        category="code-understanding",
-        name="code-mapper",
-        description="Use when a developer needs a fast structural read of a codebase slice before changing it.",
+        key="frontend-owner",
+        category="core-development",
+        name="frontend-owner",
+        description="Use when work belongs to a React or web UI surface with local ownership and validation responsibility.",
         model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="read-only",
-        developer_instructions="""Map the relevant code paths for the requested task.
-Prioritize:
-- entry points
-- data flow
-- ownership boundaries
-- risky coupling
-- likely test surface
-Return concise file references and a recommended read order.""",
+        reasoning_effort="xhigh",
+        sandbox_mode="workspace-write",
+        developer_instructions="""Own frontend implementation within the assigned repo or package.
+Respect existing design and state-management patterns.
+Do not touch backend or shared contracts unless explicitly assigned.
+Return changed files, user-visible impact, and verification run.""",
     ),
     AgentSpec(
-        key="docs-researcher",
-        category="code-understanding",
-        name="docs-researcher",
-        description="Use when implementation depends on external library or platform docs and the parent agent needs concise primary-source guidance.",
+        key="core-owner",
+        category="core-development",
+        name="core-owner",
+        description="Use when work belongs to shared core modules, schema source-of-truth, or foundational domain logic.",
         model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="read-only",
-        developer_instructions="""Research primary documentation and extract implementation-relevant guidance.
-Prefer official docs and standards.
-Return:
-- exact concept summary
-- key constraints
-- minimal implementation checklist
-- source links""",
+        reasoning_effort="xhigh",
+        sandbox_mode="workspace-write",
+        developer_instructions="""Own shared core logic and schema-first changes.
+Prefer source-of-truth handling over downstream patching.
+Surface downstream synchronization needs explicitly.
+Return changed files, downstream impact, and verification run.""",
     ),
     AgentSpec(
-        key="reviewer",
-        category="quality-safety",
-        name="reviewer",
-        description="Use when changes need a correctness, regression, and risk-focused code review.",
+        key="api-owner",
+        category="core-development",
+        name="api-owner",
+        description="Use when work belongs to an external API service, integration adapter, or infrastructure-facing application API.",
         model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="read-only",
-        developer_instructions="""Review code with a bug-finding mindset.
-Focus on behavioral regressions, security risks, missing validation, and test gaps.
-Return findings first, ordered by severity, with file references.
-Do not rewrite the code unless explicitly asked.""",
+        reasoning_effort="xhigh",
+        sandbox_mode="workspace-write",
+        developer_instructions="""Own API-facing implementation with attention to runtime behavior, credentials, and integration contracts.
+Surface operational risks early.
+Return changed files, runtime impact, and verification run.""",
     ),
     AgentSpec(
         key="release-guard",
-        category="quality-safety",
+        category="quality-security",
         name="release-guard",
         description="Use when a change needs a release checklist across build, test, contracts, and runtime assumptions.",
         model="gpt-5.4",
@@ -140,75 +107,8 @@ Check:
 Return a ship / hold recommendation with reasons.""",
     ),
     AgentSpec(
-        key="frontend-owner",
-        category="product-engineering",
-        name="frontend-owner",
-        description="Use when work belongs to a React or web UI surface with local ownership and validation responsibility.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own frontend implementation within the assigned repo or package.
-Respect existing design and state-management patterns.
-Do not touch backend or shared contracts unless explicitly assigned.
-Return changed files, user-visible impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="backend-owner",
-        category="product-engineering",
-        name="backend-owner",
-        description="Use when work belongs to API, service, schema, or domain logic on the backend side.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own backend implementation within the assigned service or module.
-Preserve API contracts unless the task explicitly includes contract change.
-Call out migration or compatibility risk early.
-Return changed files, contract impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="core-owner",
-        category="product-engineering",
-        name="core-owner",
-        description="Use when work belongs to shared core modules, schema source-of-truth, or foundational domain logic.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own shared core logic and schema-first changes.
-Prefer source-of-truth handling over downstream patching.
-Surface downstream synchronization needs explicitly.
-Return changed files, downstream impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="api-owner",
-        category="product-engineering",
-        name="api-owner",
-        description="Use when work belongs to an external API service, integration adapter, or infrastructure-facing application API.",
-        model="gpt-5.4",
-        reasoning_effort="xhigh",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Own API-facing implementation with attention to runtime behavior, credentials, and integration contracts.
-Surface operational risks early.
-Return changed files, runtime impact, and verification run.""",
-    ),
-    AgentSpec(
-        key="browser-debugger",
-        category="platform-ops",
-        name="browser-debugger",
-        description="Use when a web flow needs runtime reproduction, browser inspection, or interaction-level debugging.",
-        model="gpt-5.4",
-        reasoning_effort="high",
-        sandbox_mode="workspace-write",
-        developer_instructions="""Reproduce browser-visible issues and gather concrete evidence.
-Focus on:
-- reproduction steps
-- console/network symptoms
-- likely failing component or endpoint
-- smallest next fix candidate
-Return evidence before hypotheses.""",
-    ),
-    AgentSpec(
         key="platform-ops",
-        category="platform-ops",
+        category="infrastructure",
         name="platform-ops",
         description="Use when work touches runtime configuration, environment setup, scripts, containers, or deployment-facing tooling.",
         model="gpt-5.4",
@@ -228,6 +128,45 @@ def _resolve_project_agents_dir(project_root: Path) -> Path:
 
 def _resolve_global_agents_dir() -> Path:
     return Path.home() / ".codex" / "agents"
+
+
+def _category_key_from_dir(directory_name: str) -> str:
+    prefix, separator, remainder = directory_name.partition("-")
+    if separator and prefix.isdigit():
+        return remainder
+    return directory_name
+
+
+def _fallback_title_from_key(key: str) -> str:
+    return " ".join(part.capitalize() for part in key.split("-"))
+
+
+def _parse_builtin_category(category_dir: Path) -> Category:
+    key = _category_key_from_dir(category_dir.name)
+    title = _fallback_title_from_key(key)
+    description = title
+    readme_path = category_dir / "README.md"
+    if not readme_path.exists():
+        return Category(key=key, title=title, description=description)
+
+    lines = [line.strip() for line in readme_path.read_text(encoding="utf-8").splitlines()]
+    for line in lines:
+        if line.startswith("#"):
+            parsed_title = line.lstrip("#").strip()
+            numeric_prefix, separator, remainder = parsed_title.partition(". ")
+            if separator and numeric_prefix.isdigit():
+                title = remainder.strip()
+            elif parsed_title:
+                title = parsed_title
+            break
+
+    for line in lines:
+        if not line or line.startswith("#") or line == "Included agents:":
+            continue
+        description = line
+        break
+
+    return Category(key=key, title=title, description=description)
 
 
 def _parse_external_agent(
@@ -279,6 +218,54 @@ def _parse_external_agent(
     )
 
 
+@lru_cache(maxsize=1)
+def _get_builtin_categories() -> tuple[Category, ...]:
+    categories = [
+        _parse_builtin_category(category_dir)
+        for category_dir in sorted(BUILTIN_CATEGORIES_DIR.iterdir())
+        if category_dir.is_dir()
+    ]
+    categories.append(IMPORTED_AGENTS_CATEGORY)
+    return tuple(categories)
+
+
+@lru_cache(maxsize=1)
+def _get_builtin_agents() -> tuple[AgentSpec, ...]:
+    loaded: dict[str, AgentSpec] = {}
+
+    for category_dir in sorted(BUILTIN_CATEGORIES_DIR.iterdir()):
+        if not category_dir.is_dir():
+            continue
+        category_key = _category_key_from_dir(category_dir.name)
+        for path in sorted(category_dir.glob("*.toml")):
+            try:
+                agent = _parse_external_agent(
+                    path,
+                    inherited_category=category_key,
+                    source="builtin",
+                )
+            except (OSError, ValueError, tomllib.TOMLDecodeError) as exc:
+                raise RuntimeError(f"invalid vendored builtin agent at {path}: {exc}") from exc
+            loaded[agent.key] = agent
+
+    for agent in EXTRA_BUILTIN_AGENTS:
+        loaded[agent.key] = agent
+
+    category_order = {
+        category.key: index for index, category in enumerate(_get_builtin_categories())
+    }
+    return tuple(
+        sorted(
+            loaded.values(),
+            key=lambda agent: (
+                category_order.get(agent.category, len(category_order)),
+                agent.name.lower(),
+                agent.key,
+            ),
+        )
+    )
+
+
 def _load_external_agents(
     *,
     directory: Path,
@@ -304,7 +291,7 @@ def get_agent_map(
     include_project: bool = False,
     include_global: bool = False,
 ) -> dict[str, AgentSpec]:
-    agent_map = {agent.key: agent for agent in AGENTS}
+    agent_map = {agent.key: agent for agent in _get_builtin_agents()}
 
     if include_global:
         for agent in _load_external_agents(
@@ -336,7 +323,9 @@ def get_agents(
         include_project=include_project,
         include_global=include_global,
     )
-    category_order = {category.key: index for index, category in enumerate(CATEGORIES)}
+    category_order = {
+        category.key: index for index, category in enumerate(_get_builtin_categories())
+    }
     return tuple(
         sorted(
             agent_map.values(),
@@ -363,7 +352,7 @@ def get_categories(
             include_global=include_global,
         )
     }
-    return tuple(category for category in CATEGORIES if category.key in used_categories)
+    return tuple(category for category in _get_builtin_categories() if category.key in used_categories)
 
 
 def get_agents_by_category(

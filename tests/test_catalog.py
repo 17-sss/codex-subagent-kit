@@ -26,10 +26,19 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(set(agent_keys), set(get_agent_map().keys()))
 
     def test_filtering_by_category_returns_matching_agents_only(self) -> None:
-        filtered = get_agents_by_category({"quality-safety"})
+        filtered = get_agents_by_category({"quality-security"})
 
         self.assertTrue(filtered)
-        self.assertTrue(all(agent.category == "quality-safety" for agent in filtered))
+        self.assertTrue(all(agent.category == "quality-security" for agent in filtered))
+
+    def test_vendored_awesome_catalog_agents_are_available(self) -> None:
+        agent_map = get_agent_map()
+        categories = get_categories()
+
+        self.assertIn("erlang-expert", agent_map)
+        self.assertIn("multi-agent-coordinator", agent_map)
+        self.assertIn("language-specialists", {category.key for category in categories})
+        self.assertIn("meta-orchestration", {category.key for category in categories})
 
     def test_external_agents_are_discovered_with_project_precedence(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -91,7 +100,7 @@ developer_instructions = "custom helper instructions"
 
             self.assertEqual(agent_map["reviewer"].description, "Project reviewer override")
             self.assertEqual(agent_map["reviewer"].source, "project")
-            self.assertEqual(agent_map["reviewer"].category, "quality-safety")
+            self.assertEqual(agent_map["reviewer"].category, "quality-security")
             self.assertEqual(agent_map["custom-helper"].source, "project")
             self.assertEqual(agent_map["custom-helper"].category, "imported-agents")
             self.assertIn("imported-agents", {category.key for category in categories})
