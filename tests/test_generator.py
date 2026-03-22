@@ -39,8 +39,8 @@ class GeneratorTests(unittest.TestCase):
             reviewer_contents = (project_root / ".codex" / "agents" / "reviewer.toml").read_text(
                 encoding="utf-8"
             )
-            self.assertIn("[instructions]", reviewer_contents)
-            self.assertIn('text = """', reviewer_contents)
+            self.assertIn('instructions = """', reviewer_contents)
+            self.assertNotIn("[instructions]", reviewer_contents)
             self.assertNotIn("developer_instructions =", reviewer_contents)
 
             team_manifest = (resolve_scaffold_dir(project_root) / "team.toml").read_text(encoding="utf-8")

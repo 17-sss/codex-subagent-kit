@@ -239,7 +239,18 @@ def _parse_external_agent(
     with path.open("rb") as handle:
         data = tomllib.load(handle)
 
-    instructions = data.get("instructions", {}).get("text") or data.get("developer_instructions")
+    raw_instructions = data.get("instructions")
+    instructions: str | None
+    if isinstance(raw_instructions, str):
+        instructions = raw_instructions
+    elif isinstance(raw_instructions, dict):
+        nested_text = raw_instructions.get("text")
+        instructions = nested_text if isinstance(nested_text, str) else None
+    else:
+        instructions = None
+    if instructions is None:
+        legacy_instructions = data.get("developer_instructions")
+        instructions = legacy_instructions if isinstance(legacy_instructions, str) else None
     if not isinstance(instructions, str) or not instructions.strip():
         raise ValueError("missing instructions text")
 

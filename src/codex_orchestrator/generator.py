@@ -39,8 +39,7 @@ description = "{agent.description}"
 model = "{agent.model}"
 model_reasoning_effort = "{agent.reasoning_effort}"
 sandbox_mode = "{agent.sandbox_mode}"
-[instructions]
-text = \"\"\"
+instructions = \"\"\"
 {instructions_text}
 \"\"\"
 """

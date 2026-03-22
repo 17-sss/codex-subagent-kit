@@ -150,7 +150,7 @@ Generated subagent files follow a Codex-compatible TOML structure influenced by 
 - `model`
 - `model_reasoning_effort`
 - `sandbox_mode`
-- `[instructions].text`
+- `instructions`
 
 ## References
 

@@ -47,8 +47,7 @@ description = "Global reviewer override"
 model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
-[instructions]
-text = "global instructions"
+instructions = "global instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -60,8 +59,7 @@ description = "Project reviewer override"
 model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
-[instructions]
-text = "project instructions"
+instructions = "project instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -73,8 +71,7 @@ description = "Project custom helper"
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
-[instructions]
-text = "custom helper instructions"
+instructions = "custom helper instructions"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -98,6 +95,34 @@ text = "custom helper instructions"
             self.assertEqual(agent_map["custom-helper"].source, "project")
             self.assertEqual(agent_map["custom-helper"].category, "imported-agents")
             self.assertIn("imported-agents", {category.key for category in categories})
+
+    def test_legacy_nested_instructions_are_still_supported(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            project_agents_dir = project_root / ".codex" / "agents"
+            project_agents_dir.mkdir(parents=True)
+
+            (project_agents_dir / "legacy-helper.toml").write_text(
+                """
+name = "legacy-helper"
+description = "Legacy nested instructions"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+[instructions]
+text = "legacy instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            agent_map = get_agent_map(
+                project_root=project_root,
+                include_project=True,
+                include_global=False,
+            )
+
+            self.assertEqual(agent_map["legacy-helper"].developer_instructions, "legacy instructions")
 
 
 if __name__ == "__main__":
