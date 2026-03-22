@@ -34,7 +34,6 @@ Currently implemented:
 - minimal control-plane mutation for applying dispatch results back to queue, ledger, and runtime state
 - project-local board, monitor, `tmux`, and `cmux` launcher seeds
 - first-class `launch` CLI for generated launchers
-- migrated shell control-plane reference assets from `__codex_agents`
 
 ## Target Direction
 
@@ -63,4 +62,4 @@ Currently implemented:
 - live session binding or broker layer
 - integrated queue / dispatch / recovery
 - seeded panel evolved into a live runtime control panel
-- gradual migration from reference shell assets into a Python-native control-plane
+- continued refinement of the Python-native control-plane

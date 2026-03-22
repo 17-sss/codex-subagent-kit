@@ -16,7 +16,6 @@
 - first-class `launch` CLI 제공
 - curses 기반 TUI 제공
 - 비대화형 설치 CLI 제공
-- `__codex_agents`에서 이관한 control-plane reference asset 보관
 
 후속 범위:
 
@@ -155,10 +154,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 
 ## 참고
 
-- 현재 상태 / handoff: [docs/HANDOFF.ko.md](./docs/HANDOFF.ko.md)
 - 제품 방향 문서: [docs/PRD.ko.md](./docs/PRD.ko.md)
 - 제품 이해 / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.ko.md](./docs/UNDERSTANDING_AND_WORKFLOW.ko.md)
-- 이관 메모: [docs/MIGRATION_FROM__CODEX_AGENTS.ko.md](./docs/MIGRATION_FROM__CODEX_AGENTS.ko.md)
 - 테스트 workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
-- shell control-plane 참고 자산: [reference/legacy_shell_control_plane/README.ko.md](./reference/legacy_shell_control_plane/README.ko.md)
 - 이 저장소는 특정 회사/제품명을 전제로 한 예시 자산을 포함하지 않는다.

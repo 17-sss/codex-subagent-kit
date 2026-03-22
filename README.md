@@ -16,7 +16,6 @@ Current MVP scope:
 - provide a first-class `launch` CLI
 - provide a curses-based TUI
 - provide a non-interactive install CLI
-- keep migrated control-plane reference assets from `__codex_agents`
 
 Next scope:
 
@@ -155,11 +154,8 @@ Generated subagent files follow a Codex-compatible TOML structure influenced by 
 
 ## References
 
-- current status / handoff: [docs/HANDOFF.md](./docs/HANDOFF.md)
 - product direction: [docs/PRD.md](./docs/PRD.md)
 - product understanding / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.md](./docs/UNDERSTANDING_AND_WORKFLOW.md)
-- migration notes: [docs/MIGRATION_FROM__CODEX_AGENTS.md](./docs/MIGRATION_FROM__CODEX_AGENTS.md)
 - testing workflow: [docs/TESTING.md](./docs/TESTING.md)
-- shell control-plane reference assets: [reference/legacy_shell_control_plane/README.md](./reference/legacy_shell_control_plane/README.md)
-- Korean docs: [README.ko.md](./README.ko.md), [docs/HANDOFF.ko.md](./docs/HANDOFF.ko.md), [docs/PRD.ko.md](./docs/PRD.ko.md), [docs/UNDERSTANDING_AND_WORKFLOW.ko.md](./docs/UNDERSTANDING_AND_WORKFLOW.ko.md), [docs/TESTING.ko.md](./docs/TESTING.ko.md), [docs/MIGRATION_FROM__CODEX_AGENTS.ko.md](./docs/MIGRATION_FROM__CODEX_AGENTS.ko.md)
+- Korean docs: [README.ko.md](./README.ko.md), [docs/PRD.ko.md](./docs/PRD.ko.md), [docs/UNDERSTANDING_AND_WORKFLOW.ko.md](./docs/UNDERSTANDING_AND_WORKFLOW.ko.md), [docs/TESTING.ko.md](./docs/TESTING.ko.md)
 - this repository does not ship company-specific or product-specific example assets
