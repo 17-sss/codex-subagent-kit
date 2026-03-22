@@ -1,5 +1,7 @@
 # `__codex_agents` 이관 메모
 
+영문 기본 문서: [MIGRATION_FROM__CODEX_AGENTS.md](./MIGRATION_FROM__CODEX_AGENTS.md)
+
 ## 목적
 
 기존 `__codex_agents` 폴더를 제거하기 전에, 새 `codex-orchestrator` 프로젝트로 재사용 가능한 자산을 이관한 내역을 정리한다.

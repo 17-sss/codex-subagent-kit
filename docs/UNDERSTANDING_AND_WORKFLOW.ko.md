@@ -1,5 +1,7 @@
 # Understanding And Workflow
 
+영문 기본 문서: [UNDERSTANDING_AND_WORKFLOW.md](./UNDERSTANDING_AND_WORKFLOW.md)
+
 ## 내가 현재 이해한 제품 방향
 
 - 이 프로젝트의 목적은 단순히 `.codex/agents/*.toml` 파일을 만드는 설치기가 아니다.

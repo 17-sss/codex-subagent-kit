@@ -1,5 +1,7 @@
 # PRD: codex-orchestrator
 
+영문 기본 문서: [PRD.md](./PRD.md)
+
 ## 목적
 
 `codex-orchestrator`는 프로젝트 로컬 `.codex` 기반으로 subagent를 쉽게 설치하고, 이후 queue/dispatch/control panel까지 확장할 수 있는 멀티 에이전트 운영 도구를 만든다.

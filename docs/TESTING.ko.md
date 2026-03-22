@@ -1,5 +1,7 @@
 # TESTING
 
+영문 기본 문서: [TESTING.md](./TESTING.md)
+
 ## 목적
 
 `codex-orchestrator`의 테스트 workflow는 세 가지를 보장한다.
