@@ -17,6 +17,7 @@ from .catalog import get_agents, get_categories
 from .generator import GenerationError, install_agents, resolve_target_dir
 from .launch_runtime import LaunchError, build_launch_plan, execute_launch_plan, render_launch_preview
 from .panel import PanelError, render_panel
+from .templates import TemplateError, init_template
 from .tui import run_tui
 
 
@@ -91,6 +92,29 @@ def build_parser() -> argparse.ArgumentParser:
     tui_parser.add_argument("--project-root", default=".")
     tui_parser.add_argument("--catalog-root", action="append", default=[])
 
+    template_parser = subparsers.add_parser("template", help="Scaffold custom catalog templates.")
+    template_subparsers = template_parser.add_subparsers(dest="template_command")
+
+    template_init_parser = template_subparsers.add_parser(
+        "init",
+        help="Create a category README and agent TOML skeleton.",
+    )
+    template_init_parser.add_argument("--project-root", default=".")
+    template_init_parser.add_argument("--scope", choices=("project", "global"), default="project")
+    template_init_parser.add_argument("--catalog-root")
+    template_init_parser.add_argument("--category", required=True, help="Category key, for example custom-ops.")
+    template_init_parser.add_argument("--category-prefix", help="Numeric category prefix, for example 11.")
+    template_init_parser.add_argument("--category-title")
+    template_init_parser.add_argument("--category-description")
+    template_init_parser.add_argument("--agent", required=True, help="Agent key, for example custom-coordinator.")
+    template_init_parser.add_argument("--agent-name")
+    template_init_parser.add_argument("--agent-description")
+    template_init_parser.add_argument("--model", default="gpt-5.4")
+    template_init_parser.add_argument("--reasoning-effort", default="medium")
+    template_init_parser.add_argument("--sandbox-mode", default="read-only")
+    template_init_parser.add_argument("--orchestrator", action="store_true")
+    template_init_parser.add_argument("--overwrite", action="store_true")
+
     return parser
 
 
@@ -154,6 +178,41 @@ def run_install(args: argparse.Namespace) -> int:
         print(f"scaffold created: {path}")
     for path in result.scaffold_preserved_paths:
         print(f"scaffold preserved: {path}")
+    return 0
+
+
+def run_template_init(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    explicit_catalog_root = Path(args.catalog_root).resolve() if args.catalog_root else None
+    try:
+        result = init_template(
+            project_root=project_root,
+            scope=args.scope,
+            catalog_root=explicit_catalog_root,
+            category_key=args.category,
+            category_prefix=args.category_prefix,
+            category_title=args.category_title,
+            category_description=args.category_description,
+            agent_key=args.agent,
+            agent_name=args.agent_name,
+            agent_description=args.agent_description,
+            model=args.model,
+            reasoning_effort=args.reasoning_effort,
+            sandbox_mode=args.sandbox_mode,
+            orchestrator=args.orchestrator,
+            overwrite=args.overwrite,
+        )
+    except TemplateError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"target: {result.target_root}")
+    print(f"category: {result.category_dir}")
+    print(f"agent: {result.agent_path}")
+    for path in result.created_paths:
+        print(f"created: {path}")
+    for path in result.preserved_paths:
+        print(f"preserved: {path}")
     return 0
 
 
@@ -319,6 +378,11 @@ def main(argv: list[str] | None = None) -> int:
         return run_dispatch_open(args)
     if args.command == "apply-result":
         return run_apply_result(args)
+    if args.command == "template":
+        if args.template_command == "init":
+            return run_template_init(args)
+        parser.error("template requires a subcommand")
+        return 2
     if args.command == "tui":
         return run_tui(
             Path(args.project_root).resolve(),

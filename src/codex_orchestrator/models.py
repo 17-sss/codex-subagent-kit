@@ -39,3 +39,13 @@ class LaunchPlan:
     backend: str
     script_path: Path
     argv: list[str]
+
+
+@dataclass(frozen=True)
+class TemplateInitResult:
+    target_root: Path
+    category_dir: Path
+    readme_path: Path
+    agent_path: Path
+    created_paths: list[Path]
+    preserved_paths: list[Path]

@@ -152,6 +152,65 @@ codex_orchestrator_category = "meta-orchestration"
             self.assertIn("custom-coordinator.toml", stdout)
             self.assertTrue((project_root / ".codex" / "agents" / "custom-coordinator.toml").exists())
 
+    def test_template_init_command_creates_project_local_scaffold(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "template",
+                    "init",
+                    "--project-root",
+                    temp_dir,
+                    "--category",
+                    "custom-ops",
+                    "--agent",
+                    "custom-coordinator",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("target:", stdout)
+            self.assertIn("created:", stdout)
+            self.assertTrue(
+                (
+                    project_root
+                    / ".codex"
+                    / "orchestrator"
+                    / "catalog"
+                    / "categories"
+                    / "11-custom-ops"
+                    / "custom-coordinator.toml"
+                ).exists()
+            )
+
+    def test_template_init_command_supports_explicit_catalog_root(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir) / "project"
+            catalog_root = Path(temp_dir) / "external-categories"
+
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "template",
+                    "init",
+                    "--project-root",
+                    str(project_root),
+                    "--catalog-root",
+                    str(catalog_root),
+                    "--category",
+                    "custom-ops",
+                    "--agent",
+                    "custom-coordinator",
+                    "--orchestrator",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn(str(catalog_root), stdout)
+            self.assertTrue((catalog_root / "11-custom-ops" / "custom-coordinator.toml").exists())
+
     def test_install_command_creates_files_and_reports_target(self) -> None:
         with TemporaryDirectory() as temp_dir:
             exit_code, stdout, stderr = self.run_cli(
