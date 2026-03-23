@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from .catalog import get_agent_map
@@ -38,11 +39,11 @@ def resolve_scaffold_catalog_dir(project_root: Path) -> Path:
 
 def render_agent_file(agent: AgentSpec) -> str:
     instructions_text = agent.developer_instructions.rstrip()
-    return f"""name = "{agent.name}"
-description = "{agent.description}"
-model = "{agent.model}"
-model_reasoning_effort = "{agent.reasoning_effort}"
-sandbox_mode = "{agent.sandbox_mode}"
+    return f"""name = {json.dumps(agent.name)}
+description = {json.dumps(agent.description)}
+model = {json.dumps(agent.model)}
+model_reasoning_effort = {json.dumps(agent.reasoning_effort)}
+sandbox_mode = {json.dumps(agent.sandbox_mode)}
 developer_instructions = \"\"\"
 {instructions_text}
 \"\"\"

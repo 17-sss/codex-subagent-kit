@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tomllib
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -8,10 +9,12 @@ from unittest.mock import patch
 from codex_orchestrator.generator import (
     GenerationError,
     install_agents,
+    render_agent_file,
     resolve_scaffold_catalog_dir,
     resolve_scaffold_dir,
     resolve_target_dir,
 )
+from codex_orchestrator.models import AgentSpec
 
 
 class GeneratorTests(unittest.TestCase):
@@ -207,6 +210,24 @@ workers = ["reviewer"]
             self.assertIn(scaffold_root / "launchers" / "launch-tmux.sh", result.scaffold_created_paths)
             self.assertIn(scaffold_root / "launchers" / "launch-cmux.sh", result.scaffold_created_paths)
             self.assertIn(scaffold_root / "catalog" / "categories", result.scaffold_created_paths)
+
+    def test_render_agent_file_escapes_basic_string_fields(self) -> None:
+        rendered = render_agent_file(
+            AgentSpec(
+                key="quoted-agent",
+                category="custom-ops",
+                name='quoted "agent"',
+                description='Handles the "critical" path.',
+                model="gpt-5.4",
+                reasoning_effort="medium",
+                sandbox_mode="read-only",
+                developer_instructions="Line 1\nLine 2",
+            )
+        )
+
+        parsed = tomllib.loads(rendered)
+        self.assertEqual(parsed["name"], 'quoted "agent"')
+        self.assertEqual(parsed["description"], 'Handles the "critical" path.')
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -135,11 +136,11 @@ def render_agent_template(
     category_override: str | None,
 ) -> str:
     lines = [
-        f'name = "{agent_name}"',
-        f'description = "{agent_description}"',
-        f'model = "{model}"',
-        f'model_reasoning_effort = "{reasoning_effort}"',
-        f'sandbox_mode = "{sandbox_mode}"',
+        f"name = {json.dumps(agent_name)}",
+        f"description = {json.dumps(agent_description)}",
+        f"model = {json.dumps(model)}",
+        f"model_reasoning_effort = {json.dumps(reasoning_effort)}",
+        f"sandbox_mode = {json.dumps(sandbox_mode)}",
         'developer_instructions = """',
         f"You are `{agent_key}`.",
         "",
@@ -154,7 +155,7 @@ def render_agent_template(
         '"""',
     ]
     if category_override:
-        lines.append(f'codex_orchestrator_category = "{category_override}"')
+        lines.append(f"codex_orchestrator_category = {json.dumps(category_override)}")
     return "\n".join(lines) + "\n"
 
 

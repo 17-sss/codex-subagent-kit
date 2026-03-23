@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tomllib
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -73,6 +74,23 @@ class TemplateInitTests(unittest.TestCase):
             self.assertTrue(first_result.agent_path.exists())
             self.assertIn(first_result.readme_path, second_result.preserved_paths)
             self.assertIn(first_result.agent_path, second_result.preserved_paths)
+
+    def test_init_template_escapes_basic_string_fields(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+
+            result = init_template(
+                project_root=project_root,
+                scope="project",
+                category_key="custom-ops",
+                agent_key="custom-coordinator",
+                agent_name='custom "coordinator"',
+                agent_description='Handles the "critical" path.',
+            )
+
+            parsed = tomllib.loads(result.agent_path.read_text(encoding="utf-8"))
+            self.assertEqual(parsed["name"], 'custom "coordinator"')
+            self.assertEqual(parsed["description"], 'Handles the "critical" path.')
 
 
 if __name__ == "__main__":
