@@ -119,6 +119,8 @@ codex-orchestrator install --scope project --agents cto-coordinator,reviewer --v
 codex-orchestrator doctor --scope project --project-root .
 ```
 
+The TUI install flow also runs the same validation step after a successful install and surfaces the validation status on the completion screen.
+
 ## Usage Helper
 
 Use `usage` when you want a starter prompt for Codex based on the agents actually visible in the selected scope.

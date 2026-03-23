@@ -4,6 +4,7 @@ import curses
 from pathlib import Path
 
 from .catalog import get_agents_by_category, get_categories
+from .doctor import DoctorReport, run_doctor
 from .generator import GenerationError, ORCHESTRATOR_CATEGORY, install_agents, resolve_target_dir
 from .models import AgentSpec, InstallResult
 
@@ -126,7 +127,12 @@ def _summary_screen(
             return True
 
 
-def _result_screen(stdscr: curses.window, result: InstallResult) -> None:
+def _result_screen(
+    stdscr: curses.window,
+    result: InstallResult,
+    *,
+    validation_report: DoctorReport | None = None,
+) -> None:
     _draw_title(stdscr, "생성 완료", "아무 키나 누르면 종료됩니다.")
     row = 5
     for path in result.agent_paths[:8]:
@@ -144,6 +150,13 @@ def _result_screen(stdscr: curses.window, result: InstallResult) -> None:
     for path in result.scaffold_preserved_paths[:4]:
         stdscr.addstr(row, 4, f"preserved: {path}")
         row += 1
+    if validation_report is not None:
+        stdscr.addstr(row, 4, f"validation: {'ok' if validation_report.ok else 'issues found'}")
+        row += 1
+        for issue in validation_report.issues[:3]:
+            message = issue.message if issue.path is None else f"{issue.path.name}: {issue.message}"
+            stdscr.addstr(row, 6, message[: max(curses.COLS - 8, 20)])
+            row += 1
     stdscr.refresh()
     stdscr.getch()
 
@@ -293,8 +306,13 @@ def run_tui(project_root: Path, *, catalog_roots: tuple[Path, ...] = ()) -> int:
                     _error_screen(stdscr, str(exc))
                     continue
 
-                _result_screen(stdscr, result)
-                return 0
+                validation_report = run_doctor(
+                    project_root=project_root,
+                    scope=scope,
+                    catalog_roots=catalog_roots,
+                )
+                _result_screen(stdscr, result, validation_report=validation_report)
+                return 0 if validation_report.ok else 1
 
     try:
         return curses.wrapper(_app)

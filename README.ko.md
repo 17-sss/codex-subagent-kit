@@ -119,6 +119,8 @@ codex-orchestrator install --scope project --agents cto-coordinator,reviewer --v
 codex-orchestrator doctor --scope project --project-root .
 ```
 
+TUI install 흐름도 성공적인 설치 뒤에 같은 validation을 자동으로 실행하고, 완료 화면에 validation 상태를 함께 보여준다.
+
 ## Usage Helper
 
 `usage`는 현재 scope에서 실제로 보이는 installed agent를 기준으로 Codex에 바로 붙여 넣을 starter prompt를 만들어준다.
