@@ -31,6 +31,7 @@ Stable capabilities:
 - category-based built-in catalog
 - project/global discovery with precedence
 - external awesome-style catalog injection
+- persistent import into project/global catalog injection paths
 - project/global template scaffolding
 - Codex-compatible TOML output using `developer_instructions`
 

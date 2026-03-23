@@ -35,6 +35,7 @@ Most users only need these stable commands:
 
 ```bash
 codex-orchestrator catalog
+codex-orchestrator catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-orchestrator catalog --catalog-root /path/to/categories
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper
 codex-orchestrator doctor --scope project --project-root .
@@ -45,6 +46,7 @@ Development-only direct execution from the repo root is also supported:
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
@@ -57,6 +59,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . 
 - project-local injection lives under `.codex/orchestrator/catalog/categories/`
 - global injection lives under `~/.codex/orchestrator/catalog/categories/`
 - `--catalog-root <path>` accepts any awesome-style `categories/` tree
+- `catalog import` can persist selected categories or agents into those injection paths
 - user-authored templates can follow the same folder format and participate in the same install flow
 
 When agent keys conflict, precedence is:
@@ -84,6 +87,16 @@ codex-orchestrator template init \
   --category custom-ops \
   --agent custom-coordinator \
   --orchestrator
+```
+
+Persist selected external templates into the project-local injection path:
+
+```bash
+codex-orchestrator catalog import \
+  --scope project \
+  --project-root . \
+  --catalog-root /path/to/categories \
+  --agents custom-helper,custom-reviewer
 ```
 
 Generated agent files use a Codex-compatible TOML shape:

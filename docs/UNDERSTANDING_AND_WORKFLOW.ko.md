@@ -27,6 +27,7 @@
 ## 현재 Stable Commands
 
 - `catalog`
+- `catalog import`
 - `install`
 - `doctor`
 - `template init`

@@ -14,6 +14,7 @@ from .control_plane import (
 )
 from .dashboard import DashboardError, render_role_board
 from .catalog import get_agents, get_categories
+from .catalog_import import CatalogImportError, import_catalog
 from .doctor import render_doctor_report, run_doctor
 from .generator import GenerationError, install_agents, resolve_target_dir
 from .launch_runtime import LaunchError, build_launch_plan, execute_launch_plan, render_launch_preview
@@ -37,6 +38,18 @@ def build_parser() -> argparse.ArgumentParser:
     catalog_parser.add_argument("--project-root", default=".")
     catalog_parser.add_argument("--scope", choices=("project", "global"), default="project")
     catalog_parser.add_argument("--catalog-root", action="append", default=[])
+    catalog_subparsers = catalog_parser.add_subparsers(dest="catalog_command")
+
+    catalog_import_parser = catalog_subparsers.add_parser(
+        "import",
+        help="Persist selected external category or agent templates into a project/global catalog.",
+    )
+    catalog_import_parser.add_argument("--project-root", default=".")
+    catalog_import_parser.add_argument("--scope", choices=("project", "global"), default="project")
+    catalog_import_parser.add_argument("--catalog-root", action="append", default=[])
+    catalog_import_parser.add_argument("--agents")
+    catalog_import_parser.add_argument("--categories")
+    catalog_import_parser.add_argument("--overwrite", action="store_true")
 
     install_parser = subparsers.add_parser("install", help="Install selected subagents without the TUI.")
     install_parser.add_argument("--scope", choices=("project", "global"), required=True)
@@ -176,6 +189,36 @@ def run_catalog(args: argparse.Namespace) -> int:
             source_suffix = f" [{agent.source}]" if agent.source != "builtin" else ""
             print(f"  - {agent.key}: {agent.description}{source_suffix}")
         print()
+    return 0
+
+
+def run_catalog_import(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    catalog_roots = _resolve_catalog_roots(args.catalog_root)
+    agent_keys = [item.strip() for item in (args.agents or "").split(",") if item.strip()]
+    category_keys = [item.strip() for item in (args.categories or "").split(",") if item.strip()]
+    try:
+        result = import_catalog(
+            project_root=project_root,
+            scope=args.scope,
+            catalog_roots=catalog_roots,
+            agent_keys=agent_keys,
+            category_keys=category_keys,
+            overwrite=args.overwrite,
+        )
+    except CatalogImportError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(f"target: {result.target_root}")
+    if result.imported_category_keys:
+        print(f"categories: {', '.join(result.imported_category_keys)}")
+    if result.imported_agent_keys:
+        print(f"agents: {', '.join(result.imported_agent_keys)}")
+    for path in result.created_paths:
+        print(f"created: {path}")
+    for path in result.preserved_paths:
+        print(f"preserved: {path}")
     return 0
 
 
@@ -398,6 +441,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_tui(Path(".").resolve(), catalog_roots=())
 
     if args.command == "catalog":
+        if getattr(args, "catalog_command", None) == "import":
+            return run_catalog_import(args)
         return run_catalog(args)
     if args.command == "install":
         return run_install(args)

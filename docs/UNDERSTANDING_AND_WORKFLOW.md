@@ -27,6 +27,7 @@ In short:
 ## Stable Commands Today
 
 - `catalog`
+- `catalog import`
 - `install`
 - `doctor`
 - `template init`

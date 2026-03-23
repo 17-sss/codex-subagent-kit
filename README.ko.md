@@ -35,6 +35,7 @@ codex-orchestrator
 
 ```bash
 codex-orchestrator catalog
+codex-orchestrator catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-orchestrator catalog --catalog-root /path/to/categories
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper
 codex-orchestrator doctor --scope project --project-root .
@@ -45,6 +46,7 @@ codex-orchestrator template init --project-root . --category custom-ops --agent 
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
@@ -57,6 +59,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . 
 - project-local injection 경로는 `.codex/orchestrator/catalog/categories/`이다
 - global injection 경로는 `~/.codex/orchestrator/catalog/categories/`이다
 - `--catalog-root <path>`로 awesome 스타일 `categories/` 트리를 직접 주입할 수 있다
+- `catalog import`로 선택한 category 또는 agent를 이 injection 경로에 영구 반영할 수 있다
 - 사용자가 직접 만든 템플릿도 같은 폴더 형식을 따르면 같은 install 흐름에 참여할 수 있다
 
 같은 agent key가 충돌하면 precedence는 다음 순서다.
@@ -84,6 +87,16 @@ codex-orchestrator template init \
   --category custom-ops \
   --agent custom-coordinator \
   --orchestrator
+```
+
+외부 템플릿을 project-local injection 경로로 영구 가져올 수도 있다.
+
+```bash
+codex-orchestrator catalog import \
+  --scope project \
+  --project-root . \
+  --catalog-root /path/to/categories \
+  --agents custom-helper,custom-reviewer
 ```
 
 생성되는 agent 파일은 Codex-compatible TOML 형식을 따른다.

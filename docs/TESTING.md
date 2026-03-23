@@ -54,6 +54,11 @@ Integration smoke:
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import \
+  --scope project \
+  --project-root .tmp-smoke \
+  --catalog-root /path/to/categories \
+  --agents custom-helper
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --project-root .tmp-smoke \
@@ -71,6 +76,7 @@ Additional checks for TUI changes:
 ## Current Automated Coverage
 
 - catalog structure and key consistency
+- persistent catalog import for selected agents, full categories, and rerun preservation
 - generator file creation, preservation, and error handling
 - doctor validation for healthy installs, malformed files, and missing explicit catalog roots
 - CLI flows for `catalog`, `install`, control-plane mutations, launcher preview, and dispatch handoff

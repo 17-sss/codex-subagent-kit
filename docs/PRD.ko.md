@@ -31,6 +31,7 @@ stable capability:
 - 카테고리형 built-in catalog
 - project/global discovery와 precedence
 - awesome 스타일 외부 catalog injection
+- project/global catalog injection 경로로의 persistent import
 - project/global template scaffolding
 - `developer_instructions`를 사용하는 Codex-compatible TOML output
 

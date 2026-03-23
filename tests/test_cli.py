@@ -82,6 +82,60 @@ developer_instructions = "custom helper instructions"
             self.assertIn("custom-helper", stdout)
             self.assertIn("[project]", stdout)
 
+    def test_catalog_import_command_persists_selected_agent(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            source_root = project_root / "source-categories"
+            category_dir = source_root / "11-custom-ops"
+            category_dir.mkdir(parents=True)
+            (category_dir / "README.md").write_text(
+                "# 11. Custom Ops\n\nCustom external operators.\n",
+                encoding="utf-8",
+            )
+            (category_dir / "custom-helper.toml").write_text(
+                """
+name = "custom-helper"
+description = "Custom helper"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+developer_instructions = "custom helper instructions"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            exit_code, stdout, stderr = self.run_cli(
+                [
+                    "catalog",
+                    "import",
+                    "--project-root",
+                    temp_dir,
+                    "--scope",
+                    "project",
+                    "--catalog-root",
+                    str(source_root),
+                    "--agents",
+                    "custom-helper",
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("categories: custom-ops", stdout)
+            self.assertIn("agents: custom-helper", stdout)
+            self.assertTrue(
+                (
+                    project_root
+                    / ".codex"
+                    / "orchestrator"
+                    / "catalog"
+                    / "categories"
+                    / "11-custom-ops"
+                    / "custom-helper.toml"
+                ).exists()
+            )
+
     def test_doctor_command_reports_project_install_status(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)

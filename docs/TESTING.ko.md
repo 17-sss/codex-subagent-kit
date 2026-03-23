@@ -54,6 +54,11 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import \
+  --scope project \
+  --project-root .tmp-smoke \
+  --catalog-root /path/to/categories \
+  --agents custom-helper
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --project-root .tmp-smoke \
@@ -71,6 +76,7 @@ TUI 변경 시 추가:
 ## 현재 자동 테스트 범위
 
 - catalog 구조와 key 일관성
+- 선택 agent import, 전체 category import, 재실행 보존에 대한 persistent catalog import 검증
 - generator의 파일 생성, 중복 방지, 오류 처리
 - doctor validation의 healthy install / malformed file / missing explicit catalog root 처리
 - CLI의 `catalog`, `install`, `doctor` 기본 흐름과 오류 반환
