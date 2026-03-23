@@ -190,4 +190,5 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 - 제품 방향: [docs/PRD.ko.md](./docs/PRD.ko.md)
 - 제품 이해 / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.ko.md](./docs/UNDERSTANDING_AND_WORKFLOW.ko.md)
 - 테스트 workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
+- 릴리즈 workflow: [docs/RELEASING.ko.md](./docs/RELEASING.ko.md)
 - experimental 경계: [docs/EXPERIMENTAL.ko.md](./docs/EXPERIMENTAL.ko.md)

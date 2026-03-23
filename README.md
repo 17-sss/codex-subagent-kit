@@ -190,4 +190,5 @@ If you touch the curses TUI, keep a PTY-based manual smoke in addition to automa
 - product direction: [docs/PRD.md](./docs/PRD.md)
 - product understanding / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.md](./docs/UNDERSTANDING_AND_WORKFLOW.md)
 - testing workflow: [docs/TESTING.md](./docs/TESTING.md)
+- release workflow: [docs/RELEASING.md](./docs/RELEASING.md)
 - experimental boundary: [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md)

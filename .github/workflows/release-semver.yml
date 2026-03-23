@@ -1,0 +1,105 @@
+name: Release SemVer
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-semver-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --force --tags
+
+      - name: Compute semantic version
+        id: semver
+        run: |
+          set -euo pipefail
+
+          existing_version="$(git tag --points-at "${GITHUB_SHA}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
+          if [ -n "${existing_version}" ]; then
+            {
+              echo "version=${existing_version}"
+              echo "tag_exists=true"
+            } >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          latest_version="$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
+          if [ -n "${latest_version}" ]; then
+            commit_range="${latest_version}..${GITHUB_SHA}"
+            base_version="${latest_version}"
+          else
+            base_version="$(python3 - <<'PY'
+import tomllib
+from pathlib import Path
+
+with Path("pyproject.toml").open("rb") as handle:
+    data = tomllib.load(handle)
+
+print(data["project"]["version"])
+PY
+)"
+            {
+              echo "version=${base_version}"
+              echo "tag_exists=false"
+            } >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          git log --format='%B%n---commit-boundary---' "${commit_range}" > /tmp/release-commit-messages.txt
+
+          version="$(
+            BASE_VERSION="${base_version}" \
+            COMMITS_FILE="/tmp/release-commit-messages.txt" \
+            PYTHONPATH=src \
+            python3 - <<'PY'
+import os
+from pathlib import Path
+
+from codex_orchestrator.release_versioning import compute_next_version
+
+base_version = os.environ["BASE_VERSION"]
+raw_messages = Path(os.environ["COMMITS_FILE"]).read_text(encoding="utf-8")
+messages = [
+    chunk.strip()
+    for chunk in raw_messages.split("---commit-boundary---")
+    if chunk.strip()
+]
+print(compute_next_version(base_version, messages))
+PY
+          )"
+
+          {
+            echo "version=${version}"
+            echo "tag_exists=false"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Create git tag
+        if: steps.semver.outputs.tag_exists == 'false'
+        run: |
+          git tag "${{ steps.semver.outputs.version }}" "${GITHUB_SHA}"
+          git push origin "${{ steps.semver.outputs.version }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.semver.outputs.version }}
+          name: ${{ steps.semver.outputs.version }}
+          generate_release_notes: true
+          target_commitish: ${{ github.sha }}
