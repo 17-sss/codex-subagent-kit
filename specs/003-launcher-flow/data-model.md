@@ -22,7 +22,7 @@
 
 ## LauncherSeed
 
-- **Purpose**: represent one generated script under `.codex/orchestrator/launchers/`.
+- **Purpose**: represent one generated script under `.codex/subagent-kit/launchers/`.
 - **Fields**:
   - `filename`
   - `backend`

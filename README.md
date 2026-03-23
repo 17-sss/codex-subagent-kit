@@ -1,8 +1,8 @@
-# codex-orchestrator
+# codex-subagent-kit
 
 Korean version: [README.ko.md](./README.ko.md)
 
-`codex-orchestrator` is a local-first toolkit for installing and managing Codex subagent definitions in project and global `.codex` directories.
+`codex-subagent-kit` is a local-first toolkit for installing and managing Codex subagent definitions in project and global `.codex` directories.
 
 The stable product core is simple:
 
@@ -11,7 +11,7 @@ The stable product core is simple:
 - scaffold new category and agent templates
 - use a TUI for the install-first workflow
 
-`codex-orchestrator` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
+`codex-subagent-kit` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
 
 ## Stable Workflow
 
@@ -25,41 +25,41 @@ This matches the current Codex-native model: custom agent definitions live under
 
 ## Stable Commands
 
-Running `codex-orchestrator` without a subcommand opens the TUI by default.
+Running `codex-subagent-kit` without a subcommand opens the TUI by default.
 
 ```bash
-codex-orchestrator
+codex-subagent-kit
 ```
 
 Most users only need these stable commands:
 
 ```bash
-codex-orchestrator catalog
-codex-orchestrator catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-codex-orchestrator catalog --catalog-root /path/to/categories
-codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
-codex-orchestrator doctor --scope project --project-root .
-codex-orchestrator usage --scope project --project-root . --task "Review the failing auth flow"
-codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
+codex-subagent-kit catalog
+codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
+codex-subagent-kit catalog --catalog-root /path/to/categories
+codex-subagent-kit install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
+codex-subagent-kit doctor --scope project --project-root .
+codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
+codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
 Development-only direct execution from the repo root is also supported:
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer --validate
-PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
-PYTHONPATH=src python3 -m codex_orchestrator.cli usage --scope project --project-root . --task "Review the failing auth flow"
-PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents cto-coordinator,reviewer --validate
+PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor --scope project --project-root .
+PYTHONPATH=src python3 -m codex_subagent_kit.cli usage --scope project --project-root . --task "Review the failing auth flow"
+PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
 ## Catalog Model
 
 - the app ships a small app-owned built-in catalog
 - the app does not vendor `awesome-codex-subagents` wholesale
-- project-local injection lives under `.codex/orchestrator/catalog/categories/`
-- global injection lives under `~/.codex/orchestrator/catalog/categories/`
+- project-local injection lives under `.codex/subagent-kit/catalog/categories/`
+- global injection lives under `~/.codex/subagent-kit/catalog/categories/`
 - `--catalog-root <path>` accepts any awesome-style `categories/` tree
 - `catalog import` can persist selected categories or agents into those injection paths
 - user-authored templates can follow the same folder format and participate in the same install flow
@@ -75,7 +75,7 @@ When agent keys conflict, precedence is:
 Create a new category and agent template in the project-local injection path:
 
 ```bash
-codex-orchestrator template init \
+codex-subagent-kit template init \
   --project-root . \
   --category custom-ops \
   --agent custom-coordinator
@@ -84,7 +84,7 @@ codex-orchestrator template init \
 Create one directly in an external `categories/` tree:
 
 ```bash
-codex-orchestrator template init \
+codex-subagent-kit template init \
   --catalog-root /path/to/categories \
   --category custom-ops \
   --agent custom-coordinator \
@@ -94,7 +94,7 @@ codex-orchestrator template init \
 Persist selected external templates into the project-local injection path:
 
 ```bash
-codex-orchestrator catalog import \
+codex-subagent-kit catalog import \
   --scope project \
   --project-root . \
   --catalog-root /path/to/categories \
@@ -115,8 +115,8 @@ Generated agent files use a Codex-compatible TOML shape:
 Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed. If you want that in one step, use `install --validate`.
 
 ```bash
-codex-orchestrator install --scope project --agents cto-coordinator,reviewer --validate
-codex-orchestrator doctor --scope project --project-root .
+codex-subagent-kit install --scope project --agents cto-coordinator,reviewer --validate
+codex-subagent-kit doctor --scope project --project-root .
 ```
 
 The TUI install flow also runs the same validation step after a successful install and surfaces the validation status on the completion screen.
@@ -126,7 +126,7 @@ The TUI install flow also runs the same validation step after a successful insta
 Use `usage` when you want a starter prompt for Codex based on the agents actually visible in the selected scope.
 
 ```bash
-codex-orchestrator usage \
+codex-subagent-kit usage \
   --scope project \
   --project-root . \
   --task "Review the failing auth flow"
@@ -157,15 +157,15 @@ For development, use the repo-local editable install flow.
 
 ```bash
 ./scripts/install.sh
-codex-orchestrator --help
+codex-subagent-kit --help
 ./scripts/uninstall.sh
 ```
 
 Default behavior:
 
 - `install.sh` creates `.venv/` in the repo root and runs `pip install -e .`
-- it attempts to create a `~/.local/bin/codex-orchestrator` symlink by default
-- if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-orchestrator`
+- it attempts to create a `~/.local/bin/codex-subagent-kit` symlink by default
+- if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-subagent-kit`
 - useful options include `install.sh --dry-run`, `install.sh --no-link`, and `uninstall.sh --keep-venv`
 
 ## Testing / Validation

@@ -6,7 +6,7 @@ This document tracks the commands and ideas that exist in the repository as expe
 
 ## Why This Exists
 
-The stable identity of `codex-orchestrator` is:
+The stable identity of `codex-subagent-kit` is:
 
 - catalog management
 - TOML installation

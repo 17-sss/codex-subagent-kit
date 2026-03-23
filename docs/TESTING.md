@@ -4,7 +4,7 @@ Korean version: [TESTING.ko.md](./TESTING.ko.md)
 
 ## Goal
 
-The testing workflow for `codex-orchestrator` protects three things:
+The testing workflow for `codex-subagent-kit` protects three things:
 
 - new work should not break existing CLI and TUI flows
 - generator changes should preserve rerun safety and output contracts
@@ -54,25 +54,25 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 Integration smoke:
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import \
   --scope project \
   --project-root .tmp-smoke \
   --catalog-root /path/to/categories \
   --agents custom-helper
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-smoke \
   --agents cto-coordinator,reviewer \
   --validate
-PYTHONPATH=src python3 -m codex_orchestrator.cli doctor \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor \
   --scope project \
   --project-root .tmp-smoke
 ```
 
 Additional checks for TUI changes:
 
-- run `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root <tmp-dir>` inside a PTY
+- run `PYTHONPATH=src python3 -m codex_subagent_kit.cli tui --project-root <tmp-dir>` inside a PTY
 - confirm that the flow reaches agent generation through real key input
 
 ## Current Automated Coverage
@@ -89,4 +89,4 @@ Additional checks for TUI changes:
 ## Current Limits
 
 - the full TUI flow is not fully automated end-to-end
-- as `.codex/orchestrator` behavior grows, keep expanding coverage for scaffold, queue/dispatch, launcher, and runtime contracts
+- as `.codex/subagent-kit` behavior grows, keep expanding coverage for scaffold, queue/dispatch, launcher, and runtime contracts

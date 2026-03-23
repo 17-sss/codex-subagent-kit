@@ -2,7 +2,7 @@
 
 영문 기본 문서: [RELEASING.md](./RELEASING.md)
 
-`codex-orchestrator`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만든다.
+`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만든다.
 
 ## 트리거
 
@@ -40,4 +40,4 @@
 ## 구현 참고
 
 - workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- 테스트되는 semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_orchestrator/release_versioning.py)
+- 테스트되는 semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit/release_versioning.py)

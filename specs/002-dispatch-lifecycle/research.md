@@ -9,7 +9,7 @@
 
 ## Decision 2: Implement mutation logic in Python, not shell wrappers
 
-- **Decision**: dispatch open / result apply는 `src/codex_orchestrator/control_plane.py`에 구현한다.
+- **Decision**: dispatch open / result apply는 `src/codex_subagent_kit/control_plane.py`에 구현한다.
 - **Rationale**: 이 프로젝트의 source of truth는 Python package여야 하고, legacy shell은 참고만 해야 한다.
 - **Alternatives considered**:
   - shell script reuse: 빠를 수는 있지만, 새 제품의 canonical runtime과 다시 분리된다.

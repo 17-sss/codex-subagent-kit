@@ -4,7 +4,7 @@
 
 ## 목적
 
-`codex-orchestrator`의 테스트 workflow는 세 가지를 보장한다.
+`codex-subagent-kit`의 테스트 workflow는 세 가지를 보장한다.
 
 - 현재 동작하는 CLI/TUI 흐름을 새 기능이 깨뜨리지 않을 것
 - 생성기 변경이 재실행 가능성과 출력 계약을 유지할 것
@@ -54,25 +54,25 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 통합 smoke:
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import \
   --scope project \
   --project-root .tmp-smoke \
   --catalog-root /path/to/categories \
   --agents custom-helper
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-smoke \
   --agents cto-coordinator,reviewer \
   --validate
-PYTHONPATH=src python3 -m codex_orchestrator.cli doctor \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor \
   --scope project \
   --project-root .tmp-smoke
 ```
 
 TUI 변경 시 추가:
 
-- PTY 환경에서 `PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root <tmp-dir>` 실행
+- PTY 환경에서 `PYTHONPATH=src python3 -m codex_subagent_kit.cli tui --project-root <tmp-dir>` 실행
 - 실제 키 입력으로 agent 파일 생성 완료까지 확인
 
 ## 현재 자동 테스트 범위
@@ -88,4 +88,4 @@ TUI 변경 시 추가:
 ## 현재 한계
 
 - TUI 전체 플로우는 아직 완전 자동화하지 않는다.
-- 향후 `.codex/orchestrator` scaffold, queue/dispatch, launcher가 추가되면 해당 계약을 위한 테스트 레이어를 늘린다.
+- 향후 `.codex/subagent-kit` scaffold, queue/dispatch, launcher가 추가되면 해당 계약을 위한 테스트 레이어를 늘린다.

@@ -2,7 +2,7 @@
 
 Korean version: [RELEASING.ko.md](./RELEASING.ko.md)
 
-`codex-orchestrator` uses a `main`-only GitHub Actions workflow to create semantic-version tags and GitHub Releases.
+`codex-subagent-kit` uses a `main`-only GitHub Actions workflow to create semantic-version tags and GitHub Releases.
 
 ## Trigger
 
@@ -40,4 +40,4 @@ If the current commit already has a semver tag, the workflow reuses that version
 ## Implementation Notes
 
 - workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- tested semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_orchestrator/release_versioning.py)
+- tested semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit/release_versioning.py)

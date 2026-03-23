@@ -20,6 +20,6 @@
 
 ## Validation Rules
 
-- `project_root/.codex/orchestrator/launchers/launch-<backend>.sh` must exist before execution or dry-run succeeds.
+- `project_root/.codex/subagent-kit/launchers/launch-<backend>.sh` must exist before execution or dry-run succeeds.
 - `attach = false` is valid only for `tmux`.
 - `name_override` is optional for both backends.

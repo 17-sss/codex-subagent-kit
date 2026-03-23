@@ -9,7 +9,7 @@
 ## Prepare a fresh project
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-dispatch \
   --agents cto-coordinator,reviewer,code-mapper
@@ -18,7 +18,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 ## Enqueue a command
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli enqueue \
   --project-root .tmp-dispatch \
   --summary "Investigate the failing review flow"
 ```
@@ -26,7 +26,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue \
 ## Open a dispatch
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli dispatch-open \
   --project-root .tmp-dispatch
 ```
 
@@ -39,7 +39,7 @@ Expected outcomes:
 ## Apply a result
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli apply-result \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli apply-result \
   --project-root .tmp-dispatch \
   --dispatch-id dispatch-001 \
   --outcome completed \

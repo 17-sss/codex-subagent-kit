@@ -11,7 +11,7 @@
 
 사용자는 project-local catalog injection 경로 아래에 새 category와 agent template 골격을 빠르게 만들고 싶다.
 
-**Independent Test**: `template init --scope project ...` 실행 시 `.codex/orchestrator/catalog/categories/...` 아래에 category README와 agent TOML이 생성되면 된다.
+**Independent Test**: `template init --scope project ...` 실행 시 `.codex/subagent-kit/catalog/categories/...` 아래에 category README와 agent TOML이 생성되면 된다.
 
 ### User Story 2 - Explicit external catalog roots are scaffoldable (Priority: P1)
 
@@ -23,7 +23,7 @@
 
 사용자는 디렉터리 category와 별개로 특정 agent template를 root orchestrator 후보로 만들고 싶다.
 
-**Independent Test**: `template init ... --orchestrator`로 생성한 TOML이 `codex_orchestrator_category = "meta-orchestration"`를 포함하면 된다.
+**Independent Test**: `template init ... --orchestrator`로 생성한 TOML이 `codex_subagent_kit_category = "meta-orchestration"`를 포함하면 된다.
 
 ## Requirements
 

@@ -16,7 +16,7 @@
 
 **Language/Version**: Python 3.11+  
 **Primary Dependencies**: Python standard library only  
-**Storage**: local filesystem under `.codex/orchestrator/runtime`, `.codex/orchestrator/queue`, `.codex/orchestrator/ledger`  
+**Storage**: local filesystem under `.codex/subagent-kit/runtime`, `.codex/subagent-kit/queue`, `.codex/subagent-kit/ledger`  
 **Testing**: `./scripts/test.sh` and focused CLI smoke commands  
 **Target Platform**: local terminal environments on macOS/Linux  
 **Project Type**: CLI/TUI utility with file-based control-plane  
@@ -26,10 +26,10 @@
 
 ## Constitution Check
 
-- `Codex-Native First`: pass. lifecycle remains in local `.codex/orchestrator`.
+- `Codex-Native First`: pass. lifecycle remains in local `.codex/subagent-kit`.
 - `Local-Over-Global Defaults`: pass. lifecycle mutations are project-local.
-- `Static Definition and Runtime State Separation`: pass. agent definitions stay in `.codex/agents`, lifecycle stays in `.codex/orchestrator`.
-- `Reference Assets Are Seeds, Not Runtime`: pass if dispatch state logic is implemented in `src/codex_orchestrator/`.
+- `Static Definition and Runtime State Separation`: pass. agent definitions stay in `.codex/agents`, lifecycle stays in `.codex/subagent-kit`.
+- `Reference Assets Are Seeds, Not Runtime`: pass if dispatch state logic is implemented in `src/codex_subagent_kit/`.
 - `Re-runnable Generation and Clear Output`: pass if mutation commands report ids and paths clearly.
 - `Testable Changes and Explicit Validation`: pass if queue/dispatch/result transitions are covered by tests and smoke.
 
@@ -51,7 +51,7 @@ specs/002-dispatch-lifecycle/
 
 ```text
 src/
-└── codex_orchestrator/
+└── codex_subagent_kit/
     ├── cli.py
     ├── control_plane.py
     ├── generator.py

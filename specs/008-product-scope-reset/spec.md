@@ -11,7 +11,7 @@
 
 사용자는 이 도구의 핵심 가치가 무엇인지 README와 CLI만 보고 빠르게 이해하고 싶다.
 
-**Independent Test**: `README.md`와 `codex-orchestrator --help`를 보면 stable core가 `catalog`, `install`, `template`, `tui` 중심이라는 점이 분명히 보이면 된다.
+**Independent Test**: `README.md`와 `codex-subagent-kit --help`를 보면 stable core가 `catalog`, `install`, `template`, `tui` 중심이라는 점이 분명히 보이면 된다.
 
 ### User Story 2 - Experimental control-plane features do not redefine the product (Priority: P1)
 

@@ -9,23 +9,23 @@
 ## Prepare a fresh project and queue item
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-dispatch-handoff \
   --agents cto-coordinator,reviewer
 
-PYTHONPATH=src python3 -m codex_orchestrator.cli enqueue \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli enqueue \
   --project-root .tmp-dispatch-handoff \
   --summary "Review the control-plane regression"
 
-PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-open \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli dispatch-open \
   --project-root .tmp-dispatch-handoff
 ```
 
 ## Render the handoff package
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-prepare \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli dispatch-prepare \
   --project-root .tmp-dispatch-handoff \
   --dispatch-id dispatch-001
 ```
@@ -39,11 +39,11 @@ Expected outcomes:
 ## Mark it in-flight
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli dispatch-begin \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli dispatch-begin \
   --project-root .tmp-dispatch-handoff \
   --dispatch-id dispatch-001
 
-PYTHONPATH=src python3 -m codex_orchestrator.cli panel \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli panel \
   --project-root .tmp-dispatch-handoff
 ```
 

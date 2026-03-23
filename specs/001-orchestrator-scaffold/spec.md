@@ -3,22 +3,22 @@
 **Feature Branch**: `001-orchestrator-scaffold`  
 **Created**: 2026-03-20  
 **Status**: Draft  
-**Input**: User description: "install 이후 .codex/orchestrator scaffold를 생성하고 tmux/cmux control-plane 연결의 기반을 만든다. agent TOML은 VoltAgent가 쓰는 Codex-compatible 구조를 참고해 canonical format으로 맞추고, 최상단에는 root orchestrator가 있는 control panel topology를 유지한다."
+**Input**: User description: "install 이후 .codex/subagent-kit scaffold를 생성하고 tmux/cmux control-plane 연결의 기반을 만든다. agent TOML은 VoltAgent가 쓰는 Codex-compatible 구조를 참고해 canonical format으로 맞추고, 최상단에는 root orchestrator가 있는 control panel topology를 유지한다."
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Project install creates orchestrator scaffold (Priority: P1)
 
-프로젝트에서 subagent를 설치하는 개발자는 `.codex/agents/*.toml`만 받는 데서 끝나지 않고, 이후 control-plane 기능을 붙일 수 있는 `.codex/orchestrator` 기본 scaffold도 즉시 받아야 한다.
+프로젝트에서 subagent를 설치하는 개발자는 `.codex/agents/*.toml`만 받는 데서 끝나지 않고, 이후 control-plane 기능을 붙일 수 있는 `.codex/subagent-kit` 기본 scaffold도 즉시 받아야 한다.
 
 **Why this priority**: 현재 제품의 다음 핵심 단계는 install 결과를 control-plane 확장 가능한 구조로 이어 주는 것이다. 이 흐름이 없으면 설치 결과가 고립되고, 이후 queue/dispatch/bootstrap 작업을 안정적으로 쌓기 어렵다.
 
-**Independent Test**: 빈 프로젝트 디렉터리에서 project-scope install을 실행했을 때 `.codex/agents/*.toml`과 `.codex/orchestrator` 기본 파일/디렉터리가 함께 생성되면 이 스토리는 독립적으로 검증된다.
+**Independent Test**: 빈 프로젝트 디렉터리에서 project-scope install을 실행했을 때 `.codex/agents/*.toml`과 `.codex/subagent-kit` 기본 파일/디렉터리가 함께 생성되면 이 스토리는 독립적으로 검증된다.
 
 **Acceptance Scenarios**:
 
-1. **Given** 사용자가 비어 있는 프로젝트 루트에서 `install --scope project`를 실행했고 하나 이상의 agent를 선택했을 때, **When** 설치가 완료되면, **Then** 시스템은 `.codex/agents/*.toml`과 `.codex/orchestrator` scaffold를 함께 생성한다.
-2. **Given** 사용자가 scaffold 생성 결과를 확인할 때, **When** `.codex/orchestrator` 내부를 열어 보면, **Then** 팀 구성, runtime state 위치, 다음 실행 단계가 드러나는 기본 파일과 디렉터리가 존재한다.
+1. **Given** 사용자가 비어 있는 프로젝트 루트에서 `install --scope project`를 실행했고 하나 이상의 agent를 선택했을 때, **When** 설치가 완료되면, **Then** 시스템은 `.codex/agents/*.toml`과 `.codex/subagent-kit` scaffold를 함께 생성한다.
+2. **Given** 사용자가 scaffold 생성 결과를 확인할 때, **When** `.codex/subagent-kit` 내부를 열어 보면, **Then** 팀 구성, runtime state 위치, 다음 실행 단계가 드러나는 기본 파일과 디렉터리가 존재한다.
 3. **Given** 사용자가 control-plane seed를 열어 볼 때, **When** team manifest를 확인하면, **Then** 하나의 root orchestrator와 그 아래 subagent들이 표현되는 기본 topology가 드러나야 한다.
 
 ---
@@ -33,7 +33,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** `.codex/orchestrator`가 이미 존재하고 사용자가 일부 파일을 수정한 상태에서, **When** 사용자가 install을 다시 실행하면, **Then** 시스템은 기존 파일을 무조건 덮어쓰지 않고 안전한 재실행 규칙에 따라 동작한다.
+1. **Given** `.codex/subagent-kit`가 이미 존재하고 사용자가 일부 파일을 수정한 상태에서, **When** 사용자가 install을 다시 실행하면, **Then** 시스템은 기존 파일을 무조건 덮어쓰지 않고 안전한 재실행 규칙에 따라 동작한다.
 2. **Given** 재실행 중 이미 존재하는 scaffold 자산을 만났을 때, **When** 생성기 판단이 끝나면, **Then** 시스템은 어떤 파일을 유지했고 어떤 파일을 새로 만들었는지 사용자가 이해할 수 있게 결과를 알려준다.
 
 ---
@@ -68,7 +68,7 @@
 
 ### Edge Cases
 
-- 사용자가 `--scope global`로 설치할 때는 project-local `.codex/orchestrator` scaffold를 만들지 않고, 그 이유를 출력해야 한다.
+- 사용자가 `--scope global`로 설치할 때는 project-local `.codex/subagent-kit` scaffold를 만들지 않고, 그 이유를 출력해야 한다.
 - 일부 scaffold 파일은 이미 존재하지만 나머지는 없는 반쯤 생성된 상태에서도 install 재실행이 실패 없이 복구 가능해야 한다.
 - 사용자가 agent 설치 없이 scaffold만 기대하는 호출을 할 경우 현재 CLI 계약상 허용 범위를 명확히 안내해야 한다.
 - legacy reference 자산에 있는 shell 개념을 참고하되, 생성 결과가 legacy `.env` 파일 구조를 직접 요구하면 안 된다.
@@ -79,9 +79,9 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST extend project-scope install so that successful agent installation also prepares a `.codex/orchestrator` scaffold in the selected project root.
-- **FR-002**: System MUST keep `.codex/agents` as the location for static subagent definitions and `.codex/orchestrator` as the location for orchestration-specific scaffold assets.
-- **FR-003**: System MUST generate a team manifest seed in `.codex/orchestrator` using the product's chosen canonical format for this feature, with one explicit root orchestrator and zero or more worker subagents.
+- **FR-001**: System MUST extend project-scope install so that successful agent installation also prepares a `.codex/subagent-kit` scaffold in the selected project root.
+- **FR-002**: System MUST keep `.codex/agents` as the location for static subagent definitions and `.codex/subagent-kit` as the location for orchestration-specific scaffold assets.
+- **FR-003**: System MUST generate a team manifest seed in `.codex/subagent-kit` using the product's chosen canonical format for this feature, with one explicit root orchestrator and zero or more worker subagents.
 - **FR-004**: System MUST generate the minimum directory and file structure required to support future runtime state, queue/dispatch ledger, bootstrap/recovery, and launcher integration.
 - **FR-005**: System MUST treat migrated shell control-plane assets under `reference/legacy_shell_control_plane/` as reference material only and MUST NOT make them the runtime entrypoint of the product.
 - **FR-006**: System MUST avoid generating company-specific names, workspace-specific absolute paths, or session-specific runtime data in the scaffold output.
@@ -97,7 +97,7 @@
 
 ### Key Entities *(include if feature involves data)*
 
-- **Orchestrator Scaffold**: `.codex/orchestrator` 아래 생성되는 기본 디렉터리와 seed 파일 집합. 정적 정의와 runtime state를 분리하는 제품 구조를 반영한다.
+- **Orchestrator Scaffold**: `.codex/subagent-kit` 아래 생성되는 기본 디렉터리와 seed 파일 집합. 정적 정의와 runtime state를 분리하는 제품 구조를 반영한다.
 - **Team Manifest Seed**: 향후 오케스트레이션 팀 구성을 정의하기 위한 초기 manifest 파일. 하나의 root orchestrator와 그 하위 worker agent 구조를 표현한다.
 - **Canonical Agent TOML**: built-in 생성 자산과 외부 curated/user-provided agent 파일이 함께 공존할 수 있도록 정한 Codex-compatible TOML shape.
 - **Operator**: 실제 업무 지시를 내리는 사용자 또는 대표 역할. control panel 상에서 orchestrator의 상위 개념이다.
@@ -109,7 +109,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 개발자는 project-scope install 1회 실행만으로 `.codex/agents/*.toml`과 `.codex/orchestrator` scaffold를 모두 받을 수 있다.
+- **SC-001**: 개발자는 project-scope install 1회 실행만으로 `.codex/agents/*.toml`과 `.codex/subagent-kit` scaffold를 모두 받을 수 있다.
 - **SC-002**: 동일한 프로젝트에서 install을 재실행해도 기존 scaffold 편집본이 예고 없이 손실되지 않는다.
 - **SC-003**: 생성된 scaffold를 검사했을 때 특정 회사명, 특정 워크스페이스 경로, 세션성 runtime state가 포함되지 않는다.
 - **SC-004**: 구현 검증 시 최소한 `catalog`, project-scope `install`, 그리고 scaffold 생성 결과 확인이 성공해야 한다.

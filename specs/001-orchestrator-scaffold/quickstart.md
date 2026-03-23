@@ -4,13 +4,13 @@
 
 ```bash
 ./scripts/test.sh
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
 ```
 
 ## Validate project-scope install
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-smoke \
   --agents cto-coordinator,reviewer,code-mapper
@@ -19,13 +19,13 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 Expected outcomes:
 
 - `.tmp-smoke/.codex/agents/*.toml` created in canonical TOML format
-- `.tmp-smoke/.codex/orchestrator/` scaffold created
+- `.tmp-smoke/.codex/subagent-kit/` scaffold created
 - generated team manifest includes one root orchestrator and the remaining worker agents
 
 ## Validate global install
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope global \
   --agents reviewer
 ```
@@ -33,12 +33,12 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 Expected outcomes:
 
 - `~/.codex/agents/reviewer.toml` created
-- no project-local `.codex/orchestrator` scaffold generated
+- no project-local `.codex/subagent-kit` scaffold generated
 
 ## Validate TUI
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli tui --project-root .tmp-tui
+PYTHONPATH=src python3 -m codex_subagent_kit.cli tui --project-root .tmp-tui
 ```
 
 Expected outcomes:

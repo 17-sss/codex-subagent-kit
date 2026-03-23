@@ -16,7 +16,7 @@
 
 **Language/Version**: Python 3.11+  
 **Primary Dependencies**: Python standard library only  
-**Storage**: local filesystem under `.codex/orchestrator/` and `.codex/agents/`  
+**Storage**: local filesystem under `.codex/subagent-kit/` and `.codex/agents/`  
 **Testing**: `./scripts/test.sh` and focused CLI smoke commands  
 **Target Platform**: local terminal environments on macOS/Linux  
 **Project Type**: CLI/TUI utility with file-based control-plane  
@@ -28,7 +28,7 @@
 
 - `Codex-Native First`: pass. handoff uses current project-local `.codex` assets only.
 - `Local-Over-Global Defaults`: pass. runtime bridge remains project-local.
-- `Static Definition and Runtime State Separation`: pass. role definition lookup reads `.codex/agents`, while lifecycle writes stay in `.codex/orchestrator`.
+- `Static Definition and Runtime State Separation`: pass. role definition lookup reads `.codex/agents`, while lifecycle writes stay in `.codex/subagent-kit`.
 - `Reference Assets Are Seeds, Not Runtime`: pass. shell reference informs shape, but runtime behavior is implemented in Python.
 - `Re-runnable Generation and Clear Output`: pass if CLI errors and handoff text stay explicit.
 - `Testable Changes and Explicit Validation`: pass if handoff rendering and dispatched-state transitions are covered by tests plus smoke.
@@ -51,7 +51,7 @@ specs/005-dispatch-handoff/
 
 ```text
 src/
-└── codex_orchestrator/
+└── codex_subagent_kit/
     ├── cli.py
     ├── control_plane.py
     └── panel.py

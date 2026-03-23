@@ -9,7 +9,7 @@
 ## Prepare a fresh project
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-launcher \
   --agents cto-coordinator,reviewer,code-mapper
@@ -18,7 +18,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 ## Render a role board
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli board \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli board \
   --project-root .tmp-launcher \
   --role cto-coordinator
 ```
@@ -31,8 +31,8 @@ Expected outcomes:
 ## Inspect generated launchers
 
 ```bash
-ls .tmp-launcher/.codex/orchestrator/launchers
-sed -n '1,120p' .tmp-launcher/.codex/orchestrator/launchers/launch-tmux.sh
+ls .tmp-launcher/.codex/subagent-kit/launchers
+sed -n '1,120p' .tmp-launcher/.codex/subagent-kit/launchers/launch-tmux.sh
 ```
 
 Expected outcomes:

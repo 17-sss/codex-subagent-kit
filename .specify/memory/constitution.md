@@ -1,10 +1,10 @@
-# codex-orchestrator Constitution
+# codex-subagent-kit Constitution
 
 ## Core Principles
 
 ### I. Codex-Native First
 
-이 프로젝트의 1차 산출물은 Codex가 직접 이해하고 사용할 수 있는 로컬 자산이어야 한다. 새로운 기능은 가능하면 `.codex/agents`와 `.codex/orchestrator`를 중심으로 설계하며, 외부 shell 자산은 참고 자료일 뿐 제품의 주 실행면이 되어서는 안 된다.
+이 프로젝트의 1차 산출물은 Codex가 직접 이해하고 사용할 수 있는 로컬 자산이어야 한다. 새로운 기능은 가능하면 `.codex/agents`와 `.codex/subagent-kit`를 중심으로 설계하며, 외부 shell 자산은 참고 자료일 뿐 제품의 주 실행면이 되어서는 안 된다.
 
 ### II. Local-Over-Global Defaults
 
@@ -12,7 +12,7 @@
 
 ### III. Static Definition and Runtime State Separation
 
-정적 agent 정의와 실행 중 상태를 섞지 않는다. `.codex/agents`에는 반복 가능하고 버전 관리 가능한 정의만 두고, `.codex/orchestrator`에는 team manifest, runtime state, queue/dispatch, bootstrap/recovery처럼 orchestration 관련 구조를 둔다.
+정적 agent 정의와 실행 중 상태를 섞지 않는다. `.codex/agents`에는 반복 가능하고 버전 관리 가능한 정의만 두고, `.codex/subagent-kit`에는 team manifest, runtime state, queue/dispatch, bootstrap/recovery처럼 orchestration 관련 구조를 둔다.
 
 ### IV. Reference Assets Are Seeds, Not Runtime
 
@@ -28,7 +28,7 @@
 
 ## Product and Engineering Constraints
 
-- 구현 언어와 주 실행면은 Python 3.11+ 및 `src/codex_orchestrator/`다.
+- 구현 언어와 주 실행면은 Python 3.11+ 및 `src/codex_subagent_kit/`다.
 - 기본 사용자 흐름은 CLI와 TUI 둘 다 유지한다.
 - 생성 자산에는 특정 회사명, 특정 제품명, 절대 워크스페이스 경로를 기본값으로 넣지 않는다.
 - control-plane 기능은 점진적으로 추가하되, 현재 동작하는 install/catalog/TUI 흐름을 깨지 않는다.

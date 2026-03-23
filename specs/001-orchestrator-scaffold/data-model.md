@@ -28,7 +28,7 @@
 
 ## OrchestratorScaffold
 
-- **Purpose**: represent the generated `.codex/orchestrator` directory seed.
+- **Purpose**: represent the generated `.codex/subagent-kit` directory seed.
 - **Contents**:
   - `team.toml`
   - runtime directory placeholder

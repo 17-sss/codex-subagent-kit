@@ -1,14 +1,14 @@
-# PRD: codex-orchestrator
+# PRD: codex-subagent-kit
 
 영문 기본 문서: [PRD.md](./PRD.md)
 
 ## 목적
 
-`codex-orchestrator`는 프로젝트 로컬 또는 글로벌 `.codex` 디렉터리 아래에 Codex subagent 정의를 설치하고 관리하는 Codex-native 툴킷이다.
+`codex-subagent-kit`는 프로젝트 로컬 또는 글로벌 `.codex` 디렉터리 아래에 Codex subagent 정의를 설치하고 관리하는 Codex-native 툴킷이다.
 
 이 제품은 의도적으로 “준비”에 집중한다.
 
-- `codex-orchestrator`는 catalog를 정리하고, template를 scaffold하고, agent TOML을 설치한다
+- `codex-subagent-kit`는 catalog를 정리하고, template를 scaffold하고, agent TOML을 설치한다
 - 실제 agent thread의 spawn, 라우팅, 관리는 `codex`가 맡는다
 
 ## Stable Product Core

@@ -9,7 +9,7 @@
 ## Prepare a fresh project
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-launch-cli \
   --agents cto-coordinator,reviewer,code-mapper
@@ -18,7 +18,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 ## Preview a tmux launch
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli launch \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli launch \
   --project-root .tmp-launch-cli \
   --backend tmux \
   --dry-run
@@ -27,13 +27,13 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli launch \
 Expected outcomes:
 
 - backend is reported as `tmux`
-- the resolved launcher path points to `.codex/orchestrator/launchers/launch-tmux.sh`
+- the resolved launcher path points to `.codex/subagent-kit/launchers/launch-tmux.sh`
 - the final command is printed without executing
 
 ## Preview a named cmux launch
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli launch \
+PYTHONPATH=src python3 -m codex_subagent_kit.cli launch \
   --project-root .tmp-launch-cli \
   --backend cmux \
   --name demo-workspace \

@@ -7,7 +7,7 @@
 
 현재 project-local launcher seed 위에 다음 두 가지를 추가한다.
 
-1. `codex-orchestrator launch --backend tmux|cmux` CLI surface
+1. `codex-subagent-kit launch --backend tmux|cmux` CLI surface
 2. generated launcher file을 검증하고 실행하거나, `--dry-run`으로 preview하는 Python wrapper
 
 이번 단계에서는 live queue drain이나 actual `spawn_agent` orchestration을 붙이지 않고, generated shell launcher를 first-class entrypoint로 승격하는 데 집중한다.
@@ -16,7 +16,7 @@
 
 **Language/Version**: Python 3.11+  
 **Primary Dependencies**: Python standard library only  
-**Storage**: local filesystem under `.codex/orchestrator/`  
+**Storage**: local filesystem under `.codex/subagent-kit/`  
 **Testing**: `./scripts/test.sh` and focused CLI smoke commands  
 **Target Platform**: local terminal environments on macOS/Linux  
 **Project Type**: CLI/TUI utility with file-based control-plane  
@@ -26,7 +26,7 @@
 
 ## Constitution Check
 
-- `Codex-Native First`: pass. CLI entrypoint still consumes `.codex/orchestrator` state in the current project.
+- `Codex-Native First`: pass. CLI entrypoint still consumes `.codex/subagent-kit` state in the current project.
 - `Local-Over-Global Defaults`: pass. launch CLI is project-local only.
 - `Static Definition and Runtime State Separation`: pass. runtime wrapper only resolves launchers, not agent definitions.
 - `Reference Assets Are Seeds, Not Runtime`: pass. runtime wrapper calls generated project-local launchers, not legacy shell assets.
@@ -51,7 +51,7 @@ specs/004-launch-cli/
 
 ```text
 src/
-└── codex_orchestrator/
+└── codex_subagent_kit/
     ├── cli.py
     ├── launch_runtime.py
     └── launchers.py

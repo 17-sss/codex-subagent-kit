@@ -8,7 +8,7 @@
 현재 queue / dispatch / runtime lifecycle 위에 다음 두 가지를 추가한다.
 
 1. orchestrator 또는 worker별 read-only terminal board
-2. `.codex/orchestrator/launchers/` 아래 project-local launcher script seed
+2. `.codex/subagent-kit/launchers/` 아래 project-local launcher script seed
 
 이번 단계에서는 actual `spawn_agent` orchestration까지 하지 않고, shared state를 읽는 terminal dashboard path를 먼저 닫는다.
 
@@ -16,7 +16,7 @@
 
 **Language/Version**: Python 3.11+  
 **Primary Dependencies**: Python standard library only  
-**Storage**: local filesystem under `.codex/orchestrator/`  
+**Storage**: local filesystem under `.codex/subagent-kit/`  
 **Testing**: `./scripts/test.sh` and focused CLI smoke commands  
 **Target Platform**: local terminal environments on macOS/Linux  
 **Project Type**: CLI/TUI utility with file-based control-plane  
@@ -26,7 +26,7 @@
 
 ## Constitution Check
 
-- `Codex-Native First`: pass. dashboard state remains under `.codex/orchestrator`.
+- `Codex-Native First`: pass. dashboard state remains under `.codex/subagent-kit`.
 - `Local-Over-Global Defaults`: pass. launcher flow is project-local.
 - `Static Definition and Runtime State Separation`: pass. boards consume runtime state only.
 - `Reference Assets Are Seeds, Not Runtime`: pass if generated launchers are rendered from Python code, not copied from legacy shell.
@@ -51,7 +51,7 @@ specs/003-launcher-flow/
 
 ```text
 src/
-└── codex_orchestrator/
+└── codex_subagent_kit/
     ├── cli.py
     ├── dashboard.py
     ├── generator.py

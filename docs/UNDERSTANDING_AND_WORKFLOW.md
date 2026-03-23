@@ -11,7 +11,7 @@ Korean version: [UNDERSTANDING_AND_WORKFLOW.ko.md](./UNDERSTANDING_AND_WORKFLOW.
 
 In short:
 
-- `codex-orchestrator` prepares the workspace
+- `codex-subagent-kit` prepares the workspace
 - `codex` runs the session
 - `codex` spawns and manages subagent threads
 
@@ -67,7 +67,7 @@ flowchart LR
 ```mermaid
 flowchart TD
     U["User"]
-    CO["codex-orchestrator"]
+    CO["codex-subagent-kit"]
     FS[".codex/agents/*.toml"]
     CX["Codex session"]
     SA["Subagent threads"]
@@ -90,7 +90,7 @@ flowchart TD
     └── ...
 ```
 
-Optional experimental companion assets may also exist under `.codex/orchestrator/`, but they are not required for the stable install flow.
+Optional experimental companion assets may also exist under `.codex/subagent-kit/`, but they are not required for the stable install flow.
 
 ## Next Priorities
 

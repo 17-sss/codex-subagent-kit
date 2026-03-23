@@ -10,10 +10,10 @@
 
 ## Decision 2: Project-scope install should generate orchestrator scaffold; global install should not
 
-- **Decision**: `.codex/orchestrator` scaffold is only generated for `project` scope.
+- **Decision**: `.codex/subagent-kit` scaffold is only generated for `project` scope.
 - **Rationale**: runtime/control-plane state is project-local by nature, while global install is only for reusable static agent definitions.
 - **Alternatives considered**:
-  - Generate global scaffold in `~/.codex/orchestrator`: rejected because team runtime is not meaningfully global.
+  - Generate global scaffold in `~/.codex/subagent-kit`: rejected because team runtime is not meaningfully global.
   - Make scaffold generation a separate mandatory command: rejected because the product flow is install-first and scaffold is part of that flow.
 
 ## Decision 3: Team seed must declare exactly one root orchestrator

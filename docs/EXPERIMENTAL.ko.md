@@ -6,7 +6,7 @@
 
 ## 왜 분리했는가
 
-현재 `codex-orchestrator`의 stable 정체성은 다음이다.
+현재 `codex-subagent-kit`의 stable 정체성은 다음이다.
 
 - catalog 관리
 - TOML 설치

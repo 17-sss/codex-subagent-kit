@@ -5,9 +5,9 @@
 
 ## Phase 1: Handoff Runtime
 
-- [x] T001 Add dispatch handoff rendering and `dispatched` lifecycle mutation in `src/codex_orchestrator/control_plane.py`.
-- [x] T002 Add `dispatch-prepare` and `dispatch-begin` CLI surfaces in `src/codex_orchestrator/cli.py`.
-- [x] T003 Extend panel queue summary in `src/codex_orchestrator/panel.py` to show `dispatched`.
+- [x] T001 Add dispatch handoff rendering and `dispatched` lifecycle mutation in `src/codex_subagent_kit/control_plane.py`.
+- [x] T002 Add `dispatch-prepare` and `dispatch-begin` CLI surfaces in `src/codex_subagent_kit/cli.py`.
+- [x] T003 Extend panel queue summary in `src/codex_subagent_kit/panel.py` to show `dispatched`.
 - [x] T004 Add automated tests in `tests/test_control_plane.py`, `tests/test_cli.py`, and `tests/test_panel.py`.
 - [x] T005 Run `./scripts/test.sh` and smoke `enqueue -> dispatch-open -> dispatch-prepare -> dispatch-begin -> panel`.
 - [x] T006 Commit the handoff-runtime slice as an isolated reviewable unit.

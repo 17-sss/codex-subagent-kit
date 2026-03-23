@@ -8,7 +8,7 @@
 현재 installer MVP를 확장해 다음 두 가지를 구현한다.
 
 1. built-in agent output을 VoltAgent-style Codex-compatible TOML에 가깝게 정렬한다.
-2. project-scope install 시 `.codex/orchestrator` scaffold와 root orchestrator가 명시된 team manifest seed를 함께 생성한다.
+2. project-scope install 시 `.codex/subagent-kit` scaffold와 root orchestrator가 명시된 team manifest seed를 함께 생성한다.
 
 이번 단계에서는 terminal control panel 전체를 구현하지 않고, 그 기반이 되는 canonical format, team topology, scaffold seed까지만 책임진다.
 
@@ -16,7 +16,7 @@
 
 **Language/Version**: Python 3.11+  
 **Primary Dependencies**: Python standard library only  
-**Storage**: local filesystem under `.codex/agents` and `.codex/orchestrator`  
+**Storage**: local filesystem under `.codex/agents` and `.codex/subagent-kit`  
 **Testing**: `python3 -m compileall src`, `PYTHONPATH=src python3 -m unittest discover -s tests -v`  
 **Target Platform**: local terminal environments on macOS/Linux  
 **Project Type**: CLI/TUI utility  
@@ -30,7 +30,7 @@
 
 - `Codex-Native First`: pass. output remains local `.codex` assets.
 - `Local-Over-Global Defaults`: pass. scaffold is project-scope only.
-- `Static Definition and Runtime State Separation`: pass. `.codex/agents` and `.codex/orchestrator` stay separate.
+- `Static Definition and Runtime State Separation`: pass. `.codex/agents` and `.codex/subagent-kit` stay separate.
 - `Reference Assets Are Seeds, Not Runtime`: pass. legacy shell assets remain reference only.
 - `Re-runnable Generation and Clear Output`: pass if created/skipped/preserved paths are reported.
 - `Testable Changes and Explicit Validation`: pass if TOML rendering and scaffold generation are covered by unit tests plus CLI smoke.
@@ -57,7 +57,7 @@ specs/001-orchestrator-scaffold/
 
 ```text
 src/
-└── codex_orchestrator/
+└── codex_subagent_kit/
     ├── catalog.py
     ├── cli.py
     ├── generator.py

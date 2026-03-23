@@ -11,7 +11,7 @@
 
 한 줄로 정리하면:
 
-- `codex-orchestrator`는 작업공간을 준비하고
+- `codex-subagent-kit`는 작업공간을 준비하고
 - `codex`가 세션을 실행하며
 - `codex`가 subagent thread를 spawn하고 관리한다
 
@@ -67,7 +67,7 @@ flowchart LR
 ```mermaid
 flowchart TD
     U["User"]
-    CO["codex-orchestrator"]
+    CO["codex-subagent-kit"]
     FS[".codex/agents/*.toml"]
     CX["Codex session"]
     SA["Subagent threads"]
@@ -90,7 +90,7 @@ flowchart TD
     └── ...
 ```
 
-선택적으로 `.codex/orchestrator/` 아래에 experimental companion 자산이 있을 수는 있지만, stable install flow에 필수는 아니다.
+선택적으로 `.codex/subagent-kit/` 아래에 experimental companion 자산이 있을 수는 있지만, stable install flow에 필수는 아니다.
 
 ## 다음 우선순위
 

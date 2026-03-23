@@ -24,7 +24,7 @@ operator나 개발자는 전체 panel뿐 아니라 특정 orchestrator 또는 wo
 
 ### User Story 2 - Generate launcher scripts from project metadata (Priority: P1)
 
-project를 설치한 개발자는 `.codex/orchestrator/launchers/`에 팀 구성을 반영한 launcher script를 받아서, optional terminal dashboard를 띄울 준비가 되어 있길 원한다.
+project를 설치한 개발자는 `.codex/subagent-kit/launchers/`에 팀 구성을 반영한 launcher script를 받아서, optional terminal dashboard를 띄울 준비가 되어 있길 원한다.
 
 **Why this priority**: control-plane이 파일 기반 상태만 가지고 끝나지 않으려면, 그 상태를 읽는 terminal entrypoint가 실제로 생성돼야 한다.
 
@@ -64,7 +64,7 @@ project를 설치한 개발자는 `.codex/orchestrator/launchers/`에 팀 구성
 
 - **FR-001**: System MUST render a role-specific read-only terminal board for the root orchestrator or any worker in the current team manifest.
 - **FR-002**: System MUST keep the existing `panel` command as the team-wide monitor view while adding role-specific board rendering.
-- **FR-003**: System MUST generate project-local launcher script seeds under `.codex/orchestrator/launchers/` for board and monitor rendering.
+- **FR-003**: System MUST generate project-local launcher script seeds under `.codex/subagent-kit/launchers/` for board and monitor rendering.
 - **FR-004**: System MUST generate optional backend launcher scripts for `tmux` and `cmux` using current team metadata.
 - **FR-005**: System MUST keep generated launcher scripts vendor-neutral and rooted in the current project metadata rather than legacy shell manifests.
 - **FR-006**: System MUST preserve existing launcher scripts on rerun unless they are missing and need backfill.
@@ -75,7 +75,7 @@ project를 설치한 개발자는 `.codex/orchestrator/launchers/`에 팀 구성
 
 - **Role Board**: orchestrator 또는 특정 worker role의 상태, queue, dispatch를 보여주는 read-only terminal view.
 - **Monitor View**: 팀 전체 topology와 summary를 보여주는 기존 `panel` 기반 뷰.
-- **Launcher Script Seed**: `.codex/orchestrator/launchers/` 아래 생성되는 backend 실행 스크립트.
+- **Launcher Script Seed**: `.codex/subagent-kit/launchers/` 아래 생성되는 backend 실행 스크립트.
 - **Backend Launcher**: `tmux` 또는 `cmux`에서 board/monitor view를 띄우는 optional dashboard entrypoint.
 
 ## Success Criteria *(mandatory)*
