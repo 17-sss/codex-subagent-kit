@@ -37,7 +37,7 @@ Most users only need these stable commands:
 codex-orchestrator catalog
 codex-orchestrator catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-orchestrator catalog --catalog-root /path/to/categories
-codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper
+codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
 codex-orchestrator doctor --scope project --project-root .
 codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
 ```
@@ -47,7 +47,7 @@ Development-only direct execution from the repo root is also supported:
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer
+PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer --validate
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
@@ -110,9 +110,10 @@ Generated agent files use a Codex-compatible TOML shape:
 
 ## Validation
 
-Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed.
+Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed. If you want that in one step, use `install --validate`.
 
 ```bash
+codex-orchestrator install --scope project --agents cto-coordinator,reviewer --validate
 codex-orchestrator doctor --scope project --project-root .
 ```
 

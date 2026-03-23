@@ -250,6 +250,71 @@ codex_orchestrator_category = "meta-orchestration"
             self.assertIn("custom-coordinator.toml", stdout)
             self.assertTrue((project_root / ".codex" / "agents" / "custom-coordinator.toml").exists())
 
+    def test_install_command_can_validate_successfully(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            temp_home.mkdir()
+
+            with patch.object(Path, "home", return_value=temp_home):
+                exit_code, stdout, stderr = self.run_cli(
+                    [
+                        "install",
+                        "--scope",
+                        "project",
+                        "--project-root",
+                        temp_dir,
+                        "--agents",
+                        "cto-coordinator,reviewer",
+                        "--validate",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("reviewer.toml", stdout)
+            self.assertIn("status: ok", stdout)
+            self.assertIn("Issues: none", stdout)
+
+    def test_install_command_returns_error_when_validate_finds_issues(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            temp_home.mkdir()
+            project_agents_dir = project_root / ".codex" / "agents"
+            project_agents_dir.mkdir(parents=True)
+            (project_agents_dir / "broken.toml").write_text(
+                """
+name = "broken"
+description = "Broken agent"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with patch.object(Path, "home", return_value=temp_home):
+                exit_code, stdout, stderr = self.run_cli(
+                    [
+                        "install",
+                        "--scope",
+                        "project",
+                        "--project-root",
+                        temp_dir,
+                        "--agents",
+                        "cto-coordinator,reviewer",
+                        "--validate",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 1)
+            self.assertEqual(stderr, "")
+            self.assertIn("reviewer.toml", stdout)
+            self.assertIn("status: issues found", stdout)
+            self.assertIn("broken.toml", stdout)
+
     def test_template_init_command_creates_project_local_scaffold(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)

@@ -37,7 +37,7 @@ codex-orchestrator
 codex-orchestrator catalog
 codex-orchestrator catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-orchestrator catalog --catalog-root /path/to/categories
-codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper
+codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
 codex-orchestrator doctor --scope project --project-root .
 codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
 ```
@@ -47,7 +47,7 @@ codex-orchestrator template init --project-root . --category custom-ops --agent 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer
+PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer --validate
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
@@ -110,9 +110,10 @@ codex-orchestrator catalog import \
 
 ## Validation
 
-install 이후에는 `doctor`로 현재 보이는 agent 파일과 주입된 catalog root가 아직 정상 형식인지 확인할 수 있다.
+install 이후에는 `doctor`로 현재 보이는 agent 파일과 주입된 catalog root가 아직 정상 형식인지 확인할 수 있다. 한 번에 끝내고 싶다면 `install --validate`를 쓰면 된다.
 
 ```bash
+codex-orchestrator install --scope project --agents cto-coordinator,reviewer --validate
 codex-orchestrator doctor --scope project --project-root .
 ```
 

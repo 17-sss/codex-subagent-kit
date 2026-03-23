@@ -57,6 +57,11 @@ def build_parser() -> argparse.ArgumentParser:
     install_parser.add_argument("--project-root", default=".")
     install_parser.add_argument("--catalog-root", action="append", default=[])
     install_parser.add_argument("--overwrite", action="store_true")
+    install_parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="Run doctor immediately after a successful install.",
+    )
 
     doctor_parser = subparsers.add_parser(
         "doctor",
@@ -249,7 +254,17 @@ def run_install(args: argparse.Namespace) -> int:
         print(f"scaffold created: {path}")
     for path in result.scaffold_preserved_paths:
         print(f"scaffold preserved: {path}")
-    return 0
+    if not args.validate:
+        return 0
+
+    report = run_doctor(
+        project_root=project_root,
+        scope=args.scope,
+        catalog_roots=catalog_roots,
+    )
+    print()
+    print(render_doctor_report(report))
+    return 0 if report.ok else 1
 
 
 def run_template_init(args: argparse.Namespace) -> int:

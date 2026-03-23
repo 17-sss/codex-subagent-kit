@@ -62,7 +62,8 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import \
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --project-root .tmp-smoke \
-  --agents cto-coordinator,reviewer
+  --agents cto-coordinator,reviewer \
+  --validate
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor \
   --scope project \
   --project-root .tmp-smoke
@@ -79,6 +80,7 @@ Additional checks for TUI changes:
 - persistent catalog import for selected agents, full categories, and rerun preservation
 - generator file creation, preservation, and error handling
 - doctor validation for healthy installs, malformed files, and missing explicit catalog roots
+- install-time validation via `install --validate`
 - CLI flows for `catalog`, `install`, control-plane mutations, launcher preview, and dispatch handoff
 - pure helper coverage around TUI default selection and project validation rules
 
