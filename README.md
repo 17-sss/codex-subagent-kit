@@ -39,6 +39,7 @@ codex-orchestrator catalog import --scope project --catalog-root /path/to/catego
 codex-orchestrator catalog --catalog-root /path/to/categories
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
 codex-orchestrator doctor --scope project --project-root .
+codex-orchestrator usage --scope project --project-root . --task "Review the failing auth flow"
 codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -49,6 +50,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer --validate
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
+PYTHONPATH=src python3 -m codex_orchestrator.cli usage --scope project --project-root . --task "Review the failing auth flow"
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -115,6 +117,17 @@ Use `doctor` after install to confirm that visible agent files and any injected 
 ```bash
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer --validate
 codex-orchestrator doctor --scope project --project-root .
+```
+
+## Usage Helper
+
+Use `usage` when you want a starter prompt for Codex based on the agents actually visible in the selected scope.
+
+```bash
+codex-orchestrator usage \
+  --scope project \
+  --project-root . \
+  --task "Review the failing auth flow"
 ```
 
 ## Experimental Commands

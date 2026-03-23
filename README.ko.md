@@ -39,6 +39,7 @@ codex-orchestrator catalog import --scope project --catalog-root /path/to/catego
 codex-orchestrator catalog --catalog-root /path/to/categories
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
 codex-orchestrator doctor --scope project --project-root .
+codex-orchestrator usage --scope project --project-root . --task "Review the failing auth flow"
 codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -49,6 +50,7 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer --validate
 PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
+PYTHONPATH=src python3 -m codex_orchestrator.cli usage --scope project --project-root . --task "Review the failing auth flow"
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -115,6 +117,17 @@ install 이후에는 `doctor`로 현재 보이는 agent 파일과 주입된 cata
 ```bash
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer --validate
 codex-orchestrator doctor --scope project --project-root .
+```
+
+## Usage Helper
+
+`usage`는 현재 scope에서 실제로 보이는 installed agent를 기준으로 Codex에 바로 붙여 넣을 starter prompt를 만들어준다.
+
+```bash
+codex-orchestrator usage \
+  --scope project \
+  --project-root . \
+  --task "Review the failing auth flow"
 ```
 
 ## Experimental Commands

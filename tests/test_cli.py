@@ -172,6 +172,45 @@ developer_instructions = "custom helper instructions"
             self.assertIn("status: ok", stdout)
             self.assertIn("Installed agent files checked:", stdout)
 
+    def test_usage_command_renders_starter_prompt(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            temp_home.mkdir()
+
+            with patch.object(Path, "home", return_value=temp_home):
+                install_exit_code, _, install_stderr = self.run_cli(
+                    [
+                        "install",
+                        "--scope",
+                        "project",
+                        "--project-root",
+                        temp_dir,
+                        "--agents",
+                        "cto-coordinator,reviewer",
+                    ]
+                )
+                self.assertEqual(install_exit_code, 0)
+                self.assertEqual(install_stderr, "")
+
+                exit_code, stdout, stderr = self.run_cli(
+                    [
+                        "usage",
+                        "--scope",
+                        "project",
+                        "--project-root",
+                        temp_dir,
+                        "--task",
+                        "Review the failing auth flow",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("starter prompt:", stdout)
+            self.assertIn("Review the failing auth flow", stdout)
+            self.assertIn("cto-coordinator", stdout)
+
     def test_catalog_command_supports_catalog_root(self) -> None:
         with TemporaryDirectory() as temp_dir:
             catalog_root = Path(temp_dir) / "categories"

@@ -21,6 +21,7 @@ from .launch_runtime import LaunchError, build_launch_plan, execute_launch_plan,
 from .panel import PanelError, render_panel
 from .templates import TemplateError, init_template
 from .tui import run_tui
+from .usage import UsageError, render_usage_guide
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -70,6 +71,14 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser.add_argument("--project-root", default=".")
     doctor_parser.add_argument("--scope", choices=("project", "global"), default="project")
     doctor_parser.add_argument("--catalog-root", action="append", default=[])
+
+    usage_parser = subparsers.add_parser(
+        "usage",
+        help="Render starter prompts for the installed agents visible in the selected scope.",
+    )
+    usage_parser.add_argument("--project-root", default=".")
+    usage_parser.add_argument("--scope", choices=("project", "global"), default="project")
+    usage_parser.add_argument("--task")
 
     panel_parser = subparsers.add_parser(
         "panel",
@@ -313,6 +322,16 @@ def run_doctor_command(args: argparse.Namespace) -> int:
     return 0 if report.ok else 1
 
 
+def run_usage_command(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    try:
+        print(render_usage_guide(project_root=project_root, scope=args.scope, task=args.task))
+    except UsageError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def run_panel(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     try:
@@ -463,6 +482,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_install(args)
     if args.command == "doctor":
         return run_doctor_command(args)
+    if args.command == "usage":
+        return run_usage_command(args)
     if args.command == "panel":
         return run_panel(args)
     if args.command == "board":
