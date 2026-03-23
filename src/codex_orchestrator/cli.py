@@ -14,6 +14,7 @@ from .control_plane import (
 )
 from .dashboard import DashboardError, render_role_board
 from .catalog import get_agents, get_categories
+from .doctor import render_doctor_report, run_doctor
 from .generator import GenerationError, install_agents, resolve_target_dir
 from .launch_runtime import LaunchError, build_launch_plan, execute_launch_plan, render_launch_preview
 from .panel import PanelError, render_panel
@@ -26,7 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="codex-orchestrator",
         description=(
             "Install and manage Codex subagent definitions. "
-            "Stable core: catalog, install, template, tui. "
+            "Stable core: catalog, install, doctor, template, tui. "
             "Control-plane commands remain experimental."
         ),
     )
@@ -43,6 +44,14 @@ def build_parser() -> argparse.ArgumentParser:
     install_parser.add_argument("--project-root", default=".")
     install_parser.add_argument("--catalog-root", action="append", default=[])
     install_parser.add_argument("--overwrite", action="store_true")
+
+    doctor_parser = subparsers.add_parser(
+        "doctor",
+        help="Validate installed agent definitions and injected catalog roots.",
+    )
+    doctor_parser.add_argument("--project-root", default=".")
+    doctor_parser.add_argument("--scope", choices=("project", "global"), default="project")
+    doctor_parser.add_argument("--catalog-root", action="append", default=[])
 
     panel_parser = subparsers.add_parser(
         "panel",
@@ -235,6 +244,17 @@ def run_template_init(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_doctor_command(args: argparse.Namespace) -> int:
+    project_root = Path(args.project_root).resolve()
+    report = run_doctor(
+        project_root=project_root,
+        scope=args.scope,
+        catalog_roots=_resolve_catalog_roots(args.catalog_root),
+    )
+    print(render_doctor_report(report))
+    return 0 if report.ok else 1
+
+
 def run_panel(args: argparse.Namespace) -> int:
     project_root = Path(args.project_root).resolve()
     try:
@@ -381,6 +401,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_catalog(args)
     if args.command == "install":
         return run_install(args)
+    if args.command == "doctor":
+        return run_doctor_command(args)
     if args.command == "panel":
         return run_panel(args)
     if args.command == "board":

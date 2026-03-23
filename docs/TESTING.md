@@ -8,6 +8,7 @@ The testing workflow for `codex-orchestrator` protects three things:
 
 - new work should not break existing CLI and TUI flows
 - generator changes should preserve rerun safety and output contracts
+- validation commands should catch malformed TOML before the user reaches Codex
 - independent validation promised in SDD documents should carry through to implementation
 
 ## Core Principles
@@ -57,6 +58,9 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --project-root .tmp-smoke \
   --agents cto-coordinator,reviewer
+PYTHONPATH=src python3 -m codex_orchestrator.cli doctor \
+  --scope project \
+  --project-root .tmp-smoke
 ```
 
 Additional checks for TUI changes:
@@ -68,6 +72,7 @@ Additional checks for TUI changes:
 
 - catalog structure and key consistency
 - generator file creation, preservation, and error handling
+- doctor validation for healthy installs, malformed files, and missing explicit catalog roots
 - CLI flows for `catalog`, `install`, control-plane mutations, launcher preview, and dispatch handoff
 - pure helper coverage around TUI default selection and project validation rules
 

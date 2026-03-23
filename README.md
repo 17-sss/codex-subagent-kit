@@ -37,6 +37,7 @@ Most users only need these stable commands:
 codex-orchestrator catalog
 codex-orchestrator catalog --catalog-root /path/to/categories
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper
+codex-orchestrator doctor --scope project --project-root .
 codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -45,6 +46,7 @@ Development-only direct execution from the repo root is also supported:
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer
+PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -93,6 +95,14 @@ Generated agent files use a Codex-compatible TOML shape:
 - `sandbox_mode`
 - `developer_instructions`
 
+## Validation
+
+Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed.
+
+```bash
+codex-orchestrator doctor --scope project --project-root .
+```
+
 ## Experimental Commands
 
 The repository currently also contains control-plane-oriented commands. These are kept available as experiments, but they are not the primary product identity and may change more aggressively.
@@ -109,6 +119,8 @@ Experimental commands:
 - `apply-result`
 
 These commands are best understood as a session-companion or prototype layer around Codex usage, not as a standalone multi-agent runtime that replaces Codex.
+
+See [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md) for the current experimental boundary.
 
 ## Development Install / Uninstall
 
@@ -149,3 +161,4 @@ If you touch the curses TUI, keep a PTY-based manual smoke in addition to automa
 - product direction: [docs/PRD.md](./docs/PRD.md)
 - product understanding / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.md](./docs/UNDERSTANDING_AND_WORKFLOW.md)
 - testing workflow: [docs/TESTING.md](./docs/TESTING.md)
+- experimental boundary: [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md)

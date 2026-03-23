@@ -82,6 +82,42 @@ developer_instructions = "custom helper instructions"
             self.assertIn("custom-helper", stdout)
             self.assertIn("[project]", stdout)
 
+    def test_doctor_command_reports_project_install_status(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            temp_home.mkdir()
+
+            with patch.object(Path, "home", return_value=temp_home):
+                install_exit_code, _, install_stderr = self.run_cli(
+                    [
+                        "install",
+                        "--scope",
+                        "project",
+                        "--project-root",
+                        temp_dir,
+                        "--agents",
+                        "cto-coordinator,reviewer",
+                    ]
+                )
+                self.assertEqual(install_exit_code, 0)
+                self.assertEqual(install_stderr, "")
+
+                exit_code, stdout, stderr = self.run_cli(
+                    [
+                        "doctor",
+                        "--scope",
+                        "project",
+                        "--project-root",
+                        temp_dir,
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("status: ok", stdout)
+            self.assertIn("Installed agent files checked:", stdout)
+
     def test_catalog_command_supports_catalog_root(self) -> None:
         with TemporaryDirectory() as temp_dir:
             catalog_root = Path(temp_dir) / "categories"

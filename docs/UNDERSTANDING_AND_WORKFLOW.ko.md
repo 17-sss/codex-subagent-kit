@@ -28,6 +28,7 @@
 
 - `catalog`
 - `install`
+- `doctor`
 - `template init`
 - `tui`
 

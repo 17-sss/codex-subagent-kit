@@ -27,6 +27,7 @@ stable capability:
 
 - curses 기반 install-first TUI
 - 비대화형 install CLI
+- `doctor` validation CLI
 - 카테고리형 built-in catalog
 - project/global discovery와 precedence
 - awesome 스타일 외부 catalog injection

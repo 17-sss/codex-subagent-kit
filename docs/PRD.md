@@ -27,6 +27,7 @@ Stable capabilities:
 
 - curses-based install-first TUI
 - non-interactive install CLI
+- `doctor` validation CLI
 - category-based built-in catalog
 - project/global discovery with precedence
 - external awesome-style catalog injection

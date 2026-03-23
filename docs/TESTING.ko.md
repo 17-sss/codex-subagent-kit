@@ -8,6 +8,7 @@
 
 - 현재 동작하는 CLI/TUI 흐름을 새 기능이 깨뜨리지 않을 것
 - 생성기 변경이 재실행 가능성과 출력 계약을 유지할 것
+- validation 명령이 Codex 실행 전에 malformed TOML을 잡아낼 것
 - SDD 문서에서 정의한 독립 검증 방법이 구현 단계까지 이어질 것
 
 ## 기본 원칙
@@ -56,7 +57,10 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli install \
   --scope project \
   --project-root .tmp-smoke \
-  --agents reviewer
+  --agents cto-coordinator,reviewer
+PYTHONPATH=src python3 -m codex_orchestrator.cli doctor \
+  --scope project \
+  --project-root .tmp-smoke
 ```
 
 TUI 변경 시 추가:
@@ -68,7 +72,8 @@ TUI 변경 시 추가:
 
 - catalog 구조와 key 일관성
 - generator의 파일 생성, 중복 방지, 오류 처리
-- CLI의 `catalog` 및 `install` 기본 흐름과 오류 반환
+- doctor validation의 healthy install / malformed file / missing explicit catalog root 처리
+- CLI의 `catalog`, `install`, `doctor` 기본 흐름과 오류 반환
 
 ## 현재 한계
 

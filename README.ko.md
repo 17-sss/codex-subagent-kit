@@ -37,6 +37,7 @@ codex-orchestrator
 codex-orchestrator catalog
 codex-orchestrator catalog --catalog-root /path/to/categories
 codex-orchestrator install --scope project --agents cto-coordinator,reviewer,code-mapper
+codex-orchestrator doctor --scope project --project-root .
 codex-orchestrator template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -45,6 +46,7 @@ codex-orchestrator template init --project-root . --category custom-ops --agent 
 ```bash
 PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
 PYTHONPATH=src python3 -m codex_orchestrator.cli install --scope project --agents cto-coordinator,reviewer
+PYTHONPATH=src python3 -m codex_orchestrator.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_orchestrator.cli template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
@@ -93,6 +95,14 @@ codex-orchestrator template init \
 - `sandbox_mode`
 - `developer_instructions`
 
+## Validation
+
+install 이후에는 `doctor`로 현재 보이는 agent 파일과 주입된 catalog root가 아직 정상 형식인지 확인할 수 있다.
+
+```bash
+codex-orchestrator doctor --scope project --project-root .
+```
+
 ## Experimental Commands
 
 현재 저장소에는 control-plane 성격의 명령도 들어 있다. 다만 이 기능들은 실험 기능으로 유지하며, 제품의 기본 정체성으로 보지 않는다. 이후 더 공격적으로 바뀔 수 있다.
@@ -109,6 +119,8 @@ experimental 명령:
 - `apply-result`
 
 이 명령들은 Codex를 대체하는 독립 multi-agent runtime이라기보다, Codex 사용 주변에 붙는 session-companion 또는 prototype layer로 이해하는 편이 맞다.
+
+현재 experimental 경계는 [docs/EXPERIMENTAL.ko.md](./docs/EXPERIMENTAL.ko.md)에 따로 정리돼 있다.
 
 ## 개발용 설치 / 제거
 
@@ -149,3 +161,4 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 - 제품 방향: [docs/PRD.ko.md](./docs/PRD.ko.md)
 - 제품 이해 / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.ko.md](./docs/UNDERSTANDING_AND_WORKFLOW.ko.md)
 - 테스트 workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
+- experimental 경계: [docs/EXPERIMENTAL.ko.md](./docs/EXPERIMENTAL.ko.md)
