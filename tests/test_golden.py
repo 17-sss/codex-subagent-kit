@@ -5,9 +5,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from codex_orchestrator.doctor import render_doctor_report, run_doctor
-from codex_orchestrator.generator import install_agents
-from codex_orchestrator.usage import render_usage_guide
+from codex_subagent_kit.doctor import render_doctor_report, run_doctor
+from codex_subagent_kit.generator import install_agents
+from codex_subagent_kit.usage import render_usage_guide
 
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "golden"

@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from codex_orchestrator.catalog import (
+from codex_subagent_kit.catalog import (
     get_agent_map,
     get_agents,
     get_agents_by_category,
@@ -87,7 +87,7 @@ model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = "Coordinate custom injected work."
-codex_orchestrator_category = "meta-orchestration"
+codex_subagent_kit_category = "meta-orchestration"
 """.strip()
                 + "\n",
                 encoding="utf-8",

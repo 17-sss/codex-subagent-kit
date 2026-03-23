@@ -26,7 +26,7 @@ from .usage import UsageError, render_usage_guide
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="codex-orchestrator",
+        prog="codex-subagent-kit",
         description=(
             "Install and manage Codex subagent definitions. "
             "Stable core: catalog, install, doctor, template, tui. "

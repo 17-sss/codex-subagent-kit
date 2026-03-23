@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from codex_orchestrator.control_plane import (
+from codex_subagent_kit.control_plane import (
     ControlPlaneError,
     apply_result,
     begin_dispatch,
@@ -15,7 +15,7 @@ from codex_orchestrator.control_plane import (
     open_dispatch,
     render_dispatch_handoff,
 )
-from codex_orchestrator.generator import install_agents
+from codex_subagent_kit.generator import install_agents
 
 
 class ControlPlaneTests(unittest.TestCase):

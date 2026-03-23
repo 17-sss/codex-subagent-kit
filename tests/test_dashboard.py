@@ -4,9 +4,9 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from codex_orchestrator.control_plane import apply_result, enqueue_command, open_dispatch
-from codex_orchestrator.dashboard import DashboardError, render_role_board
-from codex_orchestrator.generator import install_agents
+from codex_subagent_kit.control_plane import apply_result, enqueue_command, open_dispatch
+from codex_subagent_kit.dashboard import DashboardError, render_role_board
+from codex_subagent_kit.generator import install_agents
 
 
 class DashboardTests(unittest.TestCase):

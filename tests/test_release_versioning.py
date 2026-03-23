@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from codex_orchestrator.release_versioning import bump_semver, classify_bump, compute_next_version, parse_semver
+from codex_subagent_kit.release_versioning import bump_semver, classify_bump, compute_next_version, parse_semver
 
 
 class ReleaseVersioningTests(unittest.TestCase):

@@ -4,14 +4,14 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from codex_orchestrator.panel import PanelError, render_panel
+from codex_subagent_kit.panel import PanelError, render_panel
 
 
 class PanelTests(unittest.TestCase):
     def test_render_panel_from_generated_team_manifest(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
-            manifest_path = project_root / ".codex" / "orchestrator" / "team.toml"
+            manifest_path = project_root / ".codex" / "subagent-kit" / "team.toml"
             manifest_path.parent.mkdir(parents=True)
             manifest_path.write_text(
                 """
@@ -45,7 +45,7 @@ workers = ["reviewer", "code-mapper"]
     def test_render_panel_reads_runtime_queue_and_dispatch_state(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
-            orchestrator_root = project_root / ".codex" / "orchestrator"
+            orchestrator_root = project_root / ".codex" / "subagent-kit"
             (orchestrator_root / "runtime").mkdir(parents=True)
             (orchestrator_root / "queue").mkdir()
             (orchestrator_root / "ledger").mkdir()

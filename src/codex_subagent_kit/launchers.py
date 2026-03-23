@@ -12,9 +12,9 @@ def _slugify_project_name(project_root: Path) -> str:
 
 def _default_backend_title(project_root: Path) -> str:
     name = _slugify_project_name(project_root)
-    if name.startswith("codex-orchestrator"):
+    if name.startswith("codex-subagent-kit"):
         return name
-    return f"codex-orchestrator-{name}"
+    return f"codex-subagent-kit-{name}"
 
 
 def default_backend_title(project_root: Path) -> str:
@@ -34,11 +34,11 @@ set -euo pipefail
 ROLE="${{1:?role is required}}"
 INTERVAL="${{2:-2}}"
 PROJECT_ROOT={quoted_project_root}
-CODEX_ORCHESTRATOR_BIN="${{CODEX_ORCHESTRATOR_BIN:-codex-orchestrator}}"
+CODEX_SUBAGENT_KIT_BIN="${{CODEX_SUBAGENT_KIT_BIN:-${{CODEX_ORCHESTRATOR_BIN:-codex-subagent-kit}}}}"
 
 while true; do
   clear
-  "$CODEX_ORCHESTRATOR_BIN" board --project-root "$PROJECT_ROOT" --role "$ROLE"
+  "$CODEX_SUBAGENT_KIT_BIN" board --project-root "$PROJECT_ROOT" --role "$ROLE"
   sleep "$INTERVAL"
 done
 """
@@ -52,11 +52,11 @@ set -euo pipefail
 
 INTERVAL="${{1:-2}}"
 PROJECT_ROOT={quoted_project_root}
-CODEX_ORCHESTRATOR_BIN="${{CODEX_ORCHESTRATOR_BIN:-codex-orchestrator}}"
+CODEX_SUBAGENT_KIT_BIN="${{CODEX_SUBAGENT_KIT_BIN:-${{CODEX_ORCHESTRATOR_BIN:-codex-subagent-kit}}}}"
 
 while true; do
   clear
-  "$CODEX_ORCHESTRATOR_BIN" panel --project-root "$PROJECT_ROOT"
+  "$CODEX_SUBAGENT_KIT_BIN" panel --project-root "$PROJECT_ROOT"
   sleep "$INTERVAL"
 done
 """

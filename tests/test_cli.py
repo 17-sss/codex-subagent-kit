@@ -7,7 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from codex_orchestrator import cli
+from codex_subagent_kit import cli
 
 
 class CLITests(unittest.TestCase):
@@ -29,7 +29,7 @@ class CLITests(unittest.TestCase):
         self.assertIn("reviewer", stdout)
 
     def test_empty_command_defaults_to_tui(self) -> None:
-        with patch("codex_orchestrator.cli.run_tui", return_value=0) as run_tui_mock:
+        with patch("codex_subagent_kit.cli.run_tui", return_value=0) as run_tui_mock:
             exit_code, stdout, stderr = self.run_cli([])
 
         self.assertEqual(exit_code, 0)
@@ -128,7 +128,7 @@ developer_instructions = "custom helper instructions"
                 (
                     project_root
                     / ".codex"
-                    / "orchestrator"
+                    / "subagent-kit"
                     / "catalog"
                     / "categories"
                     / "11-custom-ops"
@@ -264,7 +264,7 @@ model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = "Coordinate custom injected work."
-codex_orchestrator_category = "meta-orchestration"
+codex_subagent_kit_category = "meta-orchestration"
 """.strip()
                 + "\n",
                 encoding="utf-8",
@@ -379,7 +379,7 @@ sandbox_mode = "read-only"
                 (
                     project_root
                     / ".codex"
-                    / "orchestrator"
+                    / "subagent-kit"
                     / "catalog"
                     / "categories"
                     / "11-custom-ops"

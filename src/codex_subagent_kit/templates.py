@@ -4,6 +4,7 @@ import json
 import re
 from pathlib import Path
 
+from .app_paths import CATEGORY_OVERRIDE_KEY
 from .catalog import resolve_global_catalog_dir, resolve_project_catalog_dir
 from .generator import ORCHESTRATOR_CATEGORY
 from .models import TemplateInitResult
@@ -155,7 +156,7 @@ def render_agent_template(
         '"""',
     ]
     if category_override:
-        lines.append(f"codex_orchestrator_category = {json.dumps(category_override)}")
+        lines.append(f"{CATEGORY_OVERRIDE_KEY} = {json.dumps(category_override)}")
     return "\n".join(lines) + "\n"
 
 

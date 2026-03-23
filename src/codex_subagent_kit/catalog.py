@@ -4,6 +4,12 @@ import tomllib
 from functools import lru_cache
 from pathlib import Path
 
+from .app_paths import (
+    CATEGORY_OVERRIDE_KEY,
+    LEGACY_CATEGORY_OVERRIDE_KEY,
+    resolve_global_tool_dir,
+    resolve_project_tool_dir,
+)
 from .models import AgentSpec, Category
 
 
@@ -24,11 +30,11 @@ def resolve_global_agents_dir() -> Path:
 
 
 def resolve_project_catalog_dir(project_root: Path) -> Path:
-    return project_root / ".codex" / "orchestrator" / "catalog" / "categories"
+    return resolve_project_tool_dir(project_root) / "catalog" / "categories"
 
 
 def resolve_global_catalog_dir() -> Path:
-    return Path.home() / ".codex" / "orchestrator" / "catalog" / "categories"
+    return resolve_global_tool_dir() / "catalog" / "categories"
 
 
 def normalize_catalog_roots(catalog_roots: tuple[Path, ...] | None = None) -> tuple[Path, ...]:
@@ -110,9 +116,11 @@ def _parse_agent_file(
     ):
         raise ValueError("missing required string fields")
 
-    explicit_category = data.get("codex_orchestrator_category")
+    explicit_category = data.get(CATEGORY_OVERRIDE_KEY)
+    if explicit_category is None:
+        explicit_category = data.get(LEGACY_CATEGORY_OVERRIDE_KEY)
     if explicit_category is not None and (not isinstance(explicit_category, str) or not explicit_category.strip()):
-        raise ValueError("invalid codex_orchestrator_category")
+        raise ValueError(f"invalid {CATEGORY_OVERRIDE_KEY}")
 
     category = (
         explicit_category.strip()

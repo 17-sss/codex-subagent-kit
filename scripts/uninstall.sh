@@ -15,7 +15,7 @@ usage() {
   cat <<EOF
 Usage: ./scripts/uninstall.sh [options]
 
-Remove the development install for codex-orchestrator.
+Remove the development install for codex-subagent-kit.
 
 Options:
   --venv-dir <path>  Virtualenv directory to uninstall from (default: ${VENV_DIR})
@@ -80,10 +80,10 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-LINK_PATH="$LINK_DIR/codex-orchestrator"
+LINK_PATH="$LINK_DIR/codex-subagent-kit"
 VENV_BIN_DIR="$VENV_DIR/bin"
 VENV_PYTHON="$VENV_BIN_DIR/python"
-ENTRYPOINT_PATH="$VENV_BIN_DIR/codex-orchestrator"
+ENTRYPOINT_PATH="$VENV_BIN_DIR/codex-subagent-kit"
 
 log "repo root: $REPO_ROOT"
 log "venv dir: $VENV_DIR"
@@ -106,9 +106,9 @@ fi
 if [[ -x "$VENV_PYTHON" ]]; then
   log "uninstalling editable package from virtualenv"
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    run "$VENV_PYTHON" -m pip uninstall -y codex-orchestrator
+    run "$VENV_PYTHON" -m pip uninstall -y codex-subagent-kit
   else
-    "$VENV_PYTHON" -m pip uninstall -y codex-orchestrator >/dev/null || true
+    "$VENV_PYTHON" -m pip uninstall -y codex-subagent-kit >/dev/null || true
   fi
 else
   log "virtualenv python not found; skipping pip uninstall"

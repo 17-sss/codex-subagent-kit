@@ -279,7 +279,7 @@ def render_dispatch_handoff(project_root: Path, *, dispatch_id: str) -> str:
         f"role-description: {agent.description}",
         "",
         "[suggested send_input message]",
-        f"You own the `{role}` {role_label} role for this project-local codex-orchestrator team.",
+        f"You own the `{role}` {role_label} role for this project-local codex-subagent-kit team.",
         f"Operator: {operator_label}",
         f"Root orchestrator: {orchestrator_key}",
         f"Project root: {project_root}",

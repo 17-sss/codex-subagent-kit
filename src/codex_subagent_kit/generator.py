@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from .app_paths import resolve_project_tool_dir
 from .catalog import get_agent_map
 from .launchers import (
     render_cmux_launcher,
@@ -30,7 +31,7 @@ def resolve_target_dir(scope: str, project_root: Path) -> Path:
 
 
 def resolve_scaffold_dir(project_root: Path) -> Path:
-    return project_root / ".codex" / "orchestrator"
+    return resolve_project_tool_dir(project_root)
 
 
 def resolve_scaffold_catalog_dir(project_root: Path) -> Path:
@@ -109,8 +110,8 @@ This folder is the project-local seed for the future control-plane.
 ## Notes
 
 - `.codex/agents/` keeps static agent definitions.
-- `.codex/orchestrator/` keeps team and runtime-oriented assets.
-- `.codex/orchestrator/catalog/categories/` is the project-local catalog injection point for custom category directories and agent templates.
+- `.codex/subagent-kit/` keeps team and runtime-oriented assets.
+- `.codex/subagent-kit/catalog/categories/` is the project-local catalog injection point for custom category directories and agent templates.
 - `runtime/agents.toml` tracks orchestrator/worker runtime status.
 - `queue/commands.toml` is the queue seed for future operator commands.
 - `ledger/dispatches.toml` is the dispatch ledger seed.

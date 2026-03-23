@@ -4,25 +4,27 @@ import tomllib
 from collections import Counter
 from pathlib import Path
 
+from .app_paths import resolve_project_tool_dir
+
 
 class PanelError(RuntimeError):
     """Raised when the control panel cannot be rendered."""
 
 
 def resolve_team_manifest_path(project_root: Path) -> Path:
-    return project_root / ".codex" / "orchestrator" / "team.toml"
+    return resolve_project_tool_dir(project_root) / "team.toml"
 
 
 def resolve_runtime_state_path(project_root: Path) -> Path:
-    return project_root / ".codex" / "orchestrator" / "runtime" / "agents.toml"
+    return resolve_project_tool_dir(project_root) / "runtime" / "agents.toml"
 
 
 def resolve_queue_path(project_root: Path) -> Path:
-    return project_root / ".codex" / "orchestrator" / "queue" / "commands.toml"
+    return resolve_project_tool_dir(project_root) / "queue" / "commands.toml"
 
 
 def resolve_dispatch_ledger_path(project_root: Path) -> Path:
-    return project_root / ".codex" / "orchestrator" / "ledger" / "dispatches.toml"
+    return resolve_project_tool_dir(project_root) / "ledger" / "dispatches.toml"
 
 
 def _load_toml(path: Path) -> dict[str, object]:

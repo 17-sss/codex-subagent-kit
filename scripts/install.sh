@@ -16,12 +16,12 @@ usage() {
   cat <<EOF
 Usage: ./scripts/install.sh [options]
 
-Install codex-orchestrator for development using a repo-local editable virtualenv.
+Install codex-subagent-kit for development using a repo-local editable virtualenv.
 
 Options:
   --python <bin>     Python executable to use (default: ${PYTHON_BIN})
   --venv-dir <path>  Virtualenv directory (default: ${VENV_DIR})
-  --link-dir <path>  Directory for the optional codex-orchestrator symlink (default: ${LINK_DIR})
+  --link-dir <path>  Directory for the optional codex-subagent-kit symlink (default: ${LINK_DIR})
   --no-link          Do not create a symlink in the link directory
   --dry-run          Print planned actions without changing anything
   -h, --help         Show this help
@@ -90,10 +90,10 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-LINK_PATH="$LINK_DIR/codex-orchestrator"
+LINK_PATH="$LINK_DIR/codex-subagent-kit"
 VENV_BIN_DIR="$VENV_DIR/bin"
 VENV_PYTHON="$VENV_BIN_DIR/python"
-ENTRYPOINT_PATH="$VENV_BIN_DIR/codex-orchestrator"
+ENTRYPOINT_PATH="$VENV_BIN_DIR/codex-subagent-kit"
 
 if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
   echo "error: python executable not found: $PYTHON_BIN" >&2
@@ -153,7 +153,7 @@ if [[ ":$PATH:" == *":$LINK_DIR:"* ]]; then
   cat <<EOF
 
 You can now run:
-  codex-orchestrator --help
+  codex-subagent-kit --help
 EOF
 else
   cat <<EOF

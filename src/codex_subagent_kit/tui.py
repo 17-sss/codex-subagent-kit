@@ -18,7 +18,7 @@ class BackNavigation(RuntimeError):
 
 def _draw_title(stdscr: curses.window, title: str, subtitle: str | None = None) -> None:
     stdscr.clear()
-    stdscr.addstr(0, 2, "codex-orchestrator", curses.A_BOLD)
+    stdscr.addstr(0, 2, "codex-subagent-kit", curses.A_BOLD)
     stdscr.addstr(2, 2, title, curses.A_UNDERLINE)
     if subtitle:
         stdscr.addstr(3, 2, subtitle)

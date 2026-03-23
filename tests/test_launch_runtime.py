@@ -4,8 +4,8 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from codex_orchestrator.generator import install_agents
-from codex_orchestrator.launch_runtime import LaunchError, build_launch_plan, render_launch_preview
+from codex_subagent_kit.generator import install_agents
+from codex_subagent_kit.launch_runtime import LaunchError, build_launch_plan, render_launch_preview
 
 
 class LaunchRuntimeTests(unittest.TestCase):
@@ -43,7 +43,7 @@ class LaunchRuntimeTests(unittest.TestCase):
             )
 
             self.assertEqual(plan.argv[0], str(plan.script_path))
-            self.assertEqual(plan.argv[1], f"codex-orchestrator-{project_root.name}")
+            self.assertEqual(plan.argv[1], f"codex-subagent-kit-{project_root.name}")
             self.assertEqual(plan.argv[2], "--no-attach")
 
     def test_build_cmux_launch_plan_supports_custom_name(self) -> None:

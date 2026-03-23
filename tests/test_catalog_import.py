@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from codex_orchestrator.catalog_import import CatalogImportError, import_catalog
+from codex_subagent_kit.catalog_import import CatalogImportError, import_catalog
 
 
 class CatalogImportTests(unittest.TestCase):
@@ -40,8 +40,8 @@ developer_instructions = "custom helper instructions"
                 category_keys=[],
             )
 
-            target_dir = project_root / ".codex" / "orchestrator" / "catalog" / "categories" / "11-custom-ops"
-            self.assertEqual(result.target_root, project_root / ".codex" / "orchestrator" / "catalog" / "categories")
+            target_dir = project_root / ".codex" / "subagent-kit" / "catalog" / "categories" / "11-custom-ops"
+            self.assertEqual(result.target_root, project_root / ".codex" / "subagent-kit" / "catalog" / "categories")
             self.assertIn("custom-helper", result.imported_agent_keys)
             self.assertTrue((target_dir / "README.md").exists())
             self.assertTrue((target_dir / "custom-helper.toml").exists())
@@ -81,7 +81,7 @@ developer_instructions = "instructions for {key}"
                     category_keys=["custom-ops"],
                 )
 
-            target_dir = temp_home / ".codex" / "orchestrator" / "catalog" / "categories" / "11-custom-ops"
+            target_dir = temp_home / ".codex" / "subagent-kit" / "catalog" / "categories" / "11-custom-ops"
             self.assertIn("custom-ops", result.imported_category_keys)
             self.assertTrue((target_dir / "custom-helper.toml").exists())
             self.assertTrue((target_dir / "custom-reviewer.toml").exists())
@@ -91,7 +91,7 @@ developer_instructions = "instructions for {key}"
             project_root = Path(temp_dir)
             source_root = project_root / "source-categories"
             category_dir = source_root / "11-custom-ops"
-            target_dir = project_root / ".codex" / "orchestrator" / "catalog" / "categories" / "11-custom-ops"
+            target_dir = project_root / ".codex" / "subagent-kit" / "catalog" / "categories" / "11-custom-ops"
             category_dir.mkdir(parents=True)
             target_dir.mkdir(parents=True)
             (category_dir / "README.md").write_text("# 11. Custom Ops\n\nCustom external operators.\n", encoding="utf-8")

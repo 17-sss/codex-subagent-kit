@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from codex_orchestrator.templates import init_template
+from codex_subagent_kit.templates import init_template
 
 
 class TemplateInitTests(unittest.TestCase):
@@ -22,7 +22,7 @@ class TemplateInitTests(unittest.TestCase):
 
             self.assertEqual(
                 result.target_root,
-                project_root / ".codex" / "orchestrator" / "catalog" / "categories",
+                project_root / ".codex" / "subagent-kit" / "catalog" / "categories",
             )
             self.assertEqual(result.category_dir.name, "11-custom-ops")
             self.assertTrue(result.readme_path.exists())
@@ -50,7 +50,7 @@ class TemplateInitTests(unittest.TestCase):
             self.assertEqual(result.target_root, catalog_root.resolve())
             self.assertTrue(result.agent_path.exists())
             self.assertIn(
-                'codex_orchestrator_category = "meta-orchestration"',
+                'codex_subagent_kit_category = "meta-orchestration"',
                 result.agent_path.read_text(encoding="utf-8"),
             )
 

@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from codex_orchestrator.generator import (
+from codex_subagent_kit.generator import (
     GenerationError,
     install_agents,
     render_agent_file,
@@ -14,7 +14,7 @@ from codex_orchestrator.generator import (
     resolve_scaffold_dir,
     resolve_target_dir,
 )
-from codex_orchestrator.models import AgentSpec
+from codex_subagent_kit.models import AgentSpec
 
 
 class GeneratorTests(unittest.TestCase):
@@ -75,7 +75,7 @@ class GeneratorTests(unittest.TestCase):
 
             board_runner = resolve_scaffold_dir(project_root) / "launchers" / "run-board.sh"
             self.assertTrue(board_runner.exists())
-            self.assertIn("codex-orchestrator", board_runner.read_text(encoding="utf-8"))
+            self.assertIn("codex-subagent-kit", board_runner.read_text(encoding="utf-8"))
 
             self.assertTrue(resolve_scaffold_catalog_dir(project_root).exists())
 

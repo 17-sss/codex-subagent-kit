@@ -4,10 +4,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from codex_orchestrator.catalog import get_agents_by_category
-from codex_orchestrator.doctor import DoctorIssue, DoctorReport
-from codex_orchestrator.models import InstallResult
-from codex_orchestrator.tui import BackNavigation, _default_agent_selection, _validate_agent_selection, run_tui
+from codex_subagent_kit.catalog import get_agents_by_category
+from codex_subagent_kit.doctor import DoctorIssue, DoctorReport
+from codex_subagent_kit.models import InstallResult
+from codex_subagent_kit.tui import BackNavigation, _default_agent_selection, _validate_agent_selection, run_tui
 
 
 class _FakeWindow:
@@ -69,14 +69,14 @@ class TuiTests(unittest.TestCase):
             return func(_FakeWindow())
 
         with (
-            patch("codex_orchestrator.tui.curses.wrapper", side_effect=fake_wrapper),
-            patch("codex_orchestrator.tui.curses.curs_set", return_value=None),
+            patch("codex_subagent_kit.tui.curses.wrapper", side_effect=fake_wrapper),
+            patch("codex_subagent_kit.tui.curses.curs_set", return_value=None),
             patch(
-                "codex_orchestrator.tui._single_select",
+                "codex_subagent_kit.tui._single_select",
                 side_effect=["project", "global"],
             ) as single_select_mock,
             patch(
-                "codex_orchestrator.tui._multi_select",
+                "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     set(),
                     BackNavigation("back"),
@@ -85,10 +85,10 @@ class TuiTests(unittest.TestCase):
                     {"reviewer"},
                 ],
             ),
-            patch("codex_orchestrator.tui._summary_screen", return_value=True),
-            patch("codex_orchestrator.tui.install_agents", return_value=fake_result),
-            patch("codex_orchestrator.tui.run_doctor", return_value=self._doctor_report(ok=True)),
-            patch("codex_orchestrator.tui._result_screen", return_value=None),
+            patch("codex_subagent_kit.tui._summary_screen", return_value=True),
+            patch("codex_subagent_kit.tui.install_agents", return_value=fake_result),
+            patch("codex_subagent_kit.tui.run_doctor", return_value=self._doctor_report(ok=True)),
+            patch("codex_subagent_kit.tui._result_screen", return_value=None),
         ):
             exit_code = run_tui(Path("/tmp/project"))
 
@@ -109,20 +109,20 @@ class TuiTests(unittest.TestCase):
             return func(_FakeWindow())
 
         with (
-            patch("codex_orchestrator.tui.curses.wrapper", side_effect=fake_wrapper),
-            patch("codex_orchestrator.tui.curses.curs_set", return_value=None),
-            patch("codex_orchestrator.tui._single_select", return_value="project"),
+            patch("codex_subagent_kit.tui.curses.wrapper", side_effect=fake_wrapper),
+            patch("codex_subagent_kit.tui.curses.curs_set", return_value=None),
+            patch("codex_subagent_kit.tui._single_select", return_value="project"),
             patch(
-                "codex_orchestrator.tui._multi_select",
+                "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     {"meta-orchestration"},
                     {"cto-coordinator"},
                 ],
             ),
-            patch("codex_orchestrator.tui._summary_screen", return_value=True),
-            patch("codex_orchestrator.tui.install_agents", return_value=fake_result) as install_mock,
-            patch("codex_orchestrator.tui.run_doctor", return_value=self._doctor_report(ok=True)) as doctor_mock,
-            patch("codex_orchestrator.tui._result_screen", return_value=None),
+            patch("codex_subagent_kit.tui._summary_screen", return_value=True),
+            patch("codex_subagent_kit.tui.install_agents", return_value=fake_result) as install_mock,
+            patch("codex_subagent_kit.tui.run_doctor", return_value=self._doctor_report(ok=True)) as doctor_mock,
+            patch("codex_subagent_kit.tui._result_screen", return_value=None),
         ):
             exit_code = run_tui(Path("/tmp/project"), catalog_roots=(catalog_root,))
 
@@ -144,20 +144,20 @@ class TuiTests(unittest.TestCase):
             return func(_FakeWindow())
 
         with (
-            patch("codex_orchestrator.tui.curses.wrapper", side_effect=fake_wrapper),
-            patch("codex_orchestrator.tui.curses.curs_set", return_value=None),
-            patch("codex_orchestrator.tui._single_select", return_value="project"),
+            patch("codex_subagent_kit.tui.curses.wrapper", side_effect=fake_wrapper),
+            patch("codex_subagent_kit.tui.curses.curs_set", return_value=None),
+            patch("codex_subagent_kit.tui._single_select", return_value="project"),
             patch(
-                "codex_orchestrator.tui._multi_select",
+                "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     {"meta-orchestration"},
                     {"cto-coordinator"},
                 ],
             ),
-            patch("codex_orchestrator.tui._summary_screen", return_value=True),
-            patch("codex_orchestrator.tui.install_agents", return_value=fake_result),
-            patch("codex_orchestrator.tui.run_doctor", return_value=self._doctor_report(ok=False)),
-            patch("codex_orchestrator.tui._result_screen", return_value=None),
+            patch("codex_subagent_kit.tui._summary_screen", return_value=True),
+            patch("codex_subagent_kit.tui.install_agents", return_value=fake_result),
+            patch("codex_subagent_kit.tui.run_doctor", return_value=self._doctor_report(ok=False)),
+            patch("codex_subagent_kit.tui._result_screen", return_value=None),
         ):
             exit_code = run_tui(Path("/tmp/project"))
 

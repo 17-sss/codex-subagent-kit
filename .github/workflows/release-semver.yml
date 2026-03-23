@@ -72,7 +72,7 @@ PY
 import os
 from pathlib import Path
 
-from codex_orchestrator.release_versioning import compute_next_version
+from codex_subagent_kit.release_versioning import compute_next_version
 
 base_version = os.environ["BASE_VERSION"]
 raw_messages = Path(os.environ["COMMITS_FILE"]).read_text(encoding="utf-8")

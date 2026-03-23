@@ -5,8 +5,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from codex_orchestrator.generator import install_agents
-from codex_orchestrator.usage import UsageError, render_usage_guide
+from codex_subagent_kit.generator import install_agents
+from codex_subagent_kit.usage import UsageError, render_usage_guide
 
 
 class UsageTests(unittest.TestCase):
