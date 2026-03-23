@@ -34,7 +34,7 @@ set -euo pipefail
 ROLE="${{1:?role is required}}"
 INTERVAL="${{2:-2}}"
 PROJECT_ROOT={quoted_project_root}
-CODEX_SUBAGENT_KIT_BIN="${{CODEX_SUBAGENT_KIT_BIN:-${{CODEX_ORCHESTRATOR_BIN:-codex-subagent-kit}}}}"
+CODEX_SUBAGENT_KIT_BIN="${{CODEX_SUBAGENT_KIT_BIN:-codex-subagent-kit}}"
 
 while true; do
   clear
@@ -52,7 +52,7 @@ set -euo pipefail
 
 INTERVAL="${{1:-2}}"
 PROJECT_ROOT={quoted_project_root}
-CODEX_SUBAGENT_KIT_BIN="${{CODEX_SUBAGENT_KIT_BIN:-${{CODEX_ORCHESTRATOR_BIN:-codex-subagent-kit}}}}"
+CODEX_SUBAGENT_KIT_BIN="${{CODEX_SUBAGENT_KIT_BIN:-codex-subagent-kit}}"
 
 while true; do
   clear

@@ -97,6 +97,33 @@ codex_subagent_kit_category = "meta-orchestration"
 
             self.assertEqual(agent_map["custom-coordinator"].category, "meta-orchestration")
 
+    def test_old_category_override_key_is_ignored(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            catalog_root = Path(temp_dir) / "categories"
+            category_dir = catalog_root / "11-custom-ops"
+            category_dir.mkdir(parents=True)
+            (category_dir / "README.md").write_text(
+                "# 11. Custom Ops\n\nCustom externally injected operators.\n",
+                encoding="utf-8",
+            )
+            (category_dir / "custom-coordinator.toml").write_text(
+                """
+name = "custom-coordinator"
+description = "Custom orchestrator"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = "Coordinate custom injected work."
+codex_orchestrator_category = "meta-orchestration"
+""".strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            agent_map = get_agent_map(catalog_roots=(catalog_root,))
+
+            self.assertEqual(agent_map["custom-coordinator"].category, "custom-ops")
+
     def test_external_agents_are_discovered_with_project_precedence(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)

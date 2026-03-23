@@ -6,7 +6,6 @@ from pathlib import Path
 
 from .app_paths import (
     CATEGORY_OVERRIDE_KEY,
-    LEGACY_CATEGORY_OVERRIDE_KEY,
     resolve_global_tool_dir,
     resolve_project_tool_dir,
 )
@@ -117,8 +116,6 @@ def _parse_agent_file(
         raise ValueError("missing required string fields")
 
     explicit_category = data.get(CATEGORY_OVERRIDE_KEY)
-    if explicit_category is None:
-        explicit_category = data.get(LEGACY_CATEGORY_OVERRIDE_KEY)
     if explicit_category is not None and (not isinstance(explicit_category, str) or not explicit_category.strip()):
         raise ValueError(f"invalid {CATEGORY_OVERRIDE_KEY}")
 
