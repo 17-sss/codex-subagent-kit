@@ -22,7 +22,14 @@ from .tui import run_tui
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="codex-orchestrator")
+    parser = argparse.ArgumentParser(
+        prog="codex-orchestrator",
+        description=(
+            "Install and manage Codex subagent definitions. "
+            "Stable core: catalog, install, template, tui. "
+            "Control-plane commands remain experimental."
+        ),
+    )
     subparsers = parser.add_subparsers(dest="command")
 
     catalog_parser = subparsers.add_parser("catalog", help="Print the available subagent catalog.")
@@ -37,14 +44,23 @@ def build_parser() -> argparse.ArgumentParser:
     install_parser.add_argument("--catalog-root", action="append", default=[])
     install_parser.add_argument("--overwrite", action="store_true")
 
-    panel_parser = subparsers.add_parser("panel", help="Render the current project control-panel topology.")
+    panel_parser = subparsers.add_parser(
+        "panel",
+        help="[experimental] Render the current project control-panel topology.",
+    )
     panel_parser.add_argument("--project-root", default=".")
 
-    board_parser = subparsers.add_parser("board", help="Render a role-specific terminal board.")
+    board_parser = subparsers.add_parser(
+        "board",
+        help="[experimental] Render a role-specific terminal board.",
+    )
     board_parser.add_argument("--project-root", default=".")
     board_parser.add_argument("--role", required=True)
 
-    launch_parser = subparsers.add_parser("launch", help="Launch a project-local terminal backend.")
+    launch_parser = subparsers.add_parser(
+        "launch",
+        help="[experimental] Launch a project-local terminal backend.",
+    )
     launch_parser.add_argument("--project-root", default=".")
     launch_parser.add_argument("--backend", choices=("tmux", "cmux"), required=True)
     launch_parser.add_argument("--name")
@@ -53,19 +69,22 @@ def build_parser() -> argparse.ArgumentParser:
 
     dispatch_prepare_parser = subparsers.add_parser(
         "dispatch-prepare",
-        help="Render the handoff package for a ready dispatch.",
+        help="[experimental] Render the handoff package for a ready dispatch.",
     )
     dispatch_prepare_parser.add_argument("--project-root", default=".")
     dispatch_prepare_parser.add_argument("--dispatch-id", required=True)
 
     dispatch_begin_parser = subparsers.add_parser(
         "dispatch-begin",
-        help="Mark a ready dispatch as in-flight after the real send step.",
+        help="[experimental] Mark a ready dispatch as in-flight after the real send step.",
     )
     dispatch_begin_parser.add_argument("--project-root", default=".")
     dispatch_begin_parser.add_argument("--dispatch-id", required=True)
 
-    enqueue_parser = subparsers.add_parser("enqueue", help="Enqueue an operator command into the project queue.")
+    enqueue_parser = subparsers.add_parser(
+        "enqueue",
+        help="[experimental] Enqueue an operator command into the project queue.",
+    )
     enqueue_parser.add_argument("--project-root", default=".")
     enqueue_parser.add_argument("--summary", required=True)
     enqueue_parser.add_argument("--role")
@@ -74,14 +93,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     dispatch_open_parser = subparsers.add_parser(
         "dispatch-open",
-        help="Promote a pending queue command into a dispatch ticket.",
+        help="[experimental] Promote a pending queue command into a dispatch ticket.",
     )
     dispatch_open_parser.add_argument("--project-root", default=".")
     dispatch_open_parser.add_argument("--command-id")
 
     apply_result_parser = subparsers.add_parser(
         "apply-result",
-        help="Apply a completed, failed, or cancelled result to a dispatch ticket.",
+        help="[experimental] Apply a completed, failed, or cancelled result to a dispatch ticket.",
     )
     apply_result_parser.add_argument("--project-root", default=".")
     apply_result_parser.add_argument("--dispatch-id", required=True)

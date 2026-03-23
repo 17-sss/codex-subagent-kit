@@ -4,62 +4,74 @@
 
 ## 목적
 
-`codex-orchestrator`는 프로젝트 로컬 `.codex` 기반으로 subagent를 쉽게 설치하고, 이후 queue/dispatch/control panel까지 확장할 수 있는 멀티 에이전트 운영 도구를 만든다.
+`codex-orchestrator`는 프로젝트 로컬 또는 글로벌 `.codex` 디렉터리 아래에 Codex subagent 정의를 설치하고 관리하는 Codex-native 툴킷이다.
 
-## 현재 단계
+이 제품은 의도적으로 “준비”에 집중한다.
 
-현재 구현 목표는 다음의 vertical slice다.
+- `codex-orchestrator`는 catalog를 정리하고, template를 scaffold하고, agent TOML을 설치한다
+- 실제 agent thread의 spawn, 라우팅, 관리는 `codex`가 맡는다
 
-1. 설치 위치 선택
+## Stable Product Core
+
+현재 stable한 제품 정체성은 다음 흐름이다.
+
+1. 설치 대상을 고른다
    - `Project`
    - `Global`
-2. 카테고리별 subagent 선택
-3. canonical `.codex/agents/*.toml` 생성
-4. project-scope `.codex/orchestrator` scaffold seed 생성
+2. built-in 또는 injected catalog를 본다
+3. subagent를 고른다
+4. 호환되는 `.codex/agents/*.toml`을 생성한다
+5. 그 작업공간에서 `codex`를 실행한다
 
-현재 실제로 들어간 것:
+stable capability:
 
-- curses 기반 TUI
+- curses 기반 install-first TUI
 - 비대화형 install CLI
-- 카테고리형 built-in subagent catalog
-- project/global `.toml` source discovery와 precedence
-- VoltAgent-style Codex-compatible TOML output
-- root orchestrator가 포함된 project-scope `team.toml` seed
-- runtime / queue / dispatch ledger seed
-- `team.toml` + seeded state 기반 terminal panel renderer
-- role-specific terminal board renderer
-- operator command를 queue에 넣는 최소 control-plane mutation
-- queue command를 `ready` dispatch ticket으로 여는 최소 control-plane mutation
-- ready dispatch의 handoff package와 `dispatched` state 전환
-- dispatch 결과를 queue / ledger / runtime state에 적용하는 최소 control-plane mutation
-- project-local board/monitor/`tmux`/`cmux` launcher seed
-- generated launcher를 실행하는 first-class `launch` CLI
+- 카테고리형 built-in catalog
+- project/global discovery와 precedence
+- awesome 스타일 외부 catalog injection
+- project/global template scaffolding
+- `developer_instructions`를 사용하는 Codex-compatible TOML output
 
-## 최종 방향
+## Session Companion Layer
 
-- `.codex/agents`
-  - Codex-native subagent 정의
-- `.codex/orchestrator`
-  - team manifest
-  - runtime state
-  - queue / dispatch ledger
-  - bootstrap / recovery
-  - `tmux` / `cmux` control panel
+저장소 안에는 Codex 사용 주변을 돕는 얇은 session-companion 레이어가 포함될 수 있다. 이 레이어는 설치된 자산을 살펴보거나 레이아웃을 미리 보거나 세션 보조 기능을 실험하는 데 도움을 줄 수 있지만, 제품을 외부 런타임으로 재정의하지는 않는다.
+
+예:
+
+- read-only topology 렌더링
+- launcher prototype
+- queue / dispatch 실험
+
+## Experimental Boundary
+
+다음 영역은 명시적으로 experimental로 둔다.
+
+- panel 렌더링
+- board 렌더링
+- launcher 실행
+- queue / dispatch / result lifecycle helper
+
+이 기능들은 유용할 수는 있지만 제품의 주된 가치 제안으로 보지 않는다.
 
 ## 제품 원칙
 
 - Codex-native first
-- Local-over-global
-- explicit delegation
-- static definition과 runtime state 분리
-- dashboard는 optional
-- 특정 회사/제품명에 묶인 예시를 기본 제공하지 않음
+- local over global
+- runtime 추상화보다 static definition 우선
+- 특정 repo lock-in보다 external catalog compatibility 우선
+- 명시적이고 검토 가능한 TOML template
+- 회사/제품 고유의 기본 자산은 포함하지 않음
 
-## MVP 이후
+## 현재 비목표
 
-- role별 project-specific owner agent 생성기
-- actual `send_input` / `wait_agent` integration
-- live session binding / broker 계층
-- queue / dispatch / recovery 통합
-- seeded panel을 live runtime control panel로 확장
-- Python-native control-plane 고도화
+- Codex를 대체하는 runtime owner 만들기
+- Codex 바깥의 standalone multi-agent broker 구축
+- 단일 서드파티 catalog repo에 종속되기
+
+## 단기 우선순위
+
+- install / catalog / template workflow 강화
+- 생성된 TOML에 대한 compatibility check와 validation 보강
+- 사용자 작성 catalog의 import / extension 경로 개선
+- 설치된 agent를 Codex 세션 안에서 어떻게 쓰는지 문서화 강화

@@ -37,6 +37,14 @@ class CLITests(unittest.TestCase):
         self.assertEqual(stderr, "")
         run_tui_mock.assert_called_once()
 
+    def test_help_text_marks_experimental_commands(self) -> None:
+        help_text = cli.build_parser().format_help()
+
+        self.assertIn("Install and manage Codex subagent definitions.", help_text)
+        self.assertIn("Control-plane commands remain experimental.", help_text)
+        self.assertIn("[experimental] Render the current project control-", help_text)
+        self.assertIn("[experimental] Promote a pending queue command into a", help_text)
+
     def test_catalog_command_discovers_external_agents(self) -> None:
         with TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)

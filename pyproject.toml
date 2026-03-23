@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "codex-orchestrator"
 version = "0.1.0"
-description = "Project-local TUI installer for Codex subagents and future control-panel orchestration."
+description = "Local-first toolkit for installing and managing Codex subagent definitions."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
