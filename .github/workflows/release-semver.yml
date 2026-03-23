@@ -45,16 +45,7 @@ jobs:
             commit_range="${latest_version}..${GITHUB_SHA}"
             base_version="${latest_version}"
           else
-            base_version="$(python3 - <<'PY'
-import tomllib
-from pathlib import Path
-
-with Path("pyproject.toml").open("rb") as handle:
-    data = tomllib.load(handle)
-
-print(data["project"]["version"])
-PY
-)"
+            base_version="$(python3 -c 'import tomllib; from pathlib import Path; print(tomllib.load(Path("pyproject.toml").open("rb"))["project"]["version"])')"
             {
               echo "version=${base_version}"
               echo "tag_exists=false"
@@ -64,26 +55,7 @@ PY
 
           git log --format='%B%n---commit-boundary---' "${commit_range}" > /tmp/release-commit-messages.txt
 
-          version="$(
-            BASE_VERSION="${base_version}" \
-            COMMITS_FILE="/tmp/release-commit-messages.txt" \
-            PYTHONPATH=src \
-            python3 - <<'PY'
-import os
-from pathlib import Path
-
-from codex_subagent_kit.release_versioning import compute_next_version
-
-base_version = os.environ["BASE_VERSION"]
-raw_messages = Path(os.environ["COMMITS_FILE"]).read_text(encoding="utf-8")
-messages = [
-    chunk.strip()
-    for chunk in raw_messages.split("---commit-boundary---")
-    if chunk.strip()
-]
-print(compute_next_version(base_version, messages))
-PY
-          )"
+          version="$(BASE_VERSION="${base_version}" COMMITS_FILE="/tmp/release-commit-messages.txt" PYTHONPATH=src python3 -c 'import os; from pathlib import Path; from codex_subagent_kit.release_versioning import compute_next_version; raw_messages = Path(os.environ["COMMITS_FILE"]).read_text(encoding="utf-8"); messages = [chunk.strip() for chunk in raw_messages.split("---commit-boundary---") if chunk.strip()]; print(compute_next_version(os.environ["BASE_VERSION"], messages))')"
 
           {
             echo "version=${version}"
