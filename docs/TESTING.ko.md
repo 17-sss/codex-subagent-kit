@@ -17,6 +17,7 @@
 - 가능한 경우 `tests/` 아래 `unittest`로 자동화한다.
 - `curses` TUI처럼 완전 자동화가 까다로운 변경은 자동 검증과 수동 PTY smoke를 함께 남긴다.
 - 버그 수정이나 회귀 대응은 재현 테스트를 먼저 추가하거나, 자동화가 불가능하면 이유와 수동 검증 절차를 문서화한다.
+- stable CLI와 생성 결과 계약은, 너무 많은 산발적 assertion 대신 소수의 golden fixture로 고정하는 편을 우선한다.
 
 ## SDD 안에서의 테스트 workflow
 
@@ -81,6 +82,7 @@ TUI 변경 시 추가:
 - generator의 파일 생성, 중복 방지, 오류 처리
 - doctor validation의 healthy install / malformed file / missing explicit catalog root 처리
 - `install --validate`를 통한 설치 시점 validation
+- 대표 generated TOML, `usage` 출력, `doctor` 출력에 대한 golden fixture
 - CLI의 `catalog`, `install`, `doctor` 기본 흐름과 오류 반환
 
 ## 현재 한계

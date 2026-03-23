@@ -17,6 +17,7 @@ The testing workflow for `codex-orchestrator` protects three things:
 - automate in `tests/` with `unittest` whenever practical
 - for changes like the curses TUI that are harder to automate fully, keep both automated checks and manual PTY smoke
 - for bug fixes and regressions, add a reproduction test first when possible; if not possible, document the reason and the manual validation path
+- for stable CLI and generated-output contracts, prefer a small number of golden fixtures over many fragile one-off assertions
 
 ## Testing Workflow Inside SDD
 
@@ -81,6 +82,7 @@ Additional checks for TUI changes:
 - generator file creation, preservation, and error handling
 - doctor validation for healthy installs, malformed files, and missing explicit catalog roots
 - install-time validation via `install --validate`
+- golden fixtures for representative generated TOML, `usage` output, and `doctor` output
 - CLI flows for `catalog`, `install`, control-plane mutations, launcher preview, and dispatch handoff
 - pure helper coverage around TUI default selection and project validation rules
 

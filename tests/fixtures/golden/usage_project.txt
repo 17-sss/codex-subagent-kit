@@ -1,0 +1,14 @@
+scope: project
+visible installed agents:
+- reviewer [project] - Use when changes need a correctness, regression, and risk-focused code review.
+- cto-coordinator [project] - Use when a parent agent must coordinate multi-repo work, preserve the critical path, and delegate bounded tasks to owner agents.
+
+starter prompt:
+Use cto-coordinator as the root orchestrator for this task: "Review the failing auth flow". Delegate to reviewer when appropriate.
+
+direct prompt ideas:
+- Use reviewer for this task: "Review the failing auth flow". Focus on: Use when changes need a correctness, regression, and risk-focused code review.
+- Use cto-coordinator for this task: "Review the failing auth flow". Focus on: Use when a parent agent must coordinate multi-repo work, preserve the critical path, and delegate bounded tasks to owner agents.
+
+session tip:
+- If Codex spawns a subagent thread, use /agent to inspect or continue that thread.
