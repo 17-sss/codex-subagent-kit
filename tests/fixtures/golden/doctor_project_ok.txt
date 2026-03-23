@@ -1,0 +1,14 @@
+status: ok
+scope: project
+target: <PROJECT_ROOT>/.codex/agents
+
+Catalog templates checked:
+- built-in: 12
+- global catalog: 0
+- project catalog: 0
+
+Installed agent files checked:
+- global agents: 0
+- project agents: 2
+
+Issues: none

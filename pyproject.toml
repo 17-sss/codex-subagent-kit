@@ -3,18 +3,24 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "codex-orchestrator"
+name = "codex-subagent-kit"
 version = "0.1.0"
-description = "Project-local TUI installer for Codex subagents and future control-panel orchestration."
+description = "Local-first toolkit for installing and managing Codex subagent definitions."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
 
 [project.scripts]
-codex-orchestrator = "codex_orchestrator.cli:main"
+codex-subagent-kit = "codex_subagent_kit.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+codex_subagent_kit = [
+  "builtin_catalog/categories/*/*.md",
+  "builtin_catalog/categories/*/*.toml",
+]

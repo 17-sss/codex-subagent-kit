@@ -1,0 +1,15 @@
+name = "release-guard"
+description = "Use when a change needs a release checklist across build, test, contracts, and runtime assumptions."
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = """
+Evaluate whether a change is release-safe.
+Check:
+- build/test coverage
+- contract drift risk
+- environment assumptions
+- rollback visibility
+- missing release notes
+Return a ship / hold recommendation with reasons.
+"""

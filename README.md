@@ -1,44 +1,107 @@
-# codex-orchestrator
+# codex-subagent-kit
 
-`codex-orchestrator`는 프로젝트 로컬 `.codex`를 기준으로 subagent를 쉽게 설치하고, 이후 control-plane과 dashboard까지 확장하기 위한 새 프로젝트다.
+Korean version: [README.ko.md](./README.ko.md)
 
-현재 MVP 범위:
+`codex-subagent-kit` is a local-first toolkit for installing and managing Codex subagent definitions in project and global `.codex` directories.
 
-- `Project` 또는 `Global` 설치 위치 선택
-- 카테고리별 subagent catalog 제공
-- 다중 선택으로 `.codex/agents/*.toml` 생성
-- curses 기반 TUI 제공
-- 비대화형 설치 CLI 제공
-- `__codex_agents`에서 이관한 control-plane reference asset 보관
+The stable product core is simple:
 
-후속 범위:
+- browse built-in and external agent catalogs
+- install compatible `.codex/agents/*.toml` files
+- scaffold new category and agent templates
+- use a TUI for the install-first workflow
 
-- team manifest
-- queue / dispatch ledger
-- recovery / bootstrap
-- `tmux` / `cmux` control panel
-- install 이후 control-plane scaffold 생성
+`codex-subagent-kit` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
 
-## 실행
+## Stable Workflow
 
-프로젝트 루트에서:
+1. Choose `Project` or `Global`.
+2. Browse built-in templates or inject an external `categories/` tree.
+3. Select the agents you want.
+4. Install `.codex/agents/*.toml`.
+5. Run `codex` in that project and ask it to use those subagents.
+
+This matches the current Codex-native model: custom agent definitions live under `~/.codex/agents/` or `.codex/agents/`, while actual agent threads are spawned and managed inside Codex.
+
+## Stable Commands
+
+Running `codex-subagent-kit` without a subcommand opens the TUI by default.
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli catalog
-PYTHONPATH=src python3 -m codex_orchestrator.cli tui
+codex-subagent-kit
 ```
 
-비대화형 설치:
+Most users only need these stable commands:
 
 ```bash
-PYTHONPATH=src python3 -m codex_orchestrator.cli install \
+codex-subagent-kit catalog
+codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
+codex-subagent-kit catalog --catalog-root /path/to/categories
+codex-subagent-kit install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
+codex-subagent-kit doctor --scope project --project-root .
+codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
+codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
+```
+
+Development-only direct execution from the repo root is also supported:
+
+```bash
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents cto-coordinator,reviewer --validate
+PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor --scope project --project-root .
+PYTHONPATH=src python3 -m codex_subagent_kit.cli usage --scope project --project-root . --task "Review the failing auth flow"
+PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . --category custom-ops --agent custom-coordinator
+```
+
+## Catalog Model
+
+- the app ships a small app-owned built-in catalog
+- the app does not vendor `awesome-codex-subagents` wholesale
+- project-local injection lives under `.codex/subagent-kit/catalog/categories/`
+- global injection lives under `~/.codex/subagent-kit/catalog/categories/`
+- `--catalog-root <path>` accepts any awesome-style `categories/` tree
+- `catalog import` can persist selected categories or agents into those injection paths
+- user-authored templates can follow the same folder format and participate in the same install flow
+
+When agent keys conflict, precedence is:
+
+- `project`
+- `global`
+- `built-in`
+
+## Template Scaffolding
+
+Create a new category and agent template in the project-local injection path:
+
+```bash
+codex-subagent-kit template init \
+  --project-root . \
+  --category custom-ops \
+  --agent custom-coordinator
+```
+
+Create one directly in an external `categories/` tree:
+
+```bash
+codex-subagent-kit template init \
+  --catalog-root /path/to/categories \
+  --category custom-ops \
+  --agent custom-coordinator \
+  --orchestrator
+```
+
+Persist selected external templates into the project-local injection path:
+
+```bash
+codex-subagent-kit catalog import \
   --scope project \
-  --agents cto-coordinator,reviewer,code-mapper
+  --project-root . \
+  --catalog-root /path/to/categories \
+  --agents custom-helper,custom-reviewer
 ```
 
-## 현재 생성 포맷
-
-생성되는 subagent 파일은 VoltAgent가 사용하는 `.toml` 스타일을 참고해 아래 필드를 쓴다.
+Generated agent files use a Codex-compatible TOML shape:
 
 - `name`
 - `description`
@@ -47,9 +110,86 @@ PYTHONPATH=src python3 -m codex_orchestrator.cli install \
 - `sandbox_mode`
 - `developer_instructions`
 
-## 참고
+## Validation
 
-- 제품 방향 문서: [docs/PRD.ko.md](./docs/PRD.ko.md)
-- 이관 메모: [docs/MIGRATION_FROM__CODEX_AGENTS.ko.md](./docs/MIGRATION_FROM__CODEX_AGENTS.ko.md)
-- shell control-plane 참고 자산: [reference/legacy_shell_control_plane/README.md](./reference/legacy_shell_control_plane/README.md)
-- 이 저장소는 특정 회사/제품명을 전제로 한 예시 자산을 포함하지 않는다.
+Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed. If you want that in one step, use `install --validate`.
+
+```bash
+codex-subagent-kit install --scope project --agents cto-coordinator,reviewer --validate
+codex-subagent-kit doctor --scope project --project-root .
+```
+
+The TUI install flow also runs the same validation step after a successful install and surfaces the validation status on the completion screen.
+
+## Usage Helper
+
+Use `usage` when you want a starter prompt for Codex based on the agents actually visible in the selected scope.
+
+```bash
+codex-subagent-kit usage \
+  --scope project \
+  --project-root . \
+  --task "Review the failing auth flow"
+```
+
+## Experimental Commands
+
+The repository currently also contains control-plane-oriented commands. These are kept available as experiments, but they are not the primary product identity and may change more aggressively.
+
+Experimental commands:
+
+- `panel`
+- `board`
+- `launch`
+- `enqueue`
+- `dispatch-open`
+- `dispatch-prepare`
+- `dispatch-begin`
+- `apply-result`
+
+These commands are best understood as a session-companion or prototype layer around Codex usage, not as a standalone multi-agent runtime that replaces Codex.
+
+See [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md) for the current experimental boundary.
+
+## Development Install / Uninstall
+
+For development, use the repo-local editable install flow.
+
+```bash
+./scripts/install.sh
+codex-subagent-kit --help
+./scripts/uninstall.sh
+```
+
+Default behavior:
+
+- `install.sh` creates `.venv/` in the repo root and runs `pip install -e .`
+- it attempts to create a `~/.local/bin/codex-subagent-kit` symlink by default
+- if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-subagent-kit`
+- useful options include `install.sh --dry-run`, `install.sh --no-link`, and `uninstall.sh --keep-venv`
+
+## Testing / Validation
+
+Default automated validation:
+
+```bash
+./scripts/test.sh
+```
+
+Run the underlying commands directly if needed:
+
+```bash
+python3 -m compileall src
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+```
+
+If you touch the curses TUI, keep a PTY-based manual smoke in addition to automated tests.
+
+## References
+
+- product direction: [docs/PRD.md](./docs/PRD.md)
+- product understanding / workflow: [docs/UNDERSTANDING_AND_WORKFLOW.md](./docs/UNDERSTANDING_AND_WORKFLOW.md)
+- testing workflow: [docs/TESTING.md](./docs/TESTING.md)
+- PR CI workflow: [docs/TESTING.md](./docs/TESTING.md)
+- release workflow: [docs/RELEASING.md](./docs/RELEASING.md)
+- experimental boundary: [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md)
