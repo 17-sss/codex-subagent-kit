@@ -9,6 +9,13 @@
 - `main`에 대한 `push`
 - 수동 `workflow_dispatch`
 
+권장 흐름은 다음과 같다.
+
+1. `main` 대상 PR 생성
+2. PR CI에서 기본 테스트 게이트 확인
+3. `main`으로 merge
+4. release workflow가 tag와 GitHub Release 생성
+
 ## 태그 형식
 
 - `0.1.0`

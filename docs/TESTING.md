@@ -11,6 +11,17 @@ The testing workflow for `codex-subagent-kit` protects three things:
 - validation commands should catch malformed TOML before the user reaches Codex
 - independent validation promised in SDD documents should carry through to implementation
 
+## GitHub Actions CI
+
+The repository also has a pull-request CI workflow for visibility before merge.
+
+- workflow file: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
+- trigger: `pull_request` targeting `main`
+- manual trigger: `workflow_dispatch`
+- gate command: `./scripts/test.sh`
+
+This keeps the GitHub gate aligned with the same default local gate used during development.
+
 ## Core Principles
 
 - if a change affects user experience or generated output, leave behind either automated coverage or an explicit manual smoke procedure

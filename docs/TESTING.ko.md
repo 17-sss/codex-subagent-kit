@@ -11,6 +11,17 @@
 - validation 명령이 Codex 실행 전에 malformed TOML을 잡아낼 것
 - SDD 문서에서 정의한 독립 검증 방법이 구현 단계까지 이어질 것
 
+## GitHub Actions CI
+
+이 저장소에는 merge 전에 상태를 볼 수 있도록 PR CI workflow도 함께 있다.
+
+- workflow 파일: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
+- 트리거: `main` 대상 `pull_request`
+- 수동 실행: `workflow_dispatch`
+- 게이트 명령: `./scripts/test.sh`
+
+즉 GitHub Actions에서도 로컬 기본 게이트와 같은 명령을 사용한다.
+
 ## 기본 원칙
 
 - 사용자 경험이나 생성 결과를 바꾸는 작업은 자동 테스트 또는 명시적인 수동 smoke 절차를 반드시 남긴다.

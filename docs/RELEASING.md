@@ -9,6 +9,13 @@ Korean version: [RELEASING.ko.md](./RELEASING.ko.md)
 - `push` to `main`
 - manual `workflow_dispatch`
 
+The intended sequence is:
+
+1. open a PR targeting `main`
+2. let the PR CI workflow run the default test gate
+3. merge to `main`
+4. let the release workflow create the tag and GitHub Release
+
 ## Tag Format
 
 - `0.1.0`
