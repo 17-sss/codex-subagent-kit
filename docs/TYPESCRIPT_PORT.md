@@ -14,10 +14,18 @@ The repository now includes a dedicated TypeScript workspace under [`packages/co
 
 That package is intentionally a bootstrap, not a parity-complete replacement. It provides the npm package shape and CLI entrypoint that the rest of the port can build on.
 
+Current implemented slice:
+
+- shared path helpers
+- catalog data model
+- built-in catalog assets inside the TypeScript workspace
+- working `catalog` command
+
 Current bootstrap validation commands:
 
 ```bash
 npm install
+npm run test:ts
 npm run typecheck:ts
 npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js --help

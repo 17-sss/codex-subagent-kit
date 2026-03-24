@@ -172,12 +172,13 @@ codex-subagent-kit --help
 
 npm/TypeScript 포팅은 이제 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 dedicated workspace에서 시작할 수 있다.
 
-현재 이 패키지는 stable CLI surface를 위한 bootstrap entrypoint이며, Python 구현을 대체하는 production-ready 버전은 아니다. parity가 끝날 때까지는 Python CLI를 source of truth로 유지한다.
+현재 이 패키지는 stable CLI surface를 위한 bootstrap entrypoint이며, 첫 실동작 명령으로 `catalog`가 포팅되어 있다. 아직 Python 구현을 대체하는 production-ready 버전은 아니며, parity가 끝날 때까지는 Python CLI를 source of truth로 유지한다.
 
 부트스트랩 검증 명령:
 
 ```bash
 npm install
+npm run test:ts
 npm run typecheck:ts
 npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js --help

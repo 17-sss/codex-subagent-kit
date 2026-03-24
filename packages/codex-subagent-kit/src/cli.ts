@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 
+import { renderCatalogOutput } from "./catalog";
 import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
 
 type CommandAction = () => Promise<void>;
@@ -19,7 +20,16 @@ function buildCatalogCommand(): Command {
     .option("--project-root <path>", "Project root used for project-scope catalog discovery.", ".")
     .option("--scope <scope>", "Catalog visibility scope: project or global.", "project")
     .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
-    .action(createNotImplementedAction("catalog"));
+    .action((options: { projectRoot: string; scope: string; catalogRoot?: string[] }) => {
+      console.log(
+        renderCatalogOutput({
+          projectRoot: options.projectRoot,
+          includeProject: options.scope === "project",
+          includeGlobal: true,
+          catalogRoots: options.catalogRoot ?? [],
+        }),
+      );
+    });
 
   catalog
     .command("import")
