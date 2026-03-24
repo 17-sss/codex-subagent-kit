@@ -77,3 +77,5 @@ These features may remain useful, but they are not the primary value proposition
 - add compatibility checks and validation around generated TOML
 - improve import and extension paths for user-authored catalogs
 - document how installed agents are best used from inside Codex sessions
+- prepare a TypeScript/npm port plan around the stable core only
+- keep the TypeScript package bootstrap aligned to the stable command scope while Python remains the source of truth

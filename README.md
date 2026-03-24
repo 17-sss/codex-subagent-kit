@@ -168,6 +168,21 @@ Default behavior:
 - if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-subagent-kit`
 - useful options include `install.sh --dry-run`, `install.sh --no-link`, and `uninstall.sh --keep-venv`
 
+## TypeScript Port Bootstrap
+
+The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
+
+It is currently a bootstrap entrypoint for the stable CLI surface, not a production-ready replacement for the Python implementation. Until parity is complete, the Python CLI remains the source of truth.
+
+Bootstrap validation commands:
+
+```bash
+npm install
+npm run typecheck:ts
+npm run build:ts
+node packages/codex-subagent-kit/dist/cli.js --help
+```
+
 ## Testing / Validation
 
 Default automated validation:
@@ -192,4 +207,5 @@ If you touch the curses TUI, keep a PTY-based manual smoke in addition to automa
 - testing workflow: [docs/TESTING.md](./docs/TESTING.md)
 - PR CI workflow: [docs/TESTING.md](./docs/TESTING.md)
 - release workflow: [docs/RELEASING.md](./docs/RELEASING.md)
+- TypeScript/npm port plan: [docs/TYPESCRIPT_PORT.md](./docs/TYPESCRIPT_PORT.md)
 - experimental boundary: [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md)

@@ -168,6 +168,21 @@ codex-subagent-kit --help
 - `~/.local/bin`이 `PATH`에 없으면 `source .venv/bin/activate` 또는 `.venv/bin/codex-subagent-kit`로 실행하면 된다
 - `install.sh --dry-run`, `install.sh --no-link`, `uninstall.sh --keep-venv` 같은 옵션이 있다
 
+## TypeScript 포팅 부트스트랩
+
+npm/TypeScript 포팅은 이제 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 dedicated workspace에서 시작할 수 있다.
+
+현재 이 패키지는 stable CLI surface를 위한 bootstrap entrypoint이며, Python 구현을 대체하는 production-ready 버전은 아니다. parity가 끝날 때까지는 Python CLI를 source of truth로 유지한다.
+
+부트스트랩 검증 명령:
+
+```bash
+npm install
+npm run typecheck:ts
+npm run build:ts
+node packages/codex-subagent-kit/dist/cli.js --help
+```
+
 ## 테스트 / 검증
 
 기본 자동 검증 명령:
@@ -192,4 +207,5 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 - 테스트 workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
 - PR CI workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
 - 릴리즈 workflow: [docs/RELEASING.ko.md](./docs/RELEASING.ko.md)
+- TypeScript/npm 포팅 계획: [docs/TYPESCRIPT_PORT.ko.md](./docs/TYPESCRIPT_PORT.ko.md)
 - experimental 경계: [docs/EXPERIMENTAL.ko.md](./docs/EXPERIMENTAL.ko.md)

@@ -1,0 +1,31 @@
+{
+  "name": "codex-subagent-kit",
+  "version": "0.0.0-development",
+  "description": "TypeScript port bootstrap for the codex-subagent-kit stable CLI surface.",
+  "license": "MIT",
+  "bin": {
+    "codex-subagent-kit": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/cli.ts --dts --format cjs --clean",
+    "dev": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.4.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}

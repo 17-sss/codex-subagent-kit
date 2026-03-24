@@ -1,0 +1,28 @@
+export const STABLE_COMMANDS = [
+  "catalog",
+  "catalog import",
+  "install",
+  "doctor",
+  "usage",
+  "template init",
+  "tui",
+] as const;
+
+export const EXPERIMENTAL_COMMANDS = [
+  "panel",
+  "board",
+  "launch",
+  "enqueue",
+  "dispatch-open",
+  "dispatch-prepare",
+  "dispatch-begin",
+  "apply-result",
+] as const;
+
+export function renderBootstrapMessage(commandName: string): string {
+  return [
+    `The TypeScript port bootstrap is in place, but '${commandName}' is not implemented yet.`,
+    "Use the Python codex-subagent-kit CLI while stable-core parity work is still in progress.",
+    "See docs/TYPESCRIPT_PORT.md for the current port scope and delivery order.",
+  ].join("\n");
+}
