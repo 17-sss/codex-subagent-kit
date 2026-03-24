@@ -7,6 +7,7 @@ import { renderDoctorReport, runDoctor } from "./doctor";
 import { GenerationError, installAgents, resolveTargetDir } from "./generator";
 import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
 import { initTemplate, TemplateError } from "./templates";
+import { renderUsageGuide, UsageError } from "./usage";
 
 type CommandAction = () => Promise<void>;
 
@@ -237,7 +238,21 @@ export function buildProgram(): Command {
     .option("--project-root <path>", "Project root used for project-scope usage output.", ".")
     .option("--scope <scope>", "Usage scope: project or global.", "project")
     .option("--task <description>", "Task description to embed in the starter prompt.")
-    .action(createNotImplementedAction("usage"));
+    .action((options: { projectRoot: string; scope: "project" | "global"; task?: string }) => {
+      try {
+        console.log(
+          renderUsageGuide({
+            projectRoot: options.projectRoot,
+            scope: options.scope,
+            task: options.task,
+          }),
+        );
+      } catch (error) {
+        const message = error instanceof UsageError ? error.message : String(error);
+        console.error(`error: ${message}`);
+        process.exitCode = 1;
+      }
+    });
 
   program
     .command("tui")

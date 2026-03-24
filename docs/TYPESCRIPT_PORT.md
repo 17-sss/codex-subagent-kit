@@ -24,6 +24,7 @@ Current implemented slice:
 - working `install` command
 - working `doctor` command
 - working `install --validate` flow
+- working `usage` command
 
 Current bootstrap validation commands:
 

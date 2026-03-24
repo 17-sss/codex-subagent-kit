@@ -39,6 +39,7 @@ export {
   renderCategoryReadme,
   TemplateError,
 } from "./templates";
+export { renderUsageGuide, UsageError } from "./usage";
 export type {
   AgentSpec,
   CatalogOptions,

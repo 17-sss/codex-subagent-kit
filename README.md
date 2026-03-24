@@ -172,7 +172,7 @@ Default behavior:
 
 The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-It is currently a bootstrap entrypoint for the stable CLI surface with the first real commands ported: `catalog`, `template init`, `install`, and `doctor`. It is not a production-ready replacement for the Python implementation. Until parity is complete, the Python CLI remains the source of truth.
+It is currently a bootstrap entrypoint for the stable CLI surface with the first real commands ported: `catalog`, `template init`, `install`, `doctor`, and `usage`. It is not a production-ready replacement for the Python implementation. Until parity is complete, the Python CLI remains the source of truth.
 
 Bootstrap validation commands:
 
@@ -184,6 +184,7 @@ npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js catalog
 node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents cto-coordinator,reviewer --validate
+node packages/codex-subagent-kit/dist/cli.js usage --scope project --project-root /tmp/example --task "Review the failing auth flow"
 ```
 
 ## Testing / Validation
