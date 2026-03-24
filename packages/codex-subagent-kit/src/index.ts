@@ -33,6 +33,13 @@ export {
 } from "./launchers";
 export { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
 export {
+  bumpSemver,
+  classifyBump,
+  computeNextVersion,
+  parseSemver,
+  type SemverBump,
+} from "./release-versioning";
+export {
   DEFAULT_MODEL,
   DEFAULT_REASONING_EFFORT,
   DEFAULT_SANDBOX_MODE,

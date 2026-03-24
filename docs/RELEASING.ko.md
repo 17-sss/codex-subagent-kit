@@ -36,9 +36,9 @@
 
 ## 초기 릴리즈
 
-아직 semver tag가 하나도 없다면, workflow는 [pyproject.toml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/pyproject.toml)의 현재 `[project].version`을 초기 기준 버전으로 사용한다.
+아직 semver tag가 하나도 없다면, workflow는 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)의 현재 package version을 초기 기준 버전으로 사용한다.
 
-즉 지금 기준으로는 package version을 바꾸지 않는 한 첫 자동 태그는 `0.1.0`부터 시작한다.
+즉 지금 기준으로는 TypeScript package version을 바꾸지 않는 한 첫 자동 태그는 `0.1.0`부터 시작한다.
 
 ## 중복 방지
 
@@ -47,4 +47,4 @@
 ## 구현 참고
 
 - workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- 테스트되는 semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit/release_versioning.py)
+- 테스트되는 semver helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)

@@ -1,6 +1,6 @@
 {
   "name": "codex-subagent-kit",
-  "version": "0.0.0-development",
+  "version": "0.1.0",
   "description": "TypeScript port of the codex-subagent-kit stable CLI surface.",
   "license": "MIT",
   "repository": {
@@ -34,6 +34,7 @@
   "scripts": {
     "build": "tsup src/index.ts src/cli.ts --dts --format cjs --clean",
     "dev": "tsx src/cli.ts",
+    "release:version": "tsx src/release-versioning-cli.ts",
     "test": "tsx --test test/**/*.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },

@@ -36,9 +36,9 @@ The workflow uses plain semver tags without a `v` prefix.
 
 ## Initial Release
 
-If no semver tag exists yet, the workflow uses the current `[project].version` from [pyproject.toml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/pyproject.toml) as the base release version.
+If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the base release version.
 
-That means the first automatic tag from this repository will start from `0.1.0` unless the package version is changed first.
+That means the first automatic tag from this repository will start from `0.1.0` unless the TypeScript package version is changed first.
 
 ## Duplicate Protection
 
@@ -47,4 +47,4 @@ If the current commit already has a semver tag, the workflow reuses that version
 ## Implementation Notes
 
 - workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- tested semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit/release_versioning.py)
+- tested semver helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)
