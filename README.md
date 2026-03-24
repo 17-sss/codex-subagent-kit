@@ -168,11 +168,11 @@ Default behavior:
 - if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-subagent-kit`
 - useful options include `install.sh --dry-run`, `install.sh --no-link`, and `uninstall.sh --keep-venv`
 
-## TypeScript Port Bootstrap
+## TypeScript Port Progress
 
 The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-It is currently a bootstrap entrypoint for the stable CLI surface with the first real commands ported: `catalog`, `catalog import`, `template init`, `install`, `doctor`, and `usage`. It is not a production-ready replacement for the Python implementation. Until parity is complete, the Python CLI remains the source of truth.
+The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow. It is not yet the production source of truth; until parity hardening is complete, the Python CLI remains the reference implementation.
 
 Bootstrap validation commands:
 
@@ -182,6 +182,7 @@ npm run test:ts
 npm run typecheck:ts
 npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js --help
+node packages/codex-subagent-kit/dist/cli.js
 node packages/codex-subagent-kit/dist/cli.js catalog
 node packages/codex-subagent-kit/dist/cli.js catalog import --scope project --project-root /tmp/example --catalog-root /tmp/categories --agents custom-helper
 node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents cto-coordinator,reviewer --validate

@@ -8,11 +8,11 @@ The TypeScript port is intended to produce an npm-publishable CLI that preserves
 
 The port is not a product reset. It is a language and packaging migration built on top of the already-stabilized Python behavior.
 
-## Current Workspace Bootstrap
+## Current TypeScript Progress
 
 The repository now includes a dedicated TypeScript workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-That package is intentionally a bootstrap, not a parity-complete replacement. It provides the npm package shape and CLI entrypoint that the rest of the port can build on.
+That package is no longer only a skeleton. The stable command surface is mostly available in TypeScript, while Python remains the source of truth until parity hardening and npm release work are complete.
 
 Current implemented slice:
 
@@ -26,8 +26,10 @@ Current implemented slice:
 - working `doctor` command
 - working `install --validate` flow
 - working `usage` command
+- working prompt-driven install-first `tui`
+- working bare command entrypoint that opens the interactive install flow
 
-Current bootstrap validation commands:
+Current validation commands:
 
 ```bash
 npm install
@@ -35,6 +37,7 @@ npm run test:ts
 npm run typecheck:ts
 npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js --help
+node packages/codex-subagent-kit/dist/cli.js
 ```
 
 ## Stable Scope To Port First
@@ -92,7 +95,7 @@ Recommended baseline:
 - TypeScript
 - Node.js CLI runtime
 - `commander` for command parsing
-- `ink` or `blessed` for the TUI layer
+- `@inquirer/prompts` for the first interactive TUI pass
 - `@iarna/toml` or an equivalent TOML library for round-trippable parsing and writing
 - `tsup` for packaging and publishing builds
 
@@ -107,9 +110,9 @@ Avoid `Vite` for the core CLI package. It is not the natural fit for a filesyste
 5. port `install`
 6. port `doctor`
 7. port `usage`
-8. port the install-first TUI
-9. add fixture-based parity tests against the Python contract
-10. prepare npm metadata and publishing workflow
+8. add fixture-based parity tests against the Python contract
+9. prepare npm metadata and publishing workflow
+10. add TypeScript package CI and publish automation
 
 ## Release Readiness For The TypeScript Port
 

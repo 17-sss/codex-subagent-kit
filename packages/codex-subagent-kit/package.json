@@ -1,7 +1,7 @@
 {
   "name": "codex-subagent-kit",
   "version": "0.0.0-development",
-  "description": "TypeScript port bootstrap for the codex-subagent-kit stable CLI surface.",
+  "description": "TypeScript port of the codex-subagent-kit stable CLI surface.",
   "license": "MIT",
   "bin": {
     "codex-subagent-kit": "./dist/cli.js"
@@ -22,6 +22,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.8.4",
     "@iarna/toml": "^2.2.5",
     "commander": "^14.0.0"
   },

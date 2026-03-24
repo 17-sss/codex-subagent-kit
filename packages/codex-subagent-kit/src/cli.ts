@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
+import { resolve } from "node:path";
+
 import { Command } from "commander";
 
 import { renderCatalogOutput } from "./catalog";
 import { CatalogImportError, importCatalog } from "./catalog-import";
 import { renderDoctorReport, runDoctor } from "./doctor";
 import { GenerationError, installAgents, resolveTargetDir } from "./generator";
-import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
+import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS } from "./meta";
 import { initTemplate, TemplateError } from "./templates";
+import { runTui } from "./tui";
 import { renderUsageGuide, UsageError } from "./usage";
 
-type CommandAction = () => Promise<void>;
 type StringArrayOption = string[];
 
 function collectRepeatedOption(value: string, previous: StringArrayOption = []): StringArrayOption {
@@ -25,16 +27,9 @@ function resolveActionOptions<T>(args: unknown[]): T {
   return (args[0] ?? {}) as T;
 }
 
-function createNotImplementedAction(commandName: string): CommandAction {
-  return async () => {
-    console.error(renderBootstrapMessage(commandName));
-    process.exitCode = 1;
-  };
-}
-
 function buildCatalogCommand(): Command {
   const catalog = new Command("catalog")
-    .description("Browse the stable subagent catalog. (TypeScript port in progress)")
+    .description("Browse the stable subagent catalog.")
     .argument("[operation]", "Optional operation. Use 'import' for persistent catalog imports.")
     .option("--project-root <path>", "Project root used for project-scope catalog discovery.", ".")
     .option("--scope <scope>", "Catalog visibility scope: project or global.", "project")
@@ -197,17 +192,29 @@ export function buildProgram(): Command {
   program
     .name("codex-subagent-kit")
     .description(
-      "TypeScript workspace bootstrap for the codex-subagent-kit stable CLI surface. Use the Python CLI for production workflows until parity lands.",
+      "TypeScript port of the codex-subagent-kit stable CLI surface.",
+    )
+    .option("--project-root <path>", "Project root used for the install session.", ".")
+    .option(
+      "--catalog-root <path>",
+      "One external awesome-style categories root. Repeat to provide more than one.",
+      collectRepeatedOption,
+      [],
     )
     .addHelpText(
       "after",
       [
         "",
-        `Stable commands planned for the first port: ${STABLE_COMMANDS.join(", ")}`,
+        `Stable commands available in the TypeScript port: ${STABLE_COMMANDS.join(", ")}`,
         `Experimental commands intentionally excluded from the first port: ${EXPERIMENTAL_COMMANDS.join(", ")}`,
       ].join("\n"),
     )
-    .action(createNotImplementedAction("tui"));
+    .action(async (...args: unknown[]) => {
+      const options = resolveActionOptions<{ projectRoot: string; catalogRoot: string[] }>(args);
+      process.exitCode = await runTui(resolve(options.projectRoot), {
+        catalogRoots: options.catalogRoot ?? [],
+      });
+    });
 
   program
     .command("install")
@@ -347,7 +354,12 @@ export function buildProgram(): Command {
       collectRepeatedOption,
       [],
     )
-    .action(createNotImplementedAction("tui"));
+    .action(async (...args: unknown[]) => {
+      const options = resolveActionOptions<{ projectRoot: string; catalogRoot: string[] }>(args);
+      process.exitCode = await runTui(resolve(options.projectRoot), {
+        catalogRoots: options.catalogRoot ?? [],
+      });
+    });
 
   program.addCommand(buildCatalogCommand());
   program.addCommand(buildTemplateCommand());

@@ -1,6 +1,7 @@
 export {
   getAgentMap,
   getAgents,
+  getAgentsByCategory,
   getCategories,
   IMPORTED_AGENTS_CATEGORY,
   renderCatalogOutput,
@@ -40,6 +41,13 @@ export {
   renderCategoryReadme,
   TemplateError,
 } from "./templates";
+export {
+  defaultAgentSelection,
+  runTui,
+  validateAgentSelection,
+  type PromptAdapter,
+  type PromptChoice,
+} from "./tui";
 export { renderUsageGuide, UsageError } from "./usage";
 export type {
   AgentSpec,

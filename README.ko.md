@@ -168,11 +168,11 @@ codex-subagent-kit --help
 - `~/.local/bin`이 `PATH`에 없으면 `source .venv/bin/activate` 또는 `.venv/bin/codex-subagent-kit`로 실행하면 된다
 - `install.sh --dry-run`, `install.sh --no-link`, `uninstall.sh --keep-venv` 같은 옵션이 있다
 
-## TypeScript 포팅 부트스트랩
+## TypeScript 포팅 진행 상태
 
 npm/TypeScript 포팅은 이제 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 dedicated workspace에서 시작할 수 있다.
 
-현재 이 패키지는 stable CLI surface를 위한 bootstrap entrypoint이며, 첫 실동작 명령으로 `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`가 포팅되어 있다. 아직 Python 구현을 대체하는 production-ready 버전은 아니며, parity가 끝날 때까지는 Python CLI를 source of truth로 유지한다.
+현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. 아직 production source of truth는 아니며, parity hardening이 끝날 때까지는 Python CLI를 기준 구현으로 유지한다.
 
 부트스트랩 검증 명령:
 
@@ -182,6 +182,7 @@ npm run test:ts
 npm run typecheck:ts
 npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js --help
+node packages/codex-subagent-kit/dist/cli.js
 node packages/codex-subagent-kit/dist/cli.js catalog
 node packages/codex-subagent-kit/dist/cli.js catalog import --scope project --project-root /tmp/example --catalog-root /tmp/categories --agents custom-helper
 node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents cto-coordinator,reviewer --validate

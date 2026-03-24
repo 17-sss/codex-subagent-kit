@@ -309,6 +309,17 @@ export function getAgents(options: CatalogOptions = {}): AgentSpec[] {
   });
 }
 
+export function getAgentsByCategory(
+  categoryKeys: Set<string> | undefined,
+  options: CatalogOptions = {},
+): AgentSpec[] {
+  const agents = getAgents(options);
+  if (!categoryKeys || categoryKeys.size === 0) {
+    return agents;
+  }
+  return agents.filter((agent) => categoryKeys.has(agent.category));
+}
+
 export function renderCatalogOutput(options: CatalogOptions = {}): string {
   const categories = getCategories(options);
   const agents = getAgents(options);
