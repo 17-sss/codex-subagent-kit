@@ -172,7 +172,7 @@ codex-subagent-kit --help
 
 npm/TypeScript 포팅은 이제 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 dedicated workspace에서 시작할 수 있다.
 
-현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. 아직 production source of truth는 아니며, parity hardening이 끝날 때까지는 Python CLI를 기준 구현으로 유지한다.
+현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. shared golden fixture로 generated TOML과 `usage`, `doctor` 출력도 함께 검증한다. 아직 production source of truth는 아니며, parity hardening이 끝날 때까지는 Python CLI를 기준 구현으로 유지한다.
 
 부트스트랩 검증 명령:
 

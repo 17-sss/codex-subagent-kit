@@ -172,7 +172,7 @@ Default behavior:
 
 The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow. It is not yet the production source of truth; until parity hardening is complete, the Python CLI remains the reference implementation.
+The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow, and the shared golden fixtures now validate generated TOML plus `usage` and `doctor` output. It is not yet the production source of truth; until parity hardening is complete, the Python CLI remains the reference implementation.
 
 Bootstrap validation commands:
 

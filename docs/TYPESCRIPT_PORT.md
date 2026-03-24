@@ -28,6 +28,7 @@ Current implemented slice:
 - working `usage` command
 - working prompt-driven install-first `tui`
 - working bare command entrypoint that opens the interactive install flow
+- shared fixture-based parity tests for generated TOML, `usage`, and `doctor`
 
 Current validation commands:
 
