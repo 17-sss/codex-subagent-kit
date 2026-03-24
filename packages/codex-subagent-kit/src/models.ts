@@ -38,6 +38,14 @@ export interface DoctorIssue {
   message: string;
 }
 
+export interface CatalogImportResult {
+  targetRoot: string;
+  importedCategoryKeys: string[];
+  importedAgentKeys: string[];
+  createdPaths: string[];
+  preservedPaths: string[];
+}
+
 export interface DoctorReport {
   scope: string;
   targetDir: string;

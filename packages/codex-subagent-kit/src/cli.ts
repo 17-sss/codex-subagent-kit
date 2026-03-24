@@ -3,6 +3,7 @@
 import { Command } from "commander";
 
 import { renderCatalogOutput } from "./catalog";
+import { CatalogImportError, importCatalog } from "./catalog-import";
 import { renderDoctorReport, runDoctor } from "./doctor";
 import { GenerationError, installAgents, resolveTargetDir } from "./generator";
 import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
@@ -10,6 +11,19 @@ import { initTemplate, TemplateError } from "./templates";
 import { renderUsageGuide, UsageError } from "./usage";
 
 type CommandAction = () => Promise<void>;
+type StringArrayOption = string[];
+
+function collectRepeatedOption(value: string, previous: StringArrayOption = []): StringArrayOption {
+  return [...previous, value];
+}
+
+function resolveActionOptions<T>(args: unknown[]): T {
+  const last = args.at(-1);
+  if (last instanceof Command) {
+    return last.opts() as T;
+  }
+  return (args[0] ?? {}) as T;
+}
 
 function createNotImplementedAction(commandName: string): CommandAction {
   return async () => {
@@ -21,30 +35,81 @@ function createNotImplementedAction(commandName: string): CommandAction {
 function buildCatalogCommand(): Command {
   const catalog = new Command("catalog")
     .description("Browse the stable subagent catalog. (TypeScript port in progress)")
+    .argument("[operation]", "Optional operation. Use 'import' for persistent catalog imports.")
     .option("--project-root <path>", "Project root used for project-scope catalog discovery.", ".")
     .option("--scope <scope>", "Catalog visibility scope: project or global.", "project")
-    .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
-    .action((options: { projectRoot: string; scope: string; catalogRoot?: string[] }) => {
-      console.log(
-        renderCatalogOutput({
-          projectRoot: options.projectRoot,
-          includeProject: options.scope === "project",
-          includeGlobal: true,
-          catalogRoots: options.catalogRoot ?? [],
-        }),
-      );
-    });
-
-  catalog
-    .command("import")
-    .description("Persist selected external catalog entries into a project/global injected catalog.")
-    .option("--project-root <path>", "Project root used for project-scope imports.", ".")
-    .option("--scope <scope>", "Import target scope: project or global.", "project")
-    .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
+    .option(
+      "--catalog-root <path>",
+      "One external awesome-style categories root. Repeat to provide more than one.",
+      collectRepeatedOption,
+      [],
+    )
     .option("--agents <keys>", "Comma-separated agent keys to import.")
     .option("--categories <keys>", "Comma-separated category keys to import.")
     .option("--overwrite", "Overwrite existing imported templates.")
-    .action(createNotImplementedAction("catalog import"));
+    .action((operation: string | undefined, ...args: unknown[]) => {
+      const options = resolveActionOptions<{ projectRoot: string; scope: string; catalogRoot: string[] }>(args);
+      if (!operation) {
+        console.log(
+          renderCatalogOutput({
+            projectRoot: options.projectRoot,
+            includeProject: options.scope === "project",
+            includeGlobal: true,
+            catalogRoots: options.catalogRoot ?? [],
+          }),
+        );
+        return;
+      }
+
+      if (operation !== "import") {
+        console.error(`error: unknown catalog operation: ${operation}`);
+        process.exitCode = 1;
+        return;
+      }
+
+      const importOptions = resolveActionOptions<{
+        projectRoot: string;
+        scope: "project" | "global";
+        catalogRoot: string[];
+        agents?: string;
+        categories?: string;
+        overwrite?: boolean;
+      }>(args);
+        try {
+          const result = importCatalog({
+            projectRoot: importOptions.projectRoot,
+            scope: importOptions.scope,
+            catalogRoots: importOptions.catalogRoot ?? [],
+            agentKeys: (importOptions.agents ?? "")
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean),
+            categoryKeys: (importOptions.categories ?? "")
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean),
+            overwrite: importOptions.overwrite,
+          });
+
+          console.log(`target: ${result.targetRoot}`);
+          if (result.importedCategoryKeys.length > 0) {
+            console.log(`categories: ${result.importedCategoryKeys.join(", ")}`);
+          }
+          if (result.importedAgentKeys.length > 0) {
+            console.log(`agents: ${result.importedAgentKeys.join(", ")}`);
+          }
+          for (const path of result.createdPaths) {
+            console.log(`created: ${path}`);
+          }
+          for (const path of result.preservedPaths) {
+            console.log(`preserved: ${path}`);
+          }
+        } catch (error) {
+          const message = error instanceof CatalogImportError ? error.message : String(error);
+          console.error(`error: ${message}`);
+          process.exitCode = 1;
+        }
+    });
 
   return catalog;
 }
@@ -70,8 +135,8 @@ function buildTemplateCommand(): Command {
     .option("--sandbox-mode <mode>", "Sandbox mode stored in the generated TOML.", "read-only")
     .option("--orchestrator", "Mark the generated agent as a root orchestrator template.")
     .option("--overwrite", "Overwrite existing template files.")
-    .action(
-      (options: {
+    .action((...args: unknown[]) => {
+      const options = resolveActionOptions<{
         projectRoot: string;
         scope: "project" | "global";
         catalogRoot?: string;
@@ -87,7 +152,7 @@ function buildTemplateCommand(): Command {
         sandboxMode: string;
         orchestrator?: boolean;
         overwrite?: boolean;
-      }) => {
+      }>(args);
         try {
           const result = initTemplate({
             projectRoot: options.projectRoot,
@@ -121,8 +186,7 @@ function buildTemplateCommand(): Command {
           console.error(`error: ${message}`);
           process.exitCode = 1;
         }
-      },
-    );
+    });
 
   return template;
 }
@@ -151,18 +215,23 @@ export function buildProgram(): Command {
     .requiredOption("--scope <scope>", "Install target scope: project or global.")
     .requiredOption("--agents <keys>", "Comma-separated agent keys.")
     .option("--project-root <path>", "Project root used for project-scope installs.", ".")
-    .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
+    .option(
+      "--catalog-root <path>",
+      "One external awesome-style categories root. Repeat to provide more than one.",
+      collectRepeatedOption,
+      [],
+    )
     .option("--overwrite", "Overwrite existing generated agent files.")
     .option("--validate", "Run doctor immediately after install.")
-    .action(
-      (options: {
+    .action((...args: unknown[]) => {
+      const options = resolveActionOptions<{
         scope: "project" | "global";
         agents: string;
         projectRoot: string;
-        catalogRoot?: string[];
+        catalogRoot: string[];
         overwrite?: boolean;
         validate?: boolean;
-      }) => {
+      }>(args);
         try {
           const result = installAgents({
             scope: options.scope,
@@ -211,16 +280,25 @@ export function buildProgram(): Command {
           console.error(`error: ${message}`);
           process.exitCode = 1;
         }
-      },
-    );
+    });
 
   program
     .command("doctor")
     .description("Validate installed agent definitions and injected catalog roots.")
     .option("--project-root <path>", "Project root used for project-scope validation.", ".")
     .option("--scope <scope>", "Validation scope: project or global.", "project")
-    .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
-    .action((options: { projectRoot: string; scope: "project" | "global"; catalogRoot?: string[] }) => {
+    .option(
+      "--catalog-root <path>",
+      "One external awesome-style categories root. Repeat to provide more than one.",
+      collectRepeatedOption,
+      [],
+    )
+    .action((...args: unknown[]) => {
+      const options = resolveActionOptions<{
+        projectRoot: string;
+        scope: "project" | "global";
+        catalogRoot: string[];
+      }>(args);
       const report = runDoctor({
         projectRoot: options.projectRoot,
         scope: options.scope,
@@ -238,7 +316,12 @@ export function buildProgram(): Command {
     .option("--project-root <path>", "Project root used for project-scope usage output.", ".")
     .option("--scope <scope>", "Usage scope: project or global.", "project")
     .option("--task <description>", "Task description to embed in the starter prompt.")
-    .action((options: { projectRoot: string; scope: "project" | "global"; task?: string }) => {
+    .action((...args: unknown[]) => {
+      const options = resolveActionOptions<{
+        projectRoot: string;
+        scope: "project" | "global";
+        task?: string;
+      }>(args);
       try {
         console.log(
           renderUsageGuide({
@@ -258,7 +341,12 @@ export function buildProgram(): Command {
     .command("tui")
     .description("Run the interactive install-first TUI.")
     .option("--project-root <path>", "Project root used for the install session.", ".")
-    .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
+    .option(
+      "--catalog-root <path>",
+      "One external awesome-style categories root. Repeat to provide more than one.",
+      collectRepeatedOption,
+      [],
+    )
     .action(createNotImplementedAction("tui"));
 
   program.addCommand(buildCatalogCommand());

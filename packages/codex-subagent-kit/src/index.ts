@@ -5,6 +5,7 @@ export {
   IMPORTED_AGENTS_CATEGORY,
   renderCatalogOutput,
 } from "./catalog";
+export { CatalogImportError, importCatalog } from "./catalog-import";
 export { buildProgram, main } from "./cli";
 export { renderDoctorReport, runDoctor } from "./doctor";
 export {

@@ -20,6 +20,7 @@ Current implemented slice:
 - catalog data model
 - built-in catalog assets inside the TypeScript workspace
 - working `catalog` command
+- working `catalog import` command
 - working `template init` command
 - working `install` command
 - working `doctor` command
