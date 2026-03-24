@@ -37,6 +37,7 @@ npm install
 npm run test:ts
 npm run typecheck:ts
 npm run build:ts
+npm run pack:ts
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 ```
@@ -122,6 +123,7 @@ npm package를 publish하기 전에 아래를 확인해야 한다.
 - stable command가 문서/예시 기준으로 Python과 충분히 같은 동작을 한다
 - generated TOML이 Codex에서 실제로 받아들여진다
 - package name, README, 예시가 npm 사용 방식에 맞게 정리돼 있다
+- `npm pack --dry-run` 결과가 기대한 package contents를 보여준다
 - TypeScript package 전용 CI와 release path가 준비돼 있다
 
 ## 현재 결정

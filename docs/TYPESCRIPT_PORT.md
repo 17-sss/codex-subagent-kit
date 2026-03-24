@@ -37,6 +37,7 @@ npm install
 npm run test:ts
 npm run typecheck:ts
 npm run build:ts
+npm run pack:ts
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 ```
@@ -122,6 +123,7 @@ Before the npm package is published, confirm:
 - stable commands match Python behavior closely enough for docs and examples
 - generated TOML is accepted by Codex
 - package name, README, and examples are aligned with npm usage
+- `npm pack --dry-run` produces the expected package contents
 - the TypeScript package has its own CI and release path
 
 ## Current Decision

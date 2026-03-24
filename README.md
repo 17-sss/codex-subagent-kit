@@ -181,6 +181,7 @@ npm install
 npm run test:ts
 npm run typecheck:ts
 npm run build:ts
+npm run pack:ts
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 node packages/codex-subagent-kit/dist/cli.js catalog

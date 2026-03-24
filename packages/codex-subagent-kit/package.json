@@ -3,6 +3,22 @@
   "version": "0.0.0-development",
   "description": "TypeScript port of the codex-subagent-kit stable CLI surface.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/17-sss/codex-subagent-kit.git",
+    "directory": "packages/codex-subagent-kit"
+  },
+  "homepage": "https://github.com/17-sss/codex-subagent-kit",
+  "bugs": {
+    "url": "https://github.com/17-sss/codex-subagent-kit/issues"
+  },
+  "keywords": [
+    "codex",
+    "subagents",
+    "cli",
+    "toml",
+    "developer-tools"
+  ],
   "bin": {
     "codex-subagent-kit": "./dist/cli.js"
   },
