@@ -3,6 +3,8 @@
 import { Command } from "commander";
 
 import { renderCatalogOutput } from "./catalog";
+import { renderDoctorReport, runDoctor } from "./doctor";
+import { GenerationError, installAgents, resolveTargetDir } from "./generator";
 import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
 import { initTemplate, TemplateError } from "./templates";
 
@@ -151,7 +153,65 @@ export function buildProgram(): Command {
     .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
     .option("--overwrite", "Overwrite existing generated agent files.")
     .option("--validate", "Run doctor immediately after install.")
-    .action(createNotImplementedAction("install"));
+    .action(
+      (options: {
+        scope: "project" | "global";
+        agents: string;
+        projectRoot: string;
+        catalogRoot?: string[];
+        overwrite?: boolean;
+        validate?: boolean;
+      }) => {
+        try {
+          const result = installAgents({
+            scope: options.scope,
+            projectRoot: options.projectRoot,
+            agentKeys: options.agents
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean),
+            catalogRoots: options.catalogRoot ?? [],
+            overwrite: options.overwrite,
+          });
+
+          console.log(`target: ${resolveTargetDir(options.scope, options.projectRoot)}`);
+          for (const path of result.agentPaths) {
+            console.log(path);
+          }
+          for (const path of result.agentPreservedPaths) {
+            console.log(`agent preserved: ${path}`);
+          }
+          if (result.orchestratorKey) {
+            console.log(`orchestrator: ${result.orchestratorKey}`);
+          }
+          for (const path of result.scaffoldCreatedPaths) {
+            console.log(`scaffold created: ${path}`);
+          }
+          for (const path of result.scaffoldPreservedPaths) {
+            console.log(`scaffold preserved: ${path}`);
+          }
+
+          if (!options.validate) {
+            return;
+          }
+
+          const report = runDoctor({
+            projectRoot: options.projectRoot,
+            scope: options.scope,
+            catalogRoots: options.catalogRoot ?? [],
+          });
+          console.log("");
+          console.log(renderDoctorReport(report));
+          if (report.issues.length > 0) {
+            process.exitCode = 1;
+          }
+        } catch (error) {
+          const message = error instanceof GenerationError ? error.message : String(error);
+          console.error(`error: ${message}`);
+          process.exitCode = 1;
+        }
+      },
+    );
 
   program
     .command("doctor")
@@ -159,7 +219,17 @@ export function buildProgram(): Command {
     .option("--project-root <path>", "Project root used for project-scope validation.", ".")
     .option("--scope <scope>", "Validation scope: project or global.", "project")
     .option("--catalog-root <paths...>", "One or more external awesome-style categories roots.")
-    .action(createNotImplementedAction("doctor"));
+    .action((options: { projectRoot: string; scope: "project" | "global"; catalogRoot?: string[] }) => {
+      const report = runDoctor({
+        projectRoot: options.projectRoot,
+        scope: options.scope,
+        catalogRoots: options.catalogRoot ?? [],
+      });
+      console.log(renderDoctorReport(report));
+      if (report.issues.length > 0) {
+        process.exitCode = 1;
+      }
+    });
 
   program
     .command("usage")

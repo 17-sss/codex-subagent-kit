@@ -13,7 +13,7 @@ import {
   resolveProjectCatalogDir,
 } from "./paths";
 
-const BUILTIN_CATEGORIES_DIR = resolve(__dirname, "..", "builtin_catalog", "categories");
+export const BUILTIN_CATEGORIES_DIR = resolve(__dirname, "..", "builtin_catalog", "categories");
 
 export const IMPORTED_AGENTS_CATEGORY: Category = {
   key: "imported-agents",
@@ -66,7 +66,7 @@ function fallbackTitleFromKey(key: string): string {
     .join(" ");
 }
 
-function parseCategoryDir(categoryDir: string): Category {
+export function parseCategoryDir(categoryDir: string): Category {
   const key = categoryKeyFromDir(basename(categoryDir));
   let title = fallbackTitleFromKey(key);
   let description = title;
@@ -133,7 +133,7 @@ function requiredString(data: ParsedToml, key: string): string {
   return value.trim();
 }
 
-function parseAgentFile(
+export function parseAgentFile(
   path: string,
   source: string,
   inheritedCategory?: string,

@@ -21,6 +21,9 @@ Current implemented slice:
 - built-in catalog assets inside the TypeScript workspace
 - working `catalog` command
 - working `template init` command
+- working `install` command
+- working `doctor` command
+- working `install --validate` flow
 
 Current bootstrap validation commands:
 

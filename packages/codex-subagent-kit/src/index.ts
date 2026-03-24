@@ -6,7 +6,29 @@ export {
   renderCatalogOutput,
 } from "./catalog";
 export { buildProgram, main } from "./cli";
-export { ORCHESTRATOR_CATEGORY, renderAgentFile } from "./generator";
+export { renderDoctorReport, runDoctor } from "./doctor";
+export {
+  DEFAULT_ORCHESTRATOR_KEY,
+  GenerationError,
+  generateProjectScaffold,
+  installAgents,
+  ORCHESTRATOR_CATEGORY,
+  renderAgentFile,
+  renderDispatchLedgerSeed,
+  renderQueueSeed,
+  renderRuntimeState,
+  renderScaffoldReadme,
+  renderTeamManifest,
+  resolveScaffoldCatalogDir,
+  resolveScaffoldDir,
+  resolveTargetDir,
+} from "./generator";
+export {
+  renderCmuxLauncher,
+  renderRunBoardScript,
+  renderRunMonitorScript,
+  renderTmuxLauncher,
+} from "./launchers";
 export { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
 export {
   DEFAULT_MODEL,
@@ -17,4 +39,11 @@ export {
   renderCategoryReadme,
   TemplateError,
 } from "./templates";
-export type { AgentSpec, CatalogOptions, Category } from "./models";
+export type {
+  AgentSpec,
+  CatalogOptions,
+  Category,
+  DoctorIssue,
+  DoctorReport,
+  InstallResult,
+} from "./models";

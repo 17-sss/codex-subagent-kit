@@ -24,3 +24,24 @@ export interface CatalogOptions {
   includeGlobal?: boolean;
   catalogRoots?: readonly string[];
 }
+
+export interface InstallResult {
+  agentPaths: string[];
+  agentPreservedPaths: string[];
+  scaffoldCreatedPaths: string[];
+  scaffoldPreservedPaths: string[];
+  orchestratorKey?: string;
+}
+
+export interface DoctorIssue {
+  path?: string;
+  message: string;
+}
+
+export interface DoctorReport {
+  scope: string;
+  targetDir: string;
+  catalogCounts: Array<[string, number]>;
+  installedCounts: Array<[string, number]>;
+  issues: DoctorIssue[];
+}
