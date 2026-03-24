@@ -172,7 +172,7 @@ Default behavior:
 
 The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-It is currently a bootstrap entrypoint for the stable CLI surface with the first real command ported: `catalog`. It is not a production-ready replacement for the Python implementation. Until parity is complete, the Python CLI remains the source of truth.
+It is currently a bootstrap entrypoint for the stable CLI surface with the first real commands ported: `catalog` and `template init`. It is not a production-ready replacement for the Python implementation. Until parity is complete, the Python CLI remains the source of truth.
 
 Bootstrap validation commands:
 

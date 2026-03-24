@@ -4,6 +4,7 @@ import { Command } from "commander";
 
 import { renderCatalogOutput } from "./catalog";
 import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS, renderBootstrapMessage } from "./meta";
+import { initTemplate, TemplateError } from "./templates";
 
 type CommandAction = () => Promise<void>;
 
@@ -66,7 +67,59 @@ function buildTemplateCommand(): Command {
     .option("--sandbox-mode <mode>", "Sandbox mode stored in the generated TOML.", "read-only")
     .option("--orchestrator", "Mark the generated agent as a root orchestrator template.")
     .option("--overwrite", "Overwrite existing template files.")
-    .action(createNotImplementedAction("template init"));
+    .action(
+      (options: {
+        projectRoot: string;
+        scope: "project" | "global";
+        catalogRoot?: string;
+        category: string;
+        categoryPrefix?: string;
+        categoryTitle?: string;
+        categoryDescription?: string;
+        agent: string;
+        agentName?: string;
+        agentDescription?: string;
+        model: string;
+        reasoningEffort: string;
+        sandboxMode: string;
+        orchestrator?: boolean;
+        overwrite?: boolean;
+      }) => {
+        try {
+          const result = initTemplate({
+            projectRoot: options.projectRoot,
+            scope: options.scope,
+            catalogRoot: options.catalogRoot,
+            categoryKey: options.category,
+            categoryPrefix: options.categoryPrefix,
+            categoryTitle: options.categoryTitle,
+            categoryDescription: options.categoryDescription,
+            agentKey: options.agent,
+            agentName: options.agentName,
+            agentDescription: options.agentDescription,
+            model: options.model,
+            reasoningEffort: options.reasoningEffort,
+            sandboxMode: options.sandboxMode,
+            orchestrator: options.orchestrator,
+            overwrite: options.overwrite,
+          });
+
+          console.log(`target: ${result.targetRoot}`);
+          console.log(`category: ${result.categoryDir}`);
+          console.log(`agent: ${result.agentPath}`);
+          for (const path of result.createdPaths) {
+            console.log(`created: ${path}`);
+          }
+          for (const path of result.preservedPaths) {
+            console.log(`preserved: ${path}`);
+          }
+        } catch (error) {
+          const message = error instanceof TemplateError ? error.message : String(error);
+          console.error(`error: ${message}`);
+          process.exitCode = 1;
+        }
+      },
+    );
 
   return template;
 }

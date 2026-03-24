@@ -20,6 +20,7 @@ Current implemented slice:
 - catalog data model
 - built-in catalog assets inside the TypeScript workspace
 - working `catalog` command
+- working `template init` command
 
 Current bootstrap validation commands:
 
