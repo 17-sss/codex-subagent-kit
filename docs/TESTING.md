@@ -18,9 +18,10 @@ The repository also has a pull-request CI workflow for visibility before merge.
 - workflow file: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
 - trigger: `pull_request` targeting `main`
 - manual trigger: `workflow_dispatch`
-- gate command: `./scripts/test.sh`
+- Python gate: `./scripts/test.sh`
+- TypeScript gate: `npm ci`, `npm run test:ts`, `npm run typecheck:ts`, `npm run build:ts`, `npm run pack:ts`
 
-This keeps the GitHub gate aligned with the same default local gate used during development.
+This keeps the GitHub gate aligned with both local surfaces used during development: the Python source-of-truth CLI and the npm-bound TypeScript package.
 
 ## Core Principles
 

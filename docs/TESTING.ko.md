@@ -18,9 +18,10 @@
 - workflow 파일: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
 - 트리거: `main` 대상 `pull_request`
 - 수동 실행: `workflow_dispatch`
-- 게이트 명령: `./scripts/test.sh`
+- Python 게이트: `./scripts/test.sh`
+- TypeScript 게이트: `npm ci`, `npm run test:ts`, `npm run typecheck:ts`, `npm run build:ts`, `npm run pack:ts`
 
-즉 GitHub Actions에서도 로컬 기본 게이트와 같은 명령을 사용한다.
+즉 GitHub Actions에서도 Python source-of-truth CLI와 npm 대상 TypeScript package를 함께 검증한다.
 
 ## 기본 원칙
 

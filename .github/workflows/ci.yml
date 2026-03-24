@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  python:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,5 +23,33 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run test gate
+      - name: Run Python test gate
         run: ./scripts/test.sh
+
+  typescript:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run TypeScript test gate
+        run: npm run test:ts
+
+      - name: Run TypeScript typecheck
+        run: npm run typecheck:ts
+
+      - name: Build TypeScript package
+        run: npm run build:ts
+
+      - name: Validate npm package contents
+        run: npm run pack:ts
