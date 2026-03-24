@@ -20,6 +20,7 @@
 - 수동 실행: `workflow_dispatch`
 - legacy Python 게이트: `./scripts/test.sh`
 - TypeScript 게이트: `npm ci`, `npm run test:ts`, `npm run typecheck:ts`, `npm run build:ts`, `npm run pack:ts`
+- packaged consumer smoke: `npm run smoke:ts:consumer`
 
 즉 GitHub Actions에서도 legacy Python 앱과 npm 대상 TypeScript package를 함께 검증한다.
 
@@ -86,6 +87,12 @@ TUI 변경 시 추가:
 
 - PTY 환경에서 `PYTHONPATH=src python3 -m codex_subagent_kit.cli tui --project-root <tmp-dir>` 실행
 - 실제 키 입력으로 agent 파일 생성 완료까지 확인
+
+릴리즈 전에는 packaged npm consumer smoke도 함께 돌리는 편이 좋다.
+
+```bash
+npm run smoke:ts:consumer
+```
 
 ## 현재 자동 테스트 범위
 

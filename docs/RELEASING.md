@@ -60,6 +60,7 @@ The npm workflow validates that the release tag is plain semver, syncs the works
 - `npm run typecheck:ts`
 - `npm run build:ts`
 - `npm run pack:ts`
+- `npm run smoke:ts:consumer`
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
 
 ## Implementation Notes

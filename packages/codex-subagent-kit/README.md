@@ -24,6 +24,7 @@ npm install
 npm run test:ts
 npm run typecheck:ts
 npm run build:ts
+npm run smoke:ts:consumer
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 ```
@@ -71,6 +72,7 @@ The repository includes a dry-run packaging command:
 
 ```bash
 npm run pack:ts
+npm run smoke:ts:consumer
 ```
 
 See the repository-level TypeScript migration notes in `docs/TYPESCRIPT_PORT.md` for current parity status and release readiness.

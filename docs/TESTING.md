@@ -20,6 +20,7 @@ The repository also has a pull-request CI workflow for visibility before merge.
 - manual trigger: `workflow_dispatch`
 - legacy Python gate: `./scripts/test.sh`
 - TypeScript gate: `npm ci`, `npm run test:ts`, `npm run typecheck:ts`, `npm run build:ts`, `npm run pack:ts`
+- packaged consumer smoke: `npm run smoke:ts:consumer`
 
 This keeps the GitHub gate aligned with both local surfaces used during development: the legacy Python app and the npm-bound TypeScript package.
 
@@ -86,6 +87,12 @@ Additional checks for TUI changes:
 
 - run `PYTHONPATH=src python3 -m codex_subagent_kit.cli tui --project-root <tmp-dir>` inside a PTY
 - confirm that the flow reaches agent generation through real key input
+
+Before a release, prefer running the packaged npm consumer smoke as well:
+
+```bash
+npm run smoke:ts:consumer
+```
 
 ## Current Automated Coverage
 

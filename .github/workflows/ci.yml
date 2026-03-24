@@ -53,3 +53,6 @@ jobs:
 
       - name: Validate npm package contents
         run: npm run pack:ts
+
+      - name: Run npm consumer smoke
+        run: npm run smoke:ts:consumer

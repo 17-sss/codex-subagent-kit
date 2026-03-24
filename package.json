@@ -8,6 +8,7 @@
   "scripts": {
     "build:ts": "npm run build --workspace codex-subagent-kit",
     "pack:ts": "npm pack --workspace codex-subagent-kit --dry-run",
+    "smoke:ts:consumer": "bash scripts/smoke_ts_consumer.sh",
     "test:ts": "npm run test --workspace codex-subagent-kit",
     "typecheck:ts": "npm run typecheck --workspace codex-subagent-kit"
   }
