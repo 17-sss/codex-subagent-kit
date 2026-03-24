@@ -78,4 +78,4 @@ stable capability:
 - 사용자 작성 catalog의 import / extension 경로 개선
 - 설치된 agent를 Codex 세션 안에서 어떻게 쓰는지 문서화 강화
 - stable core만 대상으로 하는 TypeScript/npm 포팅 계획 정리
-- Python을 source of truth로 유지하는 동안 TypeScript 패키지 bootstrap이 stable command scope와 어긋나지 않게 관리
+- Python 앱을 legacy implementation 및 experimental track으로 남겨두면서 TypeScript 패키지가 stable command scope와 어긋나지 않게 관리

@@ -13,7 +13,7 @@ The current TypeScript package covers the stable command surface:
 - `tui`
 - bare command entrypoint for the install-first interactive flow
 
-Python is still the source of truth while parity hardening continues, but the TypeScript package is already suitable for local evaluation and packaging work.
+The TypeScript package is the active npm-targeted implementation. The Python app remains in the repository as a legacy implementation, a fallback development path, and the home for experimental commands that are outside the npm-first surface.
 
 ## Local Development
 

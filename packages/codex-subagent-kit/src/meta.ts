@@ -22,7 +22,7 @@ export const EXPERIMENTAL_COMMANDS = [
 export function renderBootstrapMessage(commandName: string): string {
   return [
     `The TypeScript port is in progress, but '${commandName}' is not implemented yet.`,
-    "Use the Python codex-subagent-kit CLI if you need a stable workflow outside the current TypeScript scope.",
+    "Use the legacy Python codex-subagent-kit app if you need a workflow outside the current TypeScript scope.",
     "See docs/TYPESCRIPT_PORT.md for the current port boundary and delivery order.",
   ].join("\n");
 }

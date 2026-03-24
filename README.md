@@ -4,6 +4,11 @@ Korean version: [README.ko.md](./README.ko.md)
 
 `codex-subagent-kit` is a local-first toolkit for installing and managing Codex subagent definitions in project and global `.codex` directories.
 
+Implementation tracks:
+
+- TypeScript package: the active npm-targeted implementation under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit)
+- Python app: a legacy implementation kept under [`src/codex_subagent_kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit) for reference, experimental commands, and fallback development workflows
+
 The stable product core is simple:
 
 - browse built-in and external agent catalogs
@@ -43,7 +48,7 @@ codex-subagent-kit usage --scope project --project-root . --task "Review the fai
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
-Development-only direct execution from the repo root is also supported:
+Legacy Python direct execution from the repo root is also supported:
 
 ```bash
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
@@ -151,28 +156,30 @@ These commands are best understood as a session-companion or prototype layer aro
 
 See [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md) for the current experimental boundary.
 
-## Development Install / Uninstall
+## Legacy Python Install / Uninstall
 
-For development, use the repo-local editable install flow.
+For the legacy Python app, use the repo-local editable install flow.
 
 ```bash
 ./scripts/install.sh
-codex-subagent-kit --help
+codex-subagent-kit-legacy --help
 ./scripts/uninstall.sh
 ```
 
 Default behavior:
 
 - `install.sh` creates `.venv/` in the repo root and runs `pip install -e .`
-- it attempts to create a `~/.local/bin/codex-subagent-kit` symlink by default
-- if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-subagent-kit`
+- it attempts to create a `~/.local/bin/codex-subagent-kit-legacy` symlink by default
+- if `~/.local/bin` is not on `PATH`, use `source .venv/bin/activate` or `.venv/bin/codex-subagent-kit-legacy`
 - useful options include `install.sh --dry-run`, `install.sh --no-link`, and `uninstall.sh --keep-venv`
+
+See [docs/LEGACY_PYTHON_APP.md](./docs/LEGACY_PYTHON_APP.md) for the current legacy-Python boundary.
 
 ## TypeScript Port Progress
 
 The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow, and the shared golden fixtures now validate generated TOML plus `usage` and `doctor` output. It is not yet the production source of truth; until parity hardening is complete, the Python CLI remains the reference implementation.
+The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow, and the shared golden fixtures now validate generated TOML plus `usage` and `doctor` output. This is the current release target for npm, while the Python app remains in the repository as a legacy implementation.
 
 Bootstrap validation commands:
 
@@ -215,4 +222,5 @@ If you touch the curses TUI, keep a PTY-based manual smoke in addition to automa
 - PR CI workflow: [docs/TESTING.md](./docs/TESTING.md)
 - release workflow: [docs/RELEASING.md](./docs/RELEASING.md)
 - TypeScript/npm port plan: [docs/TYPESCRIPT_PORT.md](./docs/TYPESCRIPT_PORT.md)
+- legacy Python app: [docs/LEGACY_PYTHON_APP.md](./docs/LEGACY_PYTHON_APP.md)
 - experimental boundary: [docs/EXPERIMENTAL.md](./docs/EXPERIMENTAL.md)

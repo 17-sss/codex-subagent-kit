@@ -14,7 +14,7 @@ The repository also includes a dedicated npm publish workflow for the TypeScript
 The intended sequence is:
 
 1. open a PR targeting `main`
-2. let the PR CI workflow run both the Python and TypeScript package gates
+2. let the PR CI workflow run both the legacy Python and TypeScript package gates
 3. merge to `main`
 4. let the release workflow create the tag and GitHub Release
 5. let the npm publish workflow publish the matching `codex-subagent-kit` package version

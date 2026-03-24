@@ -15,7 +15,7 @@ usage() {
   cat <<EOF
 Usage: ./scripts/uninstall.sh [options]
 
-Remove the development install for codex-subagent-kit.
+Remove the development install for the legacy Python codex-subagent-kit app.
 
 Options:
   --venv-dir <path>  Virtualenv directory to uninstall from (default: ${VENV_DIR})
@@ -80,10 +80,10 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-LINK_PATH="$LINK_DIR/codex-subagent-kit"
+LINK_PATH="$LINK_DIR/codex-subagent-kit-legacy"
 VENV_BIN_DIR="$VENV_DIR/bin"
 VENV_PYTHON="$VENV_BIN_DIR/python"
-ENTRYPOINT_PATH="$VENV_BIN_DIR/codex-subagent-kit"
+ENTRYPOINT_PATH="$VENV_BIN_DIR/codex-subagent-kit-legacy"
 
 log "repo root: $REPO_ROOT"
 log "venv dir: $VENV_DIR"

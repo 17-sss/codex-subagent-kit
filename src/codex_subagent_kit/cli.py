@@ -24,9 +24,9 @@ from .tui import run_tui
 from .usage import UsageError, render_usage_guide
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser(prog: str | None = None) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="codex-subagent-kit",
+        prog=prog or Path(sys.argv[0]).name or "codex-subagent-kit",
         description=(
             "Install and manage Codex subagent definitions. "
             "Stable core: catalog, install, doctor, template, tui. "
@@ -468,7 +468,7 @@ def run_apply_result(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
+    parser = build_parser(Path(sys.argv[0]).name)
     args = parser.parse_args(argv)
 
     if args.command is None:

@@ -12,7 +12,7 @@
 권장 흐름은 다음과 같다.
 
 1. `main` 대상 PR 생성
-2. PR CI에서 Python과 TypeScript package 게이트 확인
+2. PR CI에서 legacy Python과 TypeScript package 게이트 확인
 3. `main`으로 merge
 4. release workflow가 tag와 GitHub Release 생성
 5. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish

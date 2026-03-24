@@ -78,4 +78,4 @@ These features may remain useful, but they are not the primary value proposition
 - improve import and extension paths for user-authored catalogs
 - document how installed agents are best used from inside Codex sessions
 - prepare a TypeScript/npm port plan around the stable core only
-- keep the TypeScript package bootstrap aligned to the stable command scope while Python remains the source of truth
+- keep the TypeScript package aligned to the stable command scope while the Python app remains available as a legacy implementation and experimental track

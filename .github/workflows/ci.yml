@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  python:
+  python-legacy:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run Python test gate
+      - name: Run legacy Python test gate
         run: ./scripts/test.sh
 
   typescript:

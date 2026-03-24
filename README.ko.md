@@ -4,6 +4,11 @@
 
 `codex-subagent-kit`는 프로젝트 또는 글로벌 `.codex` 디렉터리에 Codex subagent 정의를 설치하고 관리하는 local-first 툴킷이다.
 
+구현 트랙:
+
+- TypeScript package: [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 현재 npm 대상 구현
+- Python app: [`src/codex_subagent_kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit) 아래에 legacy 구현으로 남겨두는 앱. reference, experimental 명령, fallback 개발 흐름에 사용
+
 현재 stable core는 단순하다.
 
 - built-in / external agent catalog 탐색
@@ -43,7 +48,7 @@ codex-subagent-kit usage --scope project --project-root . --task "Review the fai
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
 ```
 
-개발 중에는 repo 루트에서 직접 실행할 수도 있다.
+legacy Python 앱은 repo 루트에서 직접 실행할 수도 있다.
 
 ```bash
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
@@ -151,28 +156,30 @@ experimental 명령:
 
 현재 experimental 경계는 [docs/EXPERIMENTAL.ko.md](./docs/EXPERIMENTAL.ko.md)에 따로 정리돼 있다.
 
-## 개발용 설치 / 제거
+## Legacy Python 설치 / 제거
 
-개발용으로는 repo-local editable install을 사용하면 된다.
+legacy Python 앱은 repo-local editable install을 사용하면 된다.
 
 ```bash
 ./scripts/install.sh
-codex-subagent-kit --help
+codex-subagent-kit-legacy --help
 ./scripts/uninstall.sh
 ```
 
 기본 동작:
 
 - `install.sh`는 repo 루트에 `.venv/`를 만들고 `pip install -e .`를 수행한다
-- 기본적으로 `~/.local/bin/codex-subagent-kit` symlink 생성을 시도한다
-- `~/.local/bin`이 `PATH`에 없으면 `source .venv/bin/activate` 또는 `.venv/bin/codex-subagent-kit`로 실행하면 된다
+- 기본적으로 `~/.local/bin/codex-subagent-kit-legacy` symlink 생성을 시도한다
+- `~/.local/bin`이 `PATH`에 없으면 `source .venv/bin/activate` 또는 `.venv/bin/codex-subagent-kit-legacy`로 실행하면 된다
 - `install.sh --dry-run`, `install.sh --no-link`, `uninstall.sh --keep-venv` 같은 옵션이 있다
+
+legacy Python 경계는 [docs/LEGACY_PYTHON_APP.ko.md](./docs/LEGACY_PYTHON_APP.ko.md)에 따로 정리했다.
 
 ## TypeScript 포팅 진행 상태
 
 npm/TypeScript 포팅은 이제 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 dedicated workspace에서 시작할 수 있다.
 
-현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. shared golden fixture로 generated TOML과 `usage`, `doctor` 출력도 함께 검증한다. 아직 production source of truth는 아니며, parity hardening이 끝날 때까지는 Python CLI를 기준 구현으로 유지한다.
+현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. shared golden fixture로 generated TOML과 `usage`, `doctor` 출력도 함께 검증한다. 현재 npm release target은 이 TypeScript package이고, Python 앱은 저장소 안에 legacy 구현으로 남겨둔다.
 
 부트스트랩 검증 명령:
 
@@ -215,4 +222,5 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 - PR CI workflow: [docs/TESTING.ko.md](./docs/TESTING.ko.md)
 - 릴리즈 workflow: [docs/RELEASING.ko.md](./docs/RELEASING.ko.md)
 - TypeScript/npm 포팅 계획: [docs/TYPESCRIPT_PORT.ko.md](./docs/TYPESCRIPT_PORT.ko.md)
+- legacy Python 앱: [docs/LEGACY_PYTHON_APP.ko.md](./docs/LEGACY_PYTHON_APP.ko.md)
 - experimental 경계: [docs/EXPERIMENTAL.ko.md](./docs/EXPERIMENTAL.ko.md)

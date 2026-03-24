@@ -12,7 +12,7 @@ The port is not a product reset. It is a language and packaging migration built 
 
 The repository now includes a dedicated TypeScript workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-That package is no longer only a skeleton. The stable command surface is mostly available in TypeScript, while Python remains the source of truth until parity hardening and npm release work are complete.
+That package is no longer only a skeleton. The stable command surface is mostly available in TypeScript, and it is now the active npm release target. The Python app remains in the repository as a legacy implementation, fallback path, and home for experimental commands that are outside the npm-first surface.
 
 Current implemented slice:
 
@@ -134,4 +134,4 @@ The repository now includes:
 
 ## Current Decision
 
-The repository should continue to treat Python as the source of truth until the first TypeScript CLI reaches stable-core parity.
+The TypeScript package is now the active npm release target. The Python app remains in the repository as a legacy implementation, reference path, and home for experimental commands that are not part of the npm-first surface.
