@@ -126,6 +126,12 @@ npm package를 publish하기 전에 아래를 확인해야 한다.
 - `npm pack --dry-run` 결과가 기대한 package contents를 보여준다
 - TypeScript package 전용 CI와 release path가 준비돼 있다
 
+현재 저장소에는 이미 아래가 포함되어 있다.
+
+- TypeScript package용 PR CI
+- semver release workflow
+- published GitHub Release에서 실행되는 npm publish workflow
+
 ## 현재 결정
 
 첫 TypeScript CLI가 stable-core parity에 도달하기 전까지는 Python 버전을 source of truth로 유지한다.

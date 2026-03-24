@@ -2,7 +2,7 @@
 
 영문 기본 문서: [RELEASING.md](./RELEASING.md)
 
-`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만든다.
+`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만들고, TypeScript package용 npm publish workflow도 별도로 가진다.
 
 ## 트리거
 
@@ -15,6 +15,7 @@
 2. PR CI에서 Python과 TypeScript package 게이트 확인
 3. `main`으로 merge
 4. release workflow가 tag와 GitHub Release 생성
+5. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish
 
 ## 태그 형식
 
@@ -43,6 +44,21 @@
 ## 중복 방지
 
 현재 커밋에 이미 semver tag가 붙어 있으면, workflow는 그 버전을 재사용하고 중복 tag 생성을 건너뛴다.
+
+## npm Publish 흐름
+
+- workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- 트리거: published GitHub Release
+- 필요한 secret: `NPM_TOKEN`
+- 필요한 permission: npm provenance를 위한 `id-token: write`
+
+npm workflow는 release tag가 plain semver인지 확인하고, publish 시점에 workspace package version을 그 tag와 맞춘 뒤 아래 순서로 검증과 publish를 수행한다.
+
+- `npm run test:ts`
+- `npm run typecheck:ts`
+- `npm run build:ts`
+- `npm run pack:ts`
+- `npm publish --workspace codex-subagent-kit --access public --provenance`
 
 ## 구현 참고
 

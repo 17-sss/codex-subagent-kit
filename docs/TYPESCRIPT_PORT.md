@@ -126,6 +126,12 @@ Before the npm package is published, confirm:
 - `npm pack --dry-run` produces the expected package contents
 - the TypeScript package has its own CI and release path
 
+The repository now includes:
+
+- PR CI for the TypeScript package
+- a release semver workflow
+- an npm publish workflow triggered from published GitHub releases
+
 ## Current Decision
 
 The repository should continue to treat Python as the source of truth until the first TypeScript CLI reaches stable-core parity.
