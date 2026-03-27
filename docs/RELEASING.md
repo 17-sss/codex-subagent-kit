@@ -51,8 +51,10 @@ If the current commit already has a semver tag, the workflow reuses that version
 
 - workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
 - trigger: published GitHub Release
-- required secret: `NPM_TOKEN`
-- required permissions: `id-token: write` for npm provenance
+- authentication model: npm trusted publishing via GitHub Actions OIDC
+- required permissions: `id-token: write` for npm provenance and trusted publishing
+
+Before the first publish, configure npm trusted publishing for this repository and workflow in the npm package settings.
 
 The npm workflow validates that the release tag is plain semver, syncs the workspace package version to that tag at publish time, runs `./scripts/test.sh`, and then publishes with:
 

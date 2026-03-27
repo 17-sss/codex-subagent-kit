@@ -55,6 +55,4 @@ jobs:
         run: ./scripts/test.sh
 
       - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --workspace codex-subagent-kit --access public --provenance

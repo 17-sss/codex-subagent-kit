@@ -49,8 +49,10 @@
 
 - workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
 - 트리거: published GitHub Release
-- 필요한 secret: `NPM_TOKEN`
-- 필요한 permission: npm provenance를 위한 `id-token: write`
+- 인증 방식: GitHub Actions OIDC 기반 npm trusted publishing
+- 필요한 permission: npm provenance와 trusted publishing을 위한 `id-token: write`
+
+첫 publish 전에 npm package 설정에서 이 저장소와 workflow에 대한 trusted publishing을 먼저 연결해야 한다.
 
 npm workflow는 release tag가 plain semver인지 확인하고, publish 시점에 workspace package version을 그 tag와 맞춘 뒤 `./scripts/test.sh`를 실행하고 다음 명령으로 publish를 수행한다.
 
