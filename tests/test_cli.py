@@ -469,7 +469,7 @@ sandbox_mode = "read-only"
             self.assertEqual(stdout, "")
             self.assertIn("unknown agent keys", stderr)
 
-    def test_project_install_without_orchestrator_returns_error(self) -> None:
+    def test_project_install_without_orchestrator_succeeds_without_scaffold(self) -> None:
         with TemporaryDirectory() as temp_dir:
             exit_code, stdout, stderr = self.run_cli(
                 [
@@ -483,9 +483,11 @@ sandbox_mode = "read-only"
                 ]
             )
 
-            self.assertEqual(exit_code, 1)
-            self.assertEqual(stdout, "")
-            self.assertIn("meta-orchestration agent", stderr)
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(stderr, "")
+            self.assertIn("reviewer.toml", stdout)
+            self.assertNotIn("orchestrator:", stdout)
+            self.assertNotIn("scaffold created:", stdout)
 
     def test_panel_command_renders_generated_team_manifest(self) -> None:
         with TemporaryDirectory() as temp_dir:

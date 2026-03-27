@@ -38,6 +38,7 @@ Stable capabilities:
 - persistent import into project/global catalog injection paths
 - project/global template scaffolding
 - Codex-compatible TOML output using `developer_instructions`
+- optional experimental scaffold generation only when a selected install set includes a meta-orchestration agent
 
 ## Session Companion Layer
 

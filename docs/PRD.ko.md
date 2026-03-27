@@ -38,6 +38,7 @@ stable capability:
 - project/global catalog injection 경로로의 persistent import
 - project/global template scaffolding
 - `developer_instructions`를 사용하는 Codex-compatible TOML output
+- 선택한 install 조합에 meta-orchestration agent가 있을 때만 optional experimental scaffold 생성
 
 ## Session Companion Layer
 

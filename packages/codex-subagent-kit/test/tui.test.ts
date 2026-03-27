@@ -43,26 +43,24 @@ function withCapturedConsole<T>(run: () => Promise<T> | T): Promise<T> {
     });
 }
 
-test("defaultAgentSelection prefers multi-agent-coordinator for project installs", () => {
+test("defaultAgentSelection starts empty for project installs", () => {
   const selection = defaultAgentSelection("project", [
     createAgent({ key: "reviewer", category: "quality" }),
     createAgent({ key: "multi-agent-coordinator", category: "meta-orchestration" }),
     createAgent({ key: "multi-agent-coordinator", category: "meta-orchestration" }),
   ]);
 
-  assert.deepEqual([...selection], ["multi-agent-coordinator"]);
+  assert.deepEqual([...selection], []);
 });
 
-test("validateAgentSelection requires an orchestrator for project installs", () => {
+test("validateAgentSelection only requires at least one selected agent", () => {
   const agents = [
     createAgent({ key: "reviewer", category: "quality" }),
     createAgent({ key: "multi-agent-coordinator", category: "meta-orchestration" }),
   ];
 
-  assert.match(
-    validateAgentSelection("project", agents, new Set(["reviewer"])) ?? "",
-    /meta-orchestration agent/i,
-  );
+  assert.equal(validateAgentSelection("project", agents, new Set(["reviewer"])), undefined);
+  assert.match(validateAgentSelection("project", agents, new Set()) ?? "", /at least one subagent/i);
   assert.equal(validateAgentSelection("global", agents, new Set(["reviewer"])), undefined);
 });
 
@@ -141,7 +139,7 @@ test("runTui installs selected agents and returns success when doctor is clean",
 
     const agentCheckbox = checkboxCalls[1];
     const ctoChoice = agentCheckbox.choices.find((choice) => choice.value === "multi-agent-coordinator");
-    assert.equal(ctoChoice?.checked, true);
+    assert.equal(ctoChoice?.checked, undefined);
   } finally {
     cleanup(root);
   }

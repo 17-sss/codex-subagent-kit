@@ -61,7 +61,7 @@ Install project-scoped agents and validate them immediately:
 node packages/codex-subagent-kit/dist/cli.js install \
   --scope project \
   --project-root /tmp/example \
-  --agents multi-agent-coordinator,reviewer \
+  --agents reviewer,code-mapper \
   --validate
 ```
 
@@ -73,6 +73,8 @@ node packages/codex-subagent-kit/dist/cli.js usage \
   --project-root /tmp/example \
   --task "Review the failing auth flow"
 ```
+
+If the selected install set includes a `meta-orchestration` agent such as `multi-agent-coordinator`, the project install also seeds the optional experimental scaffold under `.codex/subagent-kit/`.
 
 ## Packaging
 

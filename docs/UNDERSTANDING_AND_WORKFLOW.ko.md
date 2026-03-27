@@ -86,13 +86,13 @@ flowchart TD
 ```text
 .codex/
 └── agents/
-    ├── multi-agent-coordinator.toml
     ├── reviewer.toml
     ├── code-mapper.toml
+    ├── frontend-owner.toml
     └── ...
 ```
 
-선택적으로 `.codex/subagent-kit/` 아래에 experimental companion 자산이 있을 수는 있지만, stable install flow에 필수는 아니다.
+선택적으로 `.codex/subagent-kit/` 아래에 experimental companion 자산이 있을 수는 있지만, stable install flow에 필수는 아니고 선택한 install 조합에 meta-orchestration agent가 있을 때만 자동 seed된다.
 
 stable catalog 보조 자산은 `.codex/subagent-kit/` 아래에 다음처럼 존재할 수 있다.
 

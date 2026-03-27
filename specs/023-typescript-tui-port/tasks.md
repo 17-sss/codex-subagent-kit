@@ -3,7 +3,7 @@
 ## Phase 1: Interactive Flow
 
 - [x] Port the install-first interactive flow to TypeScript.
-- [x] Keep the project-scope root orchestrator guardrail and default selection behavior.
+- [x] Historical: the original root orchestrator guardrail was later superseded by `032-optional-orchestrator`.
 
 ## Phase 2: CLI Wiring
 

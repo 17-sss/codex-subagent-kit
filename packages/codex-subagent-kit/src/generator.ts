@@ -123,9 +123,10 @@ export function renderDispatchLedgerSeed(): string {
 export function renderScaffoldReadme(orchestratorKey: string, workerKeys: string[]): string {
   const workerSummary = workerKeys.length > 0 ? workerKeys.map((workerKey) => `\`${workerKey}\``).join(", ") : "none yet";
 
-  return `# orchestrator scaffold
+  return `# experimental orchestrator scaffold
 
-This folder is the project-local seed for the future control-plane.
+This folder is the optional project-local seed for the experimental control-plane layer.
+It is generated only when the selected install set includes a meta-orchestration agent.
 
 ## Team topology
 
@@ -145,15 +146,13 @@ This folder is the project-local seed for the future control-plane.
 `;
 }
 
-export function resolveOrchestratorKey(agentMap: Map<string, AgentSpec>, agentKeys: string[]): string {
+export function findOrchestratorKey(agentMap: Map<string, AgentSpec>, agentKeys: string[]): string | undefined {
   const candidates = agentKeys
     .filter((key) => agentMap.get(key)?.category === ORCHESTRATOR_CATEGORY)
     .sort();
 
   if (candidates.length === 0) {
-    throw new GenerationError(
-      "project installs require at least one meta-orchestration agent for the root orchestrator",
-    );
+    return undefined;
   }
 
   return candidates.includes(DEFAULT_ORCHESTRATOR_KEY) ? DEFAULT_ORCHESTRATOR_KEY : candidates[0];
@@ -203,7 +202,10 @@ export function generateProjectScaffold(
   agentMap: Map<string, AgentSpec>,
   agentKeys: string[],
 ): { orchestratorKey: string; createdPaths: string[]; preservedPaths: string[] } {
-  const orchestratorKey = resolveOrchestratorKey(agentMap, agentKeys);
+  const orchestratorKey = findOrchestratorKey(agentMap, agentKeys);
+  if (!orchestratorKey) {
+    throw new GenerationError("cannot generate an orchestrator scaffold without a meta-orchestration agent");
+  }
   const workerKeys = [...agentKeys].sort().filter((key) => key !== orchestratorKey);
   const scaffoldRoot = resolveScaffoldDir(projectRoot);
   const createdPaths: string[] = [];
@@ -329,10 +331,13 @@ export function installAgents(options: InstallAgentsOptions): InstallResult {
   let orchestratorKey: string | undefined;
 
   if (options.scope === "project") {
-    const scaffold = generateProjectScaffold(options.projectRoot, agentMap, options.agentKeys);
-    scaffoldCreatedPaths = scaffold.createdPaths;
-    scaffoldPreservedPaths = scaffold.preservedPaths;
-    orchestratorKey = scaffold.orchestratorKey;
+    orchestratorKey = findOrchestratorKey(agentMap, options.agentKeys);
+    if (orchestratorKey) {
+      const scaffold = generateProjectScaffold(options.projectRoot, agentMap, options.agentKeys);
+      scaffoldCreatedPaths = scaffold.createdPaths;
+      scaffoldPreservedPaths = scaffold.preservedPaths;
+      orchestratorKey = scaffold.orchestratorKey;
+    }
   }
 
   return {

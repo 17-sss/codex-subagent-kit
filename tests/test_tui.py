@@ -26,28 +26,27 @@ class TuiTests(unittest.TestCase):
             issues=issues,
         )
 
-    def test_default_project_selection_prefers_cto_coordinator(self) -> None:
+    def test_default_project_selection_is_empty(self) -> None:
         agent_specs = get_agents_by_category()
 
         selected = _default_agent_selection("project", agent_specs)
 
-        self.assertEqual(selected, {"multi-agent-coordinator"})
+        self.assertEqual(selected, set())
 
-    def test_project_selection_requires_meta_orchestration_agent(self) -> None:
+    def test_project_selection_only_requires_at_least_one_agent(self) -> None:
         agent_specs = get_agents_by_category()
 
         message = _validate_agent_selection("project", agent_specs, {"reviewer"})
 
-        self.assertIsNotNone(message)
-        self.assertIn("meta-orchestration", message)
-        self.assertIn("multi-agent-coordinator", message)
+        self.assertIsNone(message)
 
-    def test_project_selection_accepts_root_orchestrator(self) -> None:
+    def test_selection_rejects_empty_agent_list(self) -> None:
         agent_specs = get_agents_by_category()
 
-        message = _validate_agent_selection("project", agent_specs, {"multi-agent-coordinator", "reviewer"})
+        message = _validate_agent_selection("project", agent_specs, set())
 
-        self.assertIsNone(message)
+        self.assertIsNotNone(message)
+        self.assertIn("최소 1개", message)
 
     def test_global_selection_does_not_require_meta_orchestration_agent(self) -> None:
         agent_specs = get_agents_by_category()
@@ -101,7 +100,7 @@ class TuiTests(unittest.TestCase):
             agent_preserved_paths=[],
             scaffold_created_paths=[],
             scaffold_preserved_paths=[],
-            orchestrator_key="multi-agent-coordinator",
+            orchestrator_key=None,
         )
         catalog_root = Path("/tmp/custom-catalog")
 
@@ -116,7 +115,7 @@ class TuiTests(unittest.TestCase):
                 "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     {"meta-orchestration"},
-                    {"multi-agent-coordinator"},
+                    {"reviewer"},
                 ],
             ),
             patch("codex_subagent_kit.tui._summary_screen", return_value=True),
@@ -137,7 +136,7 @@ class TuiTests(unittest.TestCase):
             agent_preserved_paths=[],
             scaffold_created_paths=[],
             scaffold_preserved_paths=[],
-            orchestrator_key="multi-agent-coordinator",
+            orchestrator_key=None,
         )
 
         def fake_wrapper(func):
@@ -151,7 +150,7 @@ class TuiTests(unittest.TestCase):
                 "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     {"meta-orchestration"},
-                    {"multi-agent-coordinator"},
+                    {"reviewer"},
                 ],
             ),
             patch("codex_subagent_kit.tui._summary_screen", return_value=True),

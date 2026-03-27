@@ -116,14 +116,23 @@ class GeneratorTests(unittest.TestCase):
             with self.assertRaises(GenerationError):
                 resolve_target_dir("invalid", Path(temp_dir))
 
-    def test_project_install_requires_orchestrator_agent(self) -> None:
+    def test_project_install_without_orchestrator_skips_scaffold(self) -> None:
         with TemporaryDirectory() as temp_dir:
-            with self.assertRaises(GenerationError):
-                install_agents(
-                    scope="project",
-                    project_root=Path(temp_dir),
-                    agent_keys=["reviewer"],
-                )
+            project_root = Path(temp_dir)
+            result = install_agents(
+                scope="project",
+                project_root=project_root,
+                agent_keys=["reviewer"],
+            )
+
+            self.assertEqual(
+                result.agent_paths,
+                [project_root / ".codex" / "agents" / "reviewer.toml"],
+            )
+            self.assertIsNone(result.orchestrator_key)
+            self.assertEqual(result.scaffold_created_paths, [])
+            self.assertEqual(result.scaffold_preserved_paths, [])
+            self.assertFalse(resolve_scaffold_dir(project_root).exists())
 
     def test_global_install_skips_scaffold(self) -> None:
         with TemporaryDirectory() as temp_dir:

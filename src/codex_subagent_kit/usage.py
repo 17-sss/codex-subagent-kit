@@ -28,7 +28,7 @@ def _starter_prompt(*, task: str, orchestrator_key: str | None, worker_keys: lis
         if worker_keys:
             worker_list = ", ".join(worker_keys)
             return (
-                f'Use {orchestrator_key} as the root orchestrator for this task: "{task}". '
+                f'Use {orchestrator_key} to coordinate this task: "{task}". '
                 f"Delegate to {worker_list} when appropriate."
             )
         return f'Use {orchestrator_key} for this task: "{task}".'

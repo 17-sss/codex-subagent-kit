@@ -34,6 +34,7 @@ These features are best understood as a `Codex session companion` or prototype l
 - they can help inspect or simulate a possible workflow around Codex usage
 - they do not replace Codex as the runtime owner of agent threads
 - they are allowed to evolve more aggressively than the stable core
+- parts of this layer are only scaffolded automatically when a selected install set includes a meta-orchestration agent
 
 ## What Is Not Promised Yet
 

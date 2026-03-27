@@ -6,9 +6,7 @@ from pathlib import Path
 from .catalog import get_agents_by_category, get_categories
 from .doctor import DoctorReport, run_doctor
 from .generator import (
-    DEFAULT_ORCHESTRATOR_KEY,
     GenerationError,
-    ORCHESTRATOR_CATEGORY,
     install_agents,
     resolve_target_dir,
 )
@@ -175,37 +173,15 @@ def _error_screen(stdscr: curses.window, message: str) -> None:
 
 
 def _default_agent_selection(scope: str, agent_specs: list[AgentSpec]) -> set[str]:
-    if scope != "project":
-        return set()
-
-    preferred = [agent.key for agent in agent_specs if agent.category == ORCHESTRATOR_CATEGORY]
-    if DEFAULT_ORCHESTRATOR_KEY in preferred:
-        return {DEFAULT_ORCHESTRATOR_KEY}
-    if preferred:
-        return {preferred[0]}
+    del scope, agent_specs
     return set()
 
 
 def _validate_agent_selection(scope: str, agent_specs: list[AgentSpec], selected_agents: set[str]) -> str | None:
+    del scope, agent_specs
     if not selected_agents:
         return "최소 1개 이상의 subagent를 선택해야 합니다."
-
-    if scope != "project":
-        return None
-
-    selected_meta = [
-        agent.key
-        for agent in agent_specs
-        if agent.key in selected_agents and agent.category == ORCHESTRATOR_CATEGORY
-    ]
-    if selected_meta:
-        return None
-
-    return (
-        "project 설치에는 최소 1개의 meta-orchestration agent가 필요합니다.\n"
-        f"예: {DEFAULT_ORCHESTRATOR_KEY}\n"
-        "필요하면 b로 돌아가 Meta & Orchestration 카테고리를 포함하세요."
-    )
+    return None
 
 
 def run_tui(project_root: Path, *, catalog_roots: tuple[Path, ...] = ()) -> int:
@@ -279,7 +255,10 @@ def run_tui(project_root: Path, *, catalog_roots: tuple[Path, ...] = ()) -> int:
                     selected_agents = _multi_select(
                         stdscr,
                         title="Subagent 선택",
-                        subtitle="Space로 토글하세요. project 설치는 root orchestrator가 필요합니다.",
+                        subtitle=(
+                            "Space로 토글하세요. meta-orchestration agent를 포함하면 "
+                            "experimental scaffold도 함께 생성됩니다."
+                        ),
                         items=agent_items,
                         selected=selected_agents,
                     )

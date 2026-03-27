@@ -97,9 +97,10 @@ def render_dispatch_ledger_seed() -> str:
 
 def render_scaffold_readme(*, orchestrator_key: str, worker_keys: list[str]) -> str:
     worker_summary = ", ".join(f"`{worker_key}`" for worker_key in worker_keys) or "none yet"
-    return f"""# orchestrator scaffold
+    return f"""# experimental orchestrator scaffold
 
-This folder is the project-local seed for the future control-plane.
+This folder is the optional project-local seed for the experimental control-plane layer.
+It is generated only when the selected install set includes a meta-orchestration agent.
 
 ## Team topology
 
@@ -119,14 +120,12 @@ This folder is the project-local seed for the future control-plane.
 """
 
 
-def resolve_orchestrator_key(*, agent_map: dict[str, AgentSpec], agent_keys: list[str]) -> str:
+def find_orchestrator_key(*, agent_map: dict[str, AgentSpec], agent_keys: list[str]) -> str | None:
     candidates = sorted(
         key for key in agent_keys if agent_map[key].category == ORCHESTRATOR_CATEGORY
     )
     if not candidates:
-        raise GenerationError(
-            "project installs require at least one meta-orchestration agent for the root orchestrator"
-        )
+        return None
     if DEFAULT_ORCHESTRATOR_KEY in candidates:
         return DEFAULT_ORCHESTRATOR_KEY
     return candidates[0]
@@ -169,7 +168,9 @@ def generate_orchestrator_scaffold(
     agent_map: dict[str, AgentSpec],
     agent_keys: list[str],
 ) -> tuple[str, list[Path], list[Path]]:
-    orchestrator_key = resolve_orchestrator_key(agent_map=agent_map, agent_keys=agent_keys)
+    orchestrator_key = find_orchestrator_key(agent_map=agent_map, agent_keys=agent_keys)
+    if orchestrator_key is None:
+        raise GenerationError("cannot generate an orchestrator scaffold without a meta-orchestration agent")
     worker_keys = [key for key in sorted(agent_keys) if key != orchestrator_key]
 
     scaffold_root = resolve_scaffold_dir(project_root)
@@ -295,11 +296,13 @@ def install_agents(
     scaffold_preserved_paths: list[Path] = []
     orchestrator_key: str | None = None
     if scope == "project":
-        orchestrator_key, scaffold_created_paths, scaffold_preserved_paths = generate_orchestrator_scaffold(
-            project_root=project_root,
-            agent_map=agent_map,
-            agent_keys=agent_keys,
-        )
+        orchestrator_key = find_orchestrator_key(agent_map=agent_map, agent_keys=agent_keys)
+        if orchestrator_key is not None:
+            orchestrator_key, scaffold_created_paths, scaffold_preserved_paths = generate_orchestrator_scaffold(
+                project_root=project_root,
+                agent_map=agent_map,
+                agent_keys=agent_keys,
+            )
 
     return InstallResult(
         agent_paths=created_paths,

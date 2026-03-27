@@ -34,6 +34,7 @@
 - Codex 사용 주변의 워크플로를 살펴보거나 흉내 내는 데 도움을 줄 수 있다
 - agent thread의 runtime owner로서 Codex를 대체하지 않는다
 - stable core보다 더 공격적으로 바뀌어도 되는 영역이다
+- 이 레이어의 일부 scaffold는 선택한 install 조합에 meta-orchestration agent가 있을 때만 자동으로 생성된다
 
 ## 아직 약속하지 않는 것
 

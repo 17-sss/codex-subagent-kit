@@ -27,7 +27,7 @@ function visibleInstalledAgents(options: RenderUsageGuideOptions) {
 function starterPrompt(task: string, orchestratorKey: string | undefined, workerKeys: string[]): string {
   if (orchestratorKey) {
     if (workerKeys.length > 0) {
-      return `Use ${orchestratorKey} as the root orchestrator for this task: "${task}". Delegate to ${workerKeys.join(", ")} when appropriate.`;
+      return `Use ${orchestratorKey} to coordinate this task: "${task}". Delegate to ${workerKeys.join(", ")} when appropriate.`;
     }
     return `Use ${orchestratorKey} for this task: "${task}".`;
   }

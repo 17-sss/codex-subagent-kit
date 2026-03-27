@@ -86,13 +86,13 @@ flowchart TD
 ```text
 .codex/
 └── agents/
-    ├── multi-agent-coordinator.toml
     ├── reviewer.toml
     ├── code-mapper.toml
+    ├── frontend-owner.toml
     └── ...
 ```
 
-Optional experimental companion assets may also exist under `.codex/subagent-kit/`, but they are not required for the stable install flow.
+Optional experimental companion assets may also exist under `.codex/subagent-kit/`, but they are not required for the stable install flow and are only seeded automatically when the selected install set includes a meta-orchestration agent.
 
 Stable catalog companion assets may also exist under `.codex/subagent-kit/`:
 

@@ -44,20 +44,21 @@ test("installAgents creates project agent files and scaffold", () => {
   }
 });
 
-test("installAgents requires an orchestrator for project scope", () => {
+test("installAgents supports project installs without an orchestrator and skips scaffold", () => {
   const root = createTempRoot();
 
   try {
-    assert.throws(
-      () =>
-        installAgents({
-          scope: "project",
-          projectRoot: root,
-          homeDir: join(root, "home"),
-          agentKeys: ["reviewer"],
-        }),
-      GenerationError,
-    );
+    const result = installAgents({
+      scope: "project",
+      projectRoot: root,
+      homeDir: join(root, "home"),
+      agentKeys: ["reviewer"],
+    });
+
+    assert.equal(result.orchestratorKey, undefined);
+    assert.equal(result.scaffoldCreatedPaths.length, 0);
+    assert.equal(result.scaffoldPreservedPaths.length, 0);
+    assert.ok(existsSync(join(root, ".codex", "agents", "reviewer.toml")));
   } finally {
     cleanup(root);
   }

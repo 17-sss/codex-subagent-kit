@@ -27,7 +27,25 @@ class UsageTests(unittest.TestCase):
             self.assertIn("visible installed agents:", rendered)
             self.assertIn("multi-agent-coordinator", rendered)
             self.assertIn("starter prompt:", rendered)
-            self.assertIn("Use multi-agent-coordinator as the root orchestrator", rendered)
+            self.assertIn("Use multi-agent-coordinator to coordinate this task", rendered)
+
+    def test_usage_without_orchestrator_still_renders_helpful_prompt(self) -> None:
+        with TemporaryDirectory() as temp_dir:
+            project_root = Path(temp_dir)
+            temp_home = project_root / "home"
+            temp_home.mkdir()
+
+            with patch.object(Path, "home", return_value=temp_home):
+                install_agents(
+                    scope="project",
+                    project_root=project_root,
+                    agent_keys=["reviewer", "code-mapper"],
+                )
+                rendered = render_usage_guide(project_root=project_root, scope="project")
+
+            self.assertIn("For this task:", rendered)
+            self.assertIn("reviewer", rendered)
+            self.assertIn("code-mapper", rendered)
 
     def test_usage_injects_task_text(self) -> None:
         with TemporaryDirectory() as temp_dir:

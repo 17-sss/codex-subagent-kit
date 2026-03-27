@@ -3,10 +3,8 @@ import { checkbox, confirm, select } from "@inquirer/prompts";
 import { getAgentsByCategory, getCategories } from "./catalog";
 import { runDoctor } from "./doctor";
 import {
-  DEFAULT_ORCHESTRATOR_KEY,
   GenerationError,
   installAgents,
-  ORCHESTRATOR_CATEGORY,
   resolveTargetDir,
   type InstallAgentsOptions,
 } from "./generator";
@@ -45,19 +43,8 @@ const defaultDeps: TuiDeps = {
 };
 
 export function defaultAgentSelection(scope: "project" | "global", agentSpecs: AgentSpec[]): Set<string> {
-  if (scope !== "project") {
-    return new Set();
-  }
-
-  const preferred = agentSpecs
-    .filter((agent) => agent.category === ORCHESTRATOR_CATEGORY)
-    .map((agent) => agent.key);
-  if (preferred.includes(DEFAULT_ORCHESTRATOR_KEY)) {
-    return new Set([DEFAULT_ORCHESTRATOR_KEY]);
-  }
-  if (preferred.length > 0) {
-    return new Set([preferred[0]]);
-  }
+  void scope;
+  void agentSpecs;
   return new Set();
 }
 
@@ -66,22 +53,12 @@ export function validateAgentSelection(
   agentSpecs: AgentSpec[],
   selectedAgents: Set<string>,
 ): string | undefined {
+  void scope;
+  void agentSpecs;
   if (selectedAgents.size === 0) {
     return "Select at least one subagent.";
   }
-
-  if (scope !== "project") {
-    return undefined;
-  }
-
-  const selectedMeta = agentSpecs.filter(
-    (agent) => selectedAgents.has(agent.key) && agent.category === ORCHESTRATOR_CATEGORY,
-  );
-  if (selectedMeta.length > 0) {
-    return undefined;
-  }
-
-  return `Project installs require at least one meta-orchestration agent, for example ${DEFAULT_ORCHESTRATOR_KEY}.`;
+  return undefined;
 }
 
 function formatResultSummary(
@@ -166,7 +143,7 @@ export async function runTui(
       const selectedAgentsList = await prompt.checkbox<string>({
         message:
           scope === "project"
-            ? "Select subagents. Project installs require a root orchestrator."
+            ? "Select subagents. Including a meta-orchestration agent also seeds the experimental scaffold."
             : "Select subagents.",
         choices: agentSpecs.map((agent) => ({
           value: agent.key,

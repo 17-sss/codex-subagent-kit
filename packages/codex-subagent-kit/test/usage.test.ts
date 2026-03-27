@@ -36,7 +36,33 @@ test("renderUsageGuide shows starter prompts for a project install", () => {
     assert.match(rendered, /visible installed agents:/);
     assert.match(rendered, /multi-agent-coordinator/);
     assert.match(rendered, /starter prompt:/);
-    assert.match(rendered, /Use multi-agent-coordinator as the root orchestrator/);
+    assert.match(rendered, /Use multi-agent-coordinator to coordinate this task/);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("renderUsageGuide still works without an orchestrator", () => {
+  const root = createTempRoot();
+
+  try {
+    const homeDir = join(root, "home");
+    installAgents({
+      scope: "project",
+      projectRoot: root,
+      homeDir,
+      agentKeys: ["reviewer", "code-mapper"],
+    });
+
+    const rendered = renderUsageGuide({
+      projectRoot: root,
+      homeDir,
+      scope: "project",
+    });
+
+    assert.match(rendered, /use these installed agents as needed/i);
+    assert.match(rendered, /reviewer/);
+    assert.match(rendered, /code-mapper/);
   } finally {
     cleanup(root);
   }

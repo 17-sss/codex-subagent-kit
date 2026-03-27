@@ -44,7 +44,7 @@ codex-subagent-kit catalog
 codex-subagent-kit catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-subagent-kit catalog --catalog-root /path/to/categories
-codex-subagent-kit install --scope project --agents multi-agent-coordinator,reviewer,code-mapper --validate
+codex-subagent-kit install --scope project --agents reviewer,code-mapper --validate
 codex-subagent-kit doctor --scope project --project-root .
 codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
@@ -56,7 +56,7 @@ Legacy Python direct execution from the repo root is also supported:
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents multi-agent-coordinator,reviewer --validate
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents reviewer,code-mapper --validate
 PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_subagent_kit.cli usage --scope project --project-root . --task "Review the failing auth flow"
 PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . --category custom-ops --agent custom-coordinator
@@ -143,12 +143,14 @@ Generated agent files use a Codex-compatible TOML shape:
 - `sandbox_mode`
 - `developer_instructions`
 
+If the selected install set includes a `meta-orchestration` agent such as `multi-agent-coordinator`, the project install also seeds the optional experimental scaffold under `.codex/subagent-kit/`.
+
 ## Validation
 
 Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed. If you want that in one step, use `install --validate`.
 
 ```bash
-codex-subagent-kit install --scope project --agents multi-agent-coordinator,reviewer --validate
+codex-subagent-kit install --scope project --agents reviewer,code-mapper --validate
 codex-subagent-kit doctor --scope project --project-root .
 ```
 
@@ -156,7 +158,7 @@ The TUI install flow also runs the same validation step after a successful insta
 
 ## Usage Helper
 
-Use `usage` when you want a starter prompt for Codex based on the agents actually visible in the selected scope.
+Use `usage` when you want a starter prompt for Codex based on the agents actually visible in the selected scope. If a meta-orchestration agent is installed, `usage` prefers it; otherwise it suggests direct specialist prompts.
 
 ```bash
 codex-subagent-kit usage \
@@ -222,7 +224,7 @@ node packages/codex-subagent-kit/dist/cli.js
 node packages/codex-subagent-kit/dist/cli.js catalog
 node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example --source-root /tmp/awesome-codex-subagents
 node packages/codex-subagent-kit/dist/cli.js catalog import --scope project --project-root /tmp/example --catalog-root /tmp/categories --agents custom-helper
-node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents multi-agent-coordinator,reviewer --validate
+node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents reviewer,code-mapper --validate
 node packages/codex-subagent-kit/dist/cli.js usage --scope project --project-root /tmp/example --task "Review the failing auth flow"
 ```
 
