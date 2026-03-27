@@ -19,6 +19,53 @@
 
 `codex-subagent-kit`는 작업공간을 준비하고, 실제 agent thread의 실행과 관리는 `codex`가 맡는다.
 
+## Quick Start
+
+이 저장소에서 현재 TypeScript 구현을 바로 써보려면:
+
+```bash
+npm install
+npm run build:ts
+node packages/codex-subagent-kit/dist/cli.js
+```
+
+bare command를 실행하면 install-first TUI가 열린다.
+
+비대화형으로 바로 설치해보려면:
+
+```bash
+node packages/codex-subagent-kit/dist/cli.js install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+```
+
+## 5-Minute Test Drive
+
+가장 빠르게 end-to-end 확인을 하고 싶다면 아래 흐름을 그대로 실행하면 된다.
+
+```bash
+mkdir -p /tmp/codex-subagent-kit-demo
+node packages/codex-subagent-kit/dist/cli.js install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+node packages/codex-subagent-kit/dist/cli.js usage \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --task "Review the failing auth flow"
+cd /tmp/codex-subagent-kit-demo
+codex
+```
+
+기대 결과:
+
+- `.codex/agents/reviewer.toml`, `.codex/agents/code-mapper.toml`이 생성된다
+- `doctor`가 `status: ok`를 출력한다
+- `usage`가 Codex에 붙여 넣을 starter prompt를 보여준다
+
 ## Stable Workflow
 
 1. `Project` 또는 `Global`을 고른다.
@@ -49,6 +96,15 @@ codex-subagent-kit doctor --scope project --project-root .
 codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
 ```
+
+어떤 명령을 써야 할지 헷갈리면 이렇게 보면 된다.
+
+- `catalog`: 현재 보이는 agent 목록을 본다
+- `catalog sync`: VoltAgent 기반 source catalog를 갱신한다
+- `install`: project/global 범위에 `.codex/agents/*.toml`을 설치한다
+- `doctor`: 설치된 TOML과 catalog root를 검증한다
+- `usage`: 설치된 agent 기준으로 Codex starter prompt를 만든다
+- `template init`: 직접 쓸 category/agent template를 scaffold한다
 
 legacy Python 앱은 repo 루트에서 직접 실행할 수도 있다.
 
@@ -166,6 +222,12 @@ codex-subagent-kit usage \
   --project-root . \
   --task "Review the failing auth flow"
 ```
+
+설치 후 Codex에 바로 이렇게 말하면 된다.
+
+- `Use reviewer to review the current changes for bugs, regressions, and missing tests.`
+- `Use code-mapper to map the auth flow before we change it.`
+- `Use multi-agent-coordinator to coordinate reviewer and code-mapper for this task.`
 
 ## Experimental Commands
 

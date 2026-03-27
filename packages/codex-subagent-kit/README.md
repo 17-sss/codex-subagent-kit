@@ -16,6 +16,32 @@ The current TypeScript package covers the stable command surface:
 
 The TypeScript package is the active npm-targeted implementation. The Python app remains in the repository as a legacy implementation, a fallback development path, and the home for experimental commands that are outside the npm-first surface.
 
+## Quick Start
+
+From the repository root:
+
+```bash
+npm install
+npm run build:ts
+node packages/codex-subagent-kit/dist/cli.js
+```
+
+That bare command opens the install-first TUI.
+
+If you want one quick non-interactive check:
+
+```bash
+node packages/codex-subagent-kit/dist/cli.js install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+node packages/codex-subagent-kit/dist/cli.js usage \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --task "Review the failing auth flow"
+```
+
 ## Local Development
 
 From the repository root:
@@ -65,6 +91,12 @@ node packages/codex-subagent-kit/dist/cli.js install \
   --validate
 ```
 
+Use `doctor` if you want to re-check the generated files later:
+
+```bash
+node packages/codex-subagent-kit/dist/cli.js doctor --scope project --project-root /tmp/example
+```
+
 Render a Codex starter prompt from the installed agents:
 
 ```bash
@@ -73,6 +105,12 @@ node packages/codex-subagent-kit/dist/cli.js usage \
   --project-root /tmp/example \
   --task "Review the failing auth flow"
 ```
+
+Common Codex-side prompts:
+
+- `Use reviewer to review the current changes for bugs, regressions, and missing tests.`
+- `Use code-mapper to map the auth flow before we change it.`
+- `Use multi-agent-coordinator to coordinate reviewer and code-mapper for this task.`
 
 If the selected install set includes a `meta-orchestration` agent such as `multi-agent-coordinator`, the project install also seeds the optional experimental scaffold under `.codex/subagent-kit/`.
 

@@ -19,6 +19,53 @@ The stable product core is simple:
 
 `codex-subagent-kit` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
 
+## Quick Start
+
+If you want to try the current TypeScript implementation from this repository:
+
+```bash
+npm install
+npm run build:ts
+node packages/codex-subagent-kit/dist/cli.js
+```
+
+That bare command opens the install-first TUI.
+
+If you prefer the non-interactive path:
+
+```bash
+node packages/codex-subagent-kit/dist/cli.js install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+```
+
+## 5-Minute Test Drive
+
+Use this if you want one copy-paste flow to verify the tool end to end:
+
+```bash
+mkdir -p /tmp/codex-subagent-kit-demo
+node packages/codex-subagent-kit/dist/cli.js install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+node packages/codex-subagent-kit/dist/cli.js usage \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --task "Review the failing auth flow"
+cd /tmp/codex-subagent-kit-demo
+codex
+```
+
+Expected result:
+
+- `.codex/agents/reviewer.toml` and `.codex/agents/code-mapper.toml` exist
+- `doctor` reports `status: ok`
+- `usage` prints a starter prompt you can paste into Codex
+
 ## Stable Workflow
 
 1. Choose `Project` or `Global`.
@@ -49,6 +96,15 @@ codex-subagent-kit doctor --scope project --project-root .
 codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
 ```
+
+If you are not sure which command to run:
+
+- `catalog`: browse the currently visible agents
+- `catalog sync`: refresh the VoltAgent-backed source catalog
+- `install`: write `.codex/agents/*.toml` into a project or global scope
+- `doctor`: validate installed TOML files and visible catalog roots
+- `usage`: generate a starter prompt for Codex based on installed agents
+- `template init`: scaffold your own category and agent template
 
 Legacy Python direct execution from the repo root is also supported:
 
@@ -166,6 +222,12 @@ codex-subagent-kit usage \
   --project-root . \
   --task "Review the failing auth flow"
 ```
+
+After install, common Codex prompts look like this:
+
+- `Use reviewer to review the current changes for bugs, regressions, and missing tests.`
+- `Use code-mapper to map the auth flow before we change it.`
+- `Use multi-agent-coordinator to coordinate reviewer and code-mapper for this task.`
 
 ## Experimental Commands
 
