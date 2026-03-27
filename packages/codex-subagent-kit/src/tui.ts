@@ -76,15 +76,6 @@ function formatResultSummary(
   for (const path of result.agentPreservedPaths.slice(0, 4)) {
     lines.push(`agent preserved: ${path}`);
   }
-  if (result.orchestratorKey) {
-    lines.push(`orchestrator: ${result.orchestratorKey}`);
-  }
-  for (const path of result.scaffoldCreatedPaths.slice(0, 4)) {
-    lines.push(`created: ${path}`);
-  }
-  for (const path of result.scaffoldPreservedPaths.slice(0, 4)) {
-    lines.push(`preserved: ${path}`);
-  }
   if (validationReport.issues.length > 0) {
     lines.push("issues:");
     for (const issue of validationReport.issues.slice(0, 4)) {
@@ -141,10 +132,7 @@ export async function runTui(
 
       const defaultSelected = defaultAgentSelection(scope, agentSpecs);
       const selectedAgentsList = await prompt.checkbox<string>({
-        message:
-          scope === "project"
-            ? "Select subagents. Including a meta-orchestration agent also seeds the experimental scaffold."
-            : "Select subagents.",
+        message: "Select subagents.",
         choices: agentSpecs.map((agent) => ({
           value: agent.key,
           name: `${agent.name} - ${agent.description}`,

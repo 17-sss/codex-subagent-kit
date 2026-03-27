@@ -28,7 +28,7 @@ The stable product identity is:
 
 Stable capabilities:
 
-- curses-based install-first TUI
+- prompt-based install-first TUI
 - non-interactive install CLI
 - `doctor` validation CLI
 - VoltAgent-backed built-in catalog snapshot
@@ -38,28 +38,6 @@ Stable capabilities:
 - persistent import into project/global catalog injection paths
 - project/global template scaffolding
 - Codex-compatible TOML output using `developer_instructions`
-- optional experimental scaffold generation only when a selected install set includes a meta-orchestration agent
-
-## Session Companion Layer
-
-The repository may include a thin session-companion layer around Codex usage. This layer can help users inspect installed assets, preview layouts, or prototype session-side utilities, but it does not redefine the product as an external runtime.
-
-Examples:
-
-- read-only topology rendering
-- launcher prototypes
-- queue and dispatch experiments
-
-## Experimental Boundary
-
-The following areas are explicitly experimental:
-
-- panel rendering
-- board rendering
-- launcher execution
-- queue / dispatch / result lifecycle helpers
-
-These features may remain useful, but they are not the primary value proposition and should not drive the product definition.
 
 ## Product Principles
 
@@ -83,5 +61,4 @@ These features may remain useful, but they are not the primary value proposition
 - add compatibility checks and validation around generated TOML
 - improve import and extension paths for user-authored catalogs
 - document how installed agents are best used from inside Codex sessions
-- prepare a TypeScript/npm port plan around the stable core only
-- keep the TypeScript package aligned to the stable command scope while the Python app remains available as a legacy implementation and experimental track
+- keep the TypeScript package aligned to the stable command scope

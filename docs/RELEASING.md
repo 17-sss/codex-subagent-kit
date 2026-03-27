@@ -14,7 +14,7 @@ The repository also includes a dedicated npm publish workflow for the TypeScript
 The intended sequence is:
 
 1. open a PR targeting `main`
-2. let the PR CI workflow run both the legacy Python and TypeScript package gates
+2. let the PR CI workflow run the TypeScript repository gate
 3. merge to `main`
 4. let the release workflow create the tag and GitHub Release
 5. let the npm publish workflow publish the matching `codex-subagent-kit` package version
@@ -54,13 +54,8 @@ If the current commit already has a semver tag, the workflow reuses that version
 - required secret: `NPM_TOKEN`
 - required permissions: `id-token: write` for npm provenance
 
-The npm workflow validates that the release tag is plain semver, syncs the workspace package version to that tag at publish time, and then runs:
+The npm workflow validates that the release tag is plain semver, syncs the workspace package version to that tag at publish time, runs `./scripts/test.sh`, and then publishes with:
 
-- `npm run test:ts`
-- `npm run typecheck:ts`
-- `npm run build:ts`
-- `npm run pack:ts`
-- `npm run smoke:ts:consumer`
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
 
 ## Implementation Notes

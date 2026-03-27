@@ -28,9 +28,6 @@ export interface CatalogOptions {
 export interface InstallResult {
   agentPaths: string[];
   agentPreservedPaths: string[];
-  scaffoldCreatedPaths: string[];
-  scaffoldPreservedPaths: string[];
-  orchestratorKey?: string;
 }
 
 export interface DoctorIssue {

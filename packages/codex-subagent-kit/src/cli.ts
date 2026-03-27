@@ -9,7 +9,7 @@ import { CatalogImportError, importCatalog } from "./catalog-import";
 import { CatalogSyncError, syncCatalog } from "./catalog-sync";
 import { renderDoctorReport, runDoctor } from "./doctor";
 import { GenerationError, installAgents, resolveTargetDir } from "./generator";
-import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS } from "./meta";
+import { STABLE_COMMANDS } from "./meta";
 import { initTemplate, TemplateError } from "./templates";
 import { runTui } from "./tui";
 import { renderUsageGuide, UsageError } from "./usage";
@@ -202,15 +202,12 @@ export function buildProgram(): Command {
 
   program
     .name("codex-subagent-kit")
-    .description(
-      "TypeScript port of the codex-subagent-kit stable CLI surface.",
-    )
+    .description("Install and manage Codex subagent catalogs, templates, and TOML definitions.")
     .addHelpText(
       "after",
       [
         "",
-        `Stable commands available in the TypeScript port: ${STABLE_COMMANDS.join(", ")}`,
-        `Experimental commands intentionally excluded from the first port: ${EXPERIMENTAL_COMMANDS.join(", ")}`,
+        `Stable commands available: ${STABLE_COMMANDS.join(", ")}`,
       ].join("\n"),
     )
     .action(async () => {
@@ -259,15 +256,6 @@ export function buildProgram(): Command {
         }
         for (const path of result.agentPreservedPaths) {
           console.log(`agent preserved: ${path}`);
-        }
-        if (result.orchestratorKey) {
-          console.log(`orchestrator: ${result.orchestratorKey}`);
-        }
-        for (const path of result.scaffoldCreatedPaths) {
-          console.log(`scaffold created: ${path}`);
-        }
-        for (const path of result.scaffoldPreservedPaths) {
-          console.log(`scaffold preserved: ${path}`);
         }
 
         if (!options.validate) {

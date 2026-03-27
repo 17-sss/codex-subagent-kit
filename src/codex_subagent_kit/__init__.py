@@ -1,2 +1,0 @@
-"""codex-subagent-kit package."""
-

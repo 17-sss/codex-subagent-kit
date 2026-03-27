@@ -6,7 +6,6 @@ Korean version: [UNDERSTANDING_AND_WORKFLOW.ko.md](./UNDERSTANDING_AND_WORKFLOW.
 
 - this project is primarily a Codex subagent installer and catalog manager
 - its job is to make `.codex/agents/*.toml` setup easy and safe
-- it can also act as a lightweight session companion around Codex usage
 - it is not currently defined as a standalone orchestration runtime outside Codex
 
 In short:
@@ -23,7 +22,6 @@ In short:
 - use a VoltAgent-backed default catalog plus user-injected catalog sources
 - keep synced upstream source roots separate from user-authored injection roots
 - let users author their own category and agent templates
-- keep experimental control-plane work clearly separated from the stable core
 
 ## Stable Commands Today
 
@@ -36,19 +34,6 @@ In short:
 - `tui`
 
 These commands define the main product value.
-
-## Experimental Commands Today
-
-- `panel`
-- `board`
-- `launch`
-- `enqueue`
-- `dispatch-open`
-- `dispatch-prepare`
-- `dispatch-begin`
-- `apply-result`
-
-These commands are useful prototypes and companion utilities, but they are not the canonical product workflow.
 
 ## Main Workflow
 
@@ -91,8 +76,6 @@ flowchart TD
     ├── frontend-owner.toml
     └── ...
 ```
-
-Optional experimental companion assets may also exist under `.codex/subagent-kit/`, but they are not required for the stable install flow and are only seeded automatically when the selected install set includes a meta-orchestration agent.
 
 Stable catalog companion assets may also exist under `.codex/subagent-kit/`:
 

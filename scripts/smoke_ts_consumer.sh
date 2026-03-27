@@ -29,8 +29,10 @@ printf '[smoke] temp workspace: %s\n' "$WORK_DIR"
 
 cd "$REPO_ROOT"
 
-printf '[smoke] building TypeScript package\n'
-npm run build:ts >/dev/null
+if [[ "${SKIP_BUILD:-0}" -ne 1 ]]; then
+  printf '[smoke] building TypeScript package\n'
+  npm run build:ts >/dev/null
+fi
 
 printf '[smoke] creating package tarball\n'
 TARBALL_NAME="$(npm_config_cache="$NPM_CACHE_DIR" npm pack --workspace codex-subagent-kit --pack-destination "$PACK_DIR" | tail -n 1)"

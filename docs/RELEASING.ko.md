@@ -12,7 +12,7 @@
 권장 흐름은 다음과 같다.
 
 1. `main` 대상 PR 생성
-2. PR CI에서 legacy Python과 TypeScript package 게이트 확인
+2. PR CI에서 TypeScript repository gate 확인
 3. `main`으로 merge
 4. release workflow가 tag와 GitHub Release 생성
 5. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish
@@ -52,13 +52,8 @@
 - 필요한 secret: `NPM_TOKEN`
 - 필요한 permission: npm provenance를 위한 `id-token: write`
 
-npm workflow는 release tag가 plain semver인지 확인하고, publish 시점에 workspace package version을 그 tag와 맞춘 뒤 아래 순서로 검증과 publish를 수행한다.
+npm workflow는 release tag가 plain semver인지 확인하고, publish 시점에 workspace package version을 그 tag와 맞춘 뒤 `./scripts/test.sh`를 실행하고 다음 명령으로 publish를 수행한다.
 
-- `npm run test:ts`
-- `npm run typecheck:ts`
-- `npm run build:ts`
-- `npm run pack:ts`
-- `npm run smoke:ts:consumer`
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
 
 ## 구현 참고

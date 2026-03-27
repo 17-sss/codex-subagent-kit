@@ -51,20 +51,8 @@ jobs:
       - name: Sync package version to release tag
         run: npm version --workspace codex-subagent-kit --no-git-tag-version "${{ steps.release.outputs.version }}"
 
-      - name: Run TypeScript test gate
-        run: npm run test:ts
-
-      - name: Run TypeScript typecheck
-        run: npm run typecheck:ts
-
-      - name: Build TypeScript package
-        run: npm run build:ts
-
-      - name: Validate npm package contents
-        run: npm run pack:ts
-
-      - name: Run npm consumer smoke
-        run: npm run smoke:ts:consumer
+      - name: Run TypeScript repository gate
+        run: ./scripts/test.sh
 
       - name: Publish to npm
         env:

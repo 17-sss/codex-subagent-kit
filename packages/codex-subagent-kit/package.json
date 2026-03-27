@@ -1,7 +1,7 @@
 {
   "name": "codex-subagent-kit",
   "version": "0.1.0",
-  "description": "TypeScript port of the codex-subagent-kit stable CLI surface.",
+  "description": "Install and manage Codex subagent catalogs, templates, and TOML definitions.",
   "license": "MIT",
   "repository": {
     "type": "git",

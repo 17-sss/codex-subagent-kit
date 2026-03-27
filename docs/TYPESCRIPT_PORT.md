@@ -4,15 +4,11 @@ Korean version: [TYPESCRIPT_PORT.ko.md](./TYPESCRIPT_PORT.ko.md)
 
 ## Goal
 
-The TypeScript port is intended to produce an npm-publishable CLI that preserves the stable product core of `codex-subagent-kit`.
+The TypeScript migration is complete for the stable product surface. `codex-subagent-kit` now ships as an npm-oriented CLI built from the workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-The port is not a product reset. It is a language and packaging migration built on top of the already-stabilized Python behavior.
+## Current TypeScript Status
 
-## Current TypeScript Progress
-
-The repository now includes a dedicated TypeScript workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
-
-That package is no longer only a skeleton. The stable command surface is mostly available in TypeScript, and it is now the active npm release target. The Python app remains in the repository as a legacy implementation, fallback path, and home for experimental commands that are outside the npm-first surface.
+The TypeScript package is the product source of truth and npm release target.
 
 Current implemented slice:
 
@@ -43,9 +39,7 @@ node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 ```
 
-## Stable Scope To Port First
-
-The first TypeScript release should cover only the stable CLI surface:
+The stable CLI surface now includes:
 
 - bare command entrypoint that opens the install-first TUI
 - `catalog`
@@ -57,24 +51,9 @@ The first TypeScript release should cover only the stable CLI surface:
 - `template init`
 - TUI install flow
 
-## Out Of Scope For The First Port
+## Contract
 
-Do not port the experimental companion layer in the first TypeScript pass:
-
-- `panel`
-- `board`
-- `launch`
-- `enqueue`
-- `dispatch-open`
-- `dispatch-prepare`
-- `dispatch-begin`
-- `apply-result`
-
-These commands can remain Python-only or be revisited after the stable npm package exists.
-
-## Parity Contract
-
-The TypeScript CLI should preserve the user-facing behavior of the Python stable core.
+The TypeScript CLI preserves the stable user-facing behavior that was originally defined during the migration.
 
 Priority parity targets:
 
@@ -85,10 +64,10 @@ Priority parity targets:
 - `usage` output structure
 - exit-code behavior for stable commands
 
-Use the current Python implementation as the reference contract, especially:
+Use the package-local fixtures as the release contract:
 
-- golden fixtures under [tests/fixtures/golden](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/tests/fixtures/golden)
-- CLI behavior locked in [tests/test_cli.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/tests/test_cli.py)
+- golden fixtures under [packages/codex-subagent-kit/test/fixtures/golden](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/test/fixtures/golden)
+- TypeScript CLI behavior locked in [packages/codex-subagent-kit/test](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/test)
 
 ## Recommended Stack
 
@@ -105,25 +84,10 @@ Recommended baseline:
 
 Avoid `Vite` for the core CLI package. It is not the natural fit for a filesystem-heavy terminal tool.
 
-## Suggested Delivery Order
-
-1. create a dedicated TypeScript package workspace
-2. implement shared data model and filesystem path helpers
-3. port catalog loading and TOML rendering
-4. port `catalog sync`
-5. port `template init`
-6. port `install`
-7. port `doctor`
-8. port `usage`
-9. add fixture-based parity tests against the Python contract
-10. prepare npm metadata and publishing workflow
-11. add TypeScript package CI and publish automation
-
-## Release Readiness For The TypeScript Port
+## Release Readiness
 
 Before the npm package is published, confirm:
 
-- stable commands match Python behavior closely enough for docs and examples
 - generated TOML is accepted by Codex
 - package name, README, and examples are aligned with npm usage
 - `npm pack --dry-run` produces the expected package contents
@@ -134,7 +98,3 @@ The repository now includes:
 - PR CI for the TypeScript package
 - a release semver workflow
 - an npm publish workflow triggered from published GitHub releases
-
-## Current Decision
-
-The TypeScript package is now the active npm release target. The Python app remains in the repository as a legacy implementation, reference path, and home for experimental commands that are not part of the npm-first surface.

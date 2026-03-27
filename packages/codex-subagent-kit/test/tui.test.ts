@@ -94,9 +94,6 @@ test("runTui installs selected agents and returns success when doctor is clean",
   const installResult: InstallResult = {
     agentPaths: [join(root, ".codex", "agents", "multi-agent-coordinator.toml")],
     agentPreservedPaths: [],
-    scaffoldCreatedPaths: [join(root, ".codex", "subagent-kit", "team.toml")],
-    scaffoldPreservedPaths: [],
-    orchestratorKey: "multi-agent-coordinator",
   };
   const doctorReport: DoctorReport = {
     scope: "project",
@@ -170,8 +167,6 @@ test("runTui returns failure when doctor reports issues", async () => {
             return {
               agentPaths: [],
               agentPreservedPaths: [],
-              scaffoldCreatedPaths: [],
-              scaffoldPreservedPaths: [],
             };
           },
           runDoctorImpl() {

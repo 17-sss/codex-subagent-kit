@@ -7,5 +7,8 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$REPO_ROOT"
 
-python3 -m compileall src
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+npm run test:ts
+npm run typecheck:ts
+npm run build:ts
+npm run pack:ts
+SKIP_BUILD=1 npm run smoke:ts:consumer

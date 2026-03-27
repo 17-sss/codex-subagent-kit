@@ -11,21 +11,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  python-legacy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Run legacy Python test gate
-        run: ./scripts/test.sh
-
   typescript:
     runs-on: ubuntu-latest
 
@@ -42,17 +27,5 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Run TypeScript test gate
-        run: npm run test:ts
-
-      - name: Run TypeScript typecheck
-        run: npm run typecheck:ts
-
-      - name: Build TypeScript package
-        run: npm run build:ts
-
-      - name: Validate npm package contents
-        run: npm run pack:ts
-
-      - name: Run npm consumer smoke
-        run: npm run smoke:ts:consumer
+      - name: Run TypeScript repository gate
+        run: ./scripts/test.sh

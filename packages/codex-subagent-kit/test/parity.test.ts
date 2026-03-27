@@ -8,7 +8,7 @@ import { renderDoctorReport, runDoctor } from "../src/doctor";
 import { installAgents } from "../src/generator";
 import { renderUsageGuide } from "../src/usage";
 
-const GOLDEN_FIXTURES_DIR = resolve(__dirname, "..", "..", "..", "tests", "fixtures", "golden");
+const GOLDEN_FIXTURES_DIR = resolve(__dirname, "fixtures", "golden");
 
 function createTempRoot(): string {
   return mkdtempSync(join(tmpdir(), "codex-subagent-kit-ts-parity-"));
@@ -31,7 +31,7 @@ test("TypeScript install output matches the reviewer golden TOML fixture", () =>
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["multi-agent-coordinator", "reviewer"],
+      agentKeys: ["reviewer"],
     });
 
     const rendered = readFileSync(join(root, ".codex", "agents", "reviewer.toml"), "utf8");
@@ -50,7 +50,7 @@ test("TypeScript usage output matches the shared project usage fixture", () => {
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["multi-agent-coordinator", "reviewer"],
+      agentKeys: ["reviewer", "code-mapper"],
     });
 
     const rendered = renderUsageGuide({
@@ -75,7 +75,7 @@ test("TypeScript doctor output matches the shared project doctor fixture", () =>
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["multi-agent-coordinator", "reviewer"],
+      agentKeys: ["reviewer", "code-mapper"],
     });
 
     const rendered = renderDoctorReport(
