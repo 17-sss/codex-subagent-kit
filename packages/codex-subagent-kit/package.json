@@ -1,6 +1,6 @@
 {
   "name": "codex-subagent-kit",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Install and manage Codex subagent catalogs, templates, and TOML definitions.",
   "license": "MIT",
   "repository": {

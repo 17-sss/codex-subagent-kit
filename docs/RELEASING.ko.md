@@ -20,8 +20,9 @@
 ## 태그 형식
 
 - `0.1.0`
-- `0.1.1`
 - `0.2.0`
+- `0.2.1`
+- `0.3.0`
 
 이 workflow는 `v` prefix 없는 plain semver tag를 사용한다.
 
@@ -39,7 +40,9 @@
 
 아직 semver tag가 하나도 없다면, workflow는 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)의 현재 package version을 초기 기준 버전으로 사용한다.
 
-즉 지금 기준으로는 TypeScript package version을 바꾸지 않는 한 첫 자동 태그는 `0.1.0`부터 시작한다.
+현재 저장소는 `0.2.1`을 눈에 보이는 package 기준선으로 유지한다.
+
+중요한 점은 publish workflow가 release tag에 맞춰 workspace version을 CI 안에서만 일시적으로 동기화한다는 것이다. 즉 release된 버전을 자동으로 `main`에 다시 써주지는 않으므로, 저장소에 보이는 기준 버전을 다음 릴리즈 기준선과 맞추고 싶다면 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)을 maintainers가 수동으로 올려줘야 한다.
 
 ## 중복 방지
 

@@ -22,8 +22,9 @@ The intended sequence is:
 ## Tag Format
 
 - `0.1.0`
-- `0.1.1`
 - `0.2.0`
+- `0.2.1`
+- `0.3.0`
 
 The workflow uses plain semver tags without a `v` prefix.
 
@@ -41,7 +42,9 @@ The workflow uses plain semver tags without a `v` prefix.
 
 If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the base release version.
 
-That means the first automatic tag from this repository will start from `0.1.0` unless the TypeScript package version is changed first.
+The repository currently keeps `0.2.1` as the visible package baseline.
+
+Note that the publish workflow syncs the workspace version to the release tag only inside CI. It does not write the released version back to `main`, so maintainers should bump [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) manually when they want the repository-visible baseline to stay aligned with the next intended release.
 
 ## Duplicate Protection
 

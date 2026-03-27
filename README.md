@@ -20,7 +20,25 @@ Repository note: the active implementation and npm release target live under [`p
 
 ## Quick Start
 
-If you want to try the current TypeScript implementation from this repository:
+If you want to use the published CLI right away:
+
+```bash
+npx codex-subagent-kit
+```
+
+That bare command opens the install-first TUI without a local clone.
+
+If you prefer the non-interactive npm path:
+
+```bash
+npx codex-subagent-kit install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+```
+
+If you want to work from this repository:
 
 ```bash
 npm install
@@ -46,12 +64,12 @@ Use this if you want one copy-paste flow to verify the tool end to end:
 
 ```bash
 mkdir -p /tmp/codex-subagent-kit-demo
-node packages/codex-subagent-kit/dist/cli.js install \
+npx codex-subagent-kit install \
   --scope project \
   --project-root /tmp/codex-subagent-kit-demo \
   --agents reviewer,code-mapper \
   --validate
-node packages/codex-subagent-kit/dist/cli.js usage \
+npx codex-subagent-kit usage \
   --scope project \
   --project-root /tmp/codex-subagent-kit-demo \
   --task "Review the failing auth flow"
@@ -87,6 +105,7 @@ Most users only need these stable commands:
 
 ```bash
 codex-subagent-kit catalog
+npx codex-subagent-kit catalog
 codex-subagent-kit catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-subagent-kit catalog --catalog-root /path/to/categories
@@ -216,6 +235,14 @@ After install, common Codex prompts look like this:
 ## TypeScript Package Status
 
 The TypeScript package is now the source of truth for the stable CLI surface: `catalog`, `catalog sync`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow, and shared golden fixtures validate generated TOML plus `usage` and `doctor` output.
+
+Published npm version examples:
+
+```bash
+npx codex-subagent-kit --help
+npx codex-subagent-kit catalog
+npx codex-subagent-kit install --scope project --project-root /tmp/example --agents reviewer,code-mapper --validate
+```
 
 Bootstrap validation commands:
 
