@@ -11,9 +11,10 @@
 
 현재 stable core는 단순하다.
 
-- built-in / external agent catalog 탐색
+- VoltAgent 기반 기본 catalog와 external/user-authored catalog 탐색
 - 호환되는 `.codex/agents/*.toml` 설치
 - 새 category / agent template scaffold 생성
+- upstream catalog 내용을 project/global source root로 sync
 - install-first 흐름을 위한 TUI 제공
 
 `codex-subagent-kit`는 작업공간을 준비하고, 실제 agent thread의 실행과 관리는 `codex`가 맡는다.
@@ -21,7 +22,7 @@
 ## Stable Workflow
 
 1. `Project` 또는 `Global`을 고른다.
-2. built-in 템플릿이나 외부 `categories/` 트리를 본다.
+2. vendored VoltAgent snapshot, synced source root, 또는 외부 `categories/` 트리를 본다.
 3. 원하는 agent를 선택한다.
 4. `.codex/agents/*.toml`을 설치한다.
 5. 그 프로젝트에서 `codex`를 실행해 subagent를 사용한다.
@@ -40,9 +41,10 @@ codex-subagent-kit
 
 ```bash
 codex-subagent-kit catalog
+codex-subagent-kit catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-subagent-kit catalog --catalog-root /path/to/categories
-codex-subagent-kit install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
+codex-subagent-kit install --scope project --agents multi-agent-coordinator,reviewer,code-mapper --validate
 codex-subagent-kit doctor --scope project --project-root .
 codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
@@ -52,8 +54,9 @@ legacy Python 앱은 repo 루트에서 직접 실행할 수도 있다.
 
 ```bash
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents cto-coordinator,reviewer --validate
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents multi-agent-coordinator,reviewer --validate
 PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_subagent_kit.cli usage --scope project --project-root . --task "Review the failing auth flow"
 PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . --category custom-ops --agent custom-coordinator
@@ -61,19 +64,29 @@ PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . 
 
 ## Catalog Model
 
-- 앱은 소수의 app-owned built-in catalog를 포함한다
-- `awesome-codex-subagents` 전체를 제품 안에 vendoring하지 않는다
+- 기본 built-in catalog는 VoltAgent [`awesome-codex-subagents/categories`](https://github.com/VoltAgent/awesome-codex-subagents/tree/main/categories)의 vendored snapshot이다
+- project-local synced source root는 `.codex/subagent-kit/sources/<source>/categories/` 아래에 있다
+- global synced source root는 `~/.codex/subagent-kit/sources/<source>/categories/` 아래에 있다
 - project-local injection 경로는 `.codex/subagent-kit/catalog/categories/`이다
 - global injection 경로는 `~/.codex/subagent-kit/catalog/categories/`이다
-- `--catalog-root <path>`로 awesome 스타일 `categories/` 트리를 직접 주입할 수 있다
-- `catalog import`로 선택한 category 또는 agent를 이 injection 경로에 영구 반영할 수 있다
+- `--catalog-root <path>`로 awesome-style `categories/` 트리를 직접 주입할 수 있다
+- `catalog sync`로 VoltAgent upstream 또는 local awesome-style clone에서 synced source root를 갱신할 수 있다
+- `catalog import`로 선택한 category 또는 agent를 injection 경로에 영구 반영할 수 있다
 - 사용자가 직접 만든 템플릿도 같은 폴더 형식을 따르면 같은 install 흐름에 참여할 수 있다
 
-같은 agent key가 충돌하면 precedence는 다음 순서다.
+merge된 catalog precedence는 다음 순서다.
+
+- built-in VoltAgent snapshot
+- global synced source root
+- global user catalog injection root
+- project synced source root
+- project user catalog injection root
+- 명시적인 `--catalog-root`
+
+설치된 agent 파일의 최종 precedence는 scope 기준으로:
 
 - `project`
 - `global`
-- `built-in`
 
 ## Template Scaffolding
 
@@ -106,6 +119,21 @@ codex-subagent-kit catalog import \
   --agents custom-helper,custom-reviewer
 ```
 
+local clone에서 project-local VoltAgent source root를 갱신:
+
+```bash
+codex-subagent-kit catalog sync \
+  --scope project \
+  --project-root . \
+  --source-root /path/to/awesome-codex-subagents
+```
+
+VoltAgent GitHub `main/categories`에서 직접 갱신:
+
+```bash
+codex-subagent-kit catalog sync --scope project --project-root .
+```
+
 생성되는 agent 파일은 Codex-compatible TOML 형식을 따른다.
 
 - `name`
@@ -120,7 +148,7 @@ codex-subagent-kit catalog import \
 install 이후에는 `doctor`로 현재 보이는 agent 파일과 주입된 catalog root가 아직 정상 형식인지 확인할 수 있다. 한 번에 끝내고 싶다면 `install --validate`를 쓰면 된다.
 
 ```bash
-codex-subagent-kit install --scope project --agents cto-coordinator,reviewer --validate
+codex-subagent-kit install --scope project --agents multi-agent-coordinator,reviewer --validate
 codex-subagent-kit doctor --scope project --project-root .
 ```
 
@@ -179,7 +207,7 @@ legacy Python 경계는 [docs/LEGACY_PYTHON_APP.ko.md](./docs/LEGACY_PYTHON_APP.
 
 npm/TypeScript 포팅은 이제 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 dedicated workspace에서 시작할 수 있다.
 
-현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. shared golden fixture로 generated TOML과 `usage`, `doctor` 출력도 함께 검증한다. 현재 npm release target은 이 TypeScript package이고, Python 앱은 저장소 안에 legacy 구현으로 남겨둔다.
+현재 TypeScript 패키지는 stable CLI surface 대부분을 다룬다. `catalog`, `catalog sync`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. shared golden fixture로 generated TOML과 `usage`, `doctor` 출력도 함께 검증한다. 현재 npm release target은 이 TypeScript package이고, Python 앱은 저장소 안에 legacy 구현으로 남겨둔다.
 
 부트스트랩 검증 명령:
 
@@ -192,8 +220,9 @@ npm run pack:ts
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 node packages/codex-subagent-kit/dist/cli.js catalog
+node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example --source-root /tmp/awesome-codex-subagents
 node packages/codex-subagent-kit/dist/cli.js catalog import --scope project --project-root /tmp/example --catalog-root /tmp/categories --agents custom-helper
-node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents cto-coordinator,reviewer --validate
+node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents multi-agent-coordinator,reviewer --validate
 node packages/codex-subagent-kit/dist/cli.js usage --scope project --project-root /tmp/example --task "Review the failing auth flow"
 ```
 

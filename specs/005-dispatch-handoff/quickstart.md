@@ -12,7 +12,7 @@
 PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-dispatch-handoff \
-  --agents cto-coordinator,reviewer
+  --agents multi-agent-coordinator,reviewer
 
 PYTHONPATH=src python3 -m codex_subagent_kit.cli enqueue \
   --project-root .tmp-dispatch-handoff \

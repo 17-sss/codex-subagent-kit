@@ -13,7 +13,7 @@ PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
 PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-smoke \
-  --agents cto-coordinator,reviewer,code-mapper
+  --agents multi-agent-coordinator,reviewer,code-mapper
 ```
 
 Expected outcomes:

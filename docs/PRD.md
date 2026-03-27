@@ -19,6 +19,9 @@ The stable product identity is:
    - `Project`
    - `Global`
 2. browse built-in or injected catalogs
+   - vendored VoltAgent snapshot
+   - synced source roots
+   - user-authored injection roots
 3. select subagents
 4. generate compatible `.codex/agents/*.toml`
 5. run `codex` in that workspace
@@ -28,7 +31,8 @@ Stable capabilities:
 - curses-based install-first TUI
 - non-interactive install CLI
 - `doctor` validation CLI
-- category-based built-in catalog
+- VoltAgent-backed built-in catalog snapshot
+- project/global synced source-root discovery and refresh
 - project/global discovery with precedence
 - external awesome-style catalog injection
 - persistent import into project/global catalog injection paths
@@ -61,7 +65,7 @@ These features may remain useful, but they are not the primary value proposition
 - Codex-native first
 - local over global
 - static definitions before runtime abstractions
-- external catalog compatibility over repository lock-in
+- VoltAgent-backed by default without locking users to VoltAgent
 - explicit, inspectable TOML templates
 - no company-specific default assets
 
@@ -69,11 +73,12 @@ These features may remain useful, but they are not the primary value proposition
 
 - replacing Codex as the runtime owner of agent threads
 - building a standalone multi-agent broker outside Codex
-- depending on a single third-party catalog repository
+- forcing users to depend only on a single third-party catalog repository
 
 ## Near-Term Priorities
 
 - strengthen install, catalog, and template workflows
+- keep the vendored VoltAgent snapshot and `catalog sync` flow current
 - add compatibility checks and validation around generated TOML
 - improve import and extension paths for user-authored catalogs
 - document how installed agents are best used from inside Codex sessions

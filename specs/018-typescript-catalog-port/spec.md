@@ -1,5 +1,7 @@
 # Feature Specification: TypeScript Catalog Port
 
+> Historical note: the original TypeScript catalog port assumed app-owned built-ins. The current catalog source model is superseded by [031-voltagent-catalog-sync](../031-voltagent-catalog-sync/spec.md).
+
 **Feature**: `018-typescript-catalog-port`  
 **Created**: 2026-03-24  
 **Status**: Implemented  

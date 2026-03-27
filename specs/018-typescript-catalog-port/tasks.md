@@ -1,5 +1,7 @@
 # Tasks: TypeScript Catalog Port
 
+> Historical note: superseded in source-of-truth terms by [031-voltagent-catalog-sync](../031-voltagent-catalog-sync/spec.md).
+
 ## Phase 1: Shared Helpers
 
 - [x] Add TypeScript model definitions for categories, agents, and catalog options.

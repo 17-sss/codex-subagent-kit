@@ -20,13 +20,15 @@ In short:
 - support both `Project` and `Global` install scopes
 - keep agent definitions in `.codex/agents`
 - use Codex-compatible TOML as the canonical format
-- support built-in and user-injected catalog sources
+- use a VoltAgent-backed default catalog plus user-injected catalog sources
+- keep synced upstream source roots separate from user-authored injection roots
 - let users author their own category and agent templates
 - keep experimental control-plane work clearly separated from the stable core
 
 ## Stable Commands Today
 
 - `catalog`
+- `catalog sync`
 - `catalog import`
 - `install`
 - `doctor`
@@ -53,7 +55,7 @@ These commands are useful prototypes and companion utilities, but they are not t
 ```mermaid
 flowchart LR
     A["1. Choose Scope<br/>Project or Global"]
-    B["2. Browse Catalogs<br/>Built-in + external categories"]
+    B["2. Browse Catalogs<br/>VoltAgent snapshot + synced sources + external categories"]
     C["3. Select Agents"]
     D["4. Install TOML Files<br/>.codex/agents/*.toml"]
     E["5. Run Codex<br/>inside that workspace"]
@@ -84,7 +86,7 @@ flowchart TD
 ```text
 .codex/
 └── agents/
-    ├── cto-coordinator.toml
+    ├── multi-agent-coordinator.toml
     ├── reviewer.toml
     ├── code-mapper.toml
     └── ...
@@ -92,8 +94,19 @@ flowchart TD
 
 Optional experimental companion assets may also exist under `.codex/subagent-kit/`, but they are not required for the stable install flow.
 
+Stable catalog companion assets may also exist under `.codex/subagent-kit/`:
+
+```text
+.codex/subagent-kit/
+├── catalog/
+│   └── categories/        # user-authored categories and imported TOML files
+└── sources/
+    └── voltagent/
+        └── categories/    # synced upstream snapshot overlay
+```
+
 ## Next Priorities
 
 1. improve compatibility validation for installed TOML files
-2. improve catalog import and user-authored template workflows
+2. improve catalog sync, import, and user-authored template workflows
 3. document recommended Codex-side usage patterns after install

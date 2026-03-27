@@ -12,7 +12,7 @@
 PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-launcher \
-  --agents cto-coordinator,reviewer,code-mapper
+  --agents multi-agent-coordinator,reviewer,code-mapper
 ```
 
 ## Render a role board
@@ -20,7 +20,7 @@ PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
 ```bash
 PYTHONPATH=src python3 -m codex_subagent_kit.cli board \
   --project-root .tmp-launcher \
-  --role cto-coordinator
+  --role multi-agent-coordinator
 ```
 
 Expected outcomes:

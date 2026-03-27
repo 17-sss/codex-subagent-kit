@@ -18,8 +18,9 @@ Current implemented slice:
 
 - shared path helpers
 - catalog data model
-- built-in catalog assets inside the TypeScript workspace
+- vendored VoltAgent catalog snapshot inside the TypeScript workspace
 - working `catalog` command
+- working `catalog sync` command
 - working `catalog import` command
 - working `template init` command
 - working `install` command
@@ -48,6 +49,7 @@ The first TypeScript release should cover only the stable CLI surface:
 
 - bare command entrypoint that opens the install-first TUI
 - `catalog`
+- `catalog sync`
 - `catalog import`
 - `install`
 - `doctor`
@@ -108,13 +110,14 @@ Avoid `Vite` for the core CLI package. It is not the natural fit for a filesyste
 1. create a dedicated TypeScript package workspace
 2. implement shared data model and filesystem path helpers
 3. port catalog loading and TOML rendering
-4. port `template init`
-5. port `install`
-6. port `doctor`
-7. port `usage`
-8. add fixture-based parity tests against the Python contract
-9. prepare npm metadata and publishing workflow
-10. add TypeScript package CI and publish automation
+4. port `catalog sync`
+5. port `template init`
+6. port `install`
+7. port `doctor`
+8. port `usage`
+9. add fixture-based parity tests against the Python contract
+10. prepare npm metadata and publishing workflow
+11. add TypeScript package CI and publish automation
 
 ## Release Readiness For The TypeScript Port
 

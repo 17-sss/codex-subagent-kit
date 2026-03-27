@@ -1,5 +1,7 @@
 # Feature Specification: Catalog Injection
 
+> Historical note: this feature captured the earlier app-owned built-in catalog phase. The current VoltAgent-backed catalog model is defined in [031-voltagent-catalog-sync](../031-voltagent-catalog-sync/spec.md).
+
 **Feature**: `006-catalog-injection`  
 **Created**: 2026-03-23  
 **Status**: Implemented  

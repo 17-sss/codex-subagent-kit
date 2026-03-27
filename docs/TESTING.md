@@ -68,6 +68,10 @@ Integration smoke:
 
 ```bash
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog sync \
+  --scope project \
+  --project-root .tmp-smoke \
+  --source-root /path/to/awesome-codex-subagents
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import \
   --scope project \
   --project-root .tmp-smoke \
@@ -76,7 +80,7 @@ PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import \
 PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-smoke \
-  --agents cto-coordinator,reviewer \
+  --agents multi-agent-coordinator,reviewer \
   --validate
 PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor \
   --scope project \
@@ -97,6 +101,7 @@ npm run smoke:ts:consumer
 ## Current Automated Coverage
 
 - catalog structure and key consistency
+- VoltAgent-backed built-in snapshot availability and local `catalog sync` flows
 - persistent catalog import for selected agents, full categories, and rerun preservation
 - generator file creation, preservation, and error handling
 - doctor validation for healthy installs, malformed files, and missing explicit catalog roots

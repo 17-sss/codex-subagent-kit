@@ -5,6 +5,7 @@
 The current TypeScript package covers the stable command surface:
 
 - `catalog`
+- `catalog sync`
 - `catalog import`
 - `template init`
 - `install`
@@ -31,10 +32,17 @@ node packages/codex-subagent-kit/dist/cli.js
 
 ## Stable Commands
 
-Browse the built-in and injected catalog:
+Browse the VoltAgent-backed built-in snapshot and any injected catalogs:
 
 ```bash
 node packages/codex-subagent-kit/dist/cli.js catalog
+```
+
+Refresh a project-local synced source root from a local clone or from VoltAgent upstream:
+
+```bash
+node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example --source-root /tmp/awesome-codex-subagents
+node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example
 ```
 
 Import external awesome-style `categories/` content into the project catalog:
@@ -53,7 +61,7 @@ Install project-scoped agents and validate them immediately:
 node packages/codex-subagent-kit/dist/cli.js install \
   --scope project \
   --project-root /tmp/example \
-  --agents cto-coordinator,reviewer \
+  --agents multi-agent-coordinator,reviewer \
   --validate
 ```
 

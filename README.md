@@ -11,9 +11,10 @@ Implementation tracks:
 
 The stable product core is simple:
 
-- browse built-in and external agent catalogs
+- browse the VoltAgent-backed default catalog plus external/user-authored catalogs
 - install compatible `.codex/agents/*.toml` files
 - scaffold new category and agent templates
+- sync upstream catalog content into project/global source roots
 - use a TUI for the install-first workflow
 
 `codex-subagent-kit` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
@@ -21,7 +22,7 @@ The stable product core is simple:
 ## Stable Workflow
 
 1. Choose `Project` or `Global`.
-2. Browse built-in templates or inject an external `categories/` tree.
+2. Browse the vendored VoltAgent snapshot, synced source roots, or injected `categories/` trees.
 3. Select the agents you want.
 4. Install `.codex/agents/*.toml`.
 5. Run `codex` in that project and ask it to use those subagents.
@@ -40,9 +41,10 @@ Most users only need these stable commands:
 
 ```bash
 codex-subagent-kit catalog
+codex-subagent-kit catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-subagent-kit catalog --catalog-root /path/to/categories
-codex-subagent-kit install --scope project --agents cto-coordinator,reviewer,code-mapper --validate
+codex-subagent-kit install --scope project --agents multi-agent-coordinator,reviewer,code-mapper --validate
 codex-subagent-kit doctor --scope project --project-root .
 codex-subagent-kit usage --scope project --project-root . --task "Review the failing auth flow"
 codex-subagent-kit template init --project-root . --category custom-ops --agent custom-coordinator
@@ -52,8 +54,9 @@ Legacy Python direct execution from the repo root is also supported:
 
 ```bash
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
+PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
-PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents cto-coordinator,reviewer --validate
+PYTHONPATH=src python3 -m codex_subagent_kit.cli install --scope project --agents multi-agent-coordinator,reviewer --validate
 PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor --scope project --project-root .
 PYTHONPATH=src python3 -m codex_subagent_kit.cli usage --scope project --project-root . --task "Review the failing auth flow"
 PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . --category custom-ops --agent custom-coordinator
@@ -61,19 +64,29 @@ PYTHONPATH=src python3 -m codex_subagent_kit.cli template init --project-root . 
 
 ## Catalog Model
 
-- the app ships a small app-owned built-in catalog
-- the app does not vendor `awesome-codex-subagents` wholesale
+- the default built-in catalog is a vendored snapshot of VoltAgent [`awesome-codex-subagents/categories`](https://github.com/VoltAgent/awesome-codex-subagents/tree/main/categories)
+- project-local synced source roots live under `.codex/subagent-kit/sources/<source>/categories/`
+- global synced source roots live under `~/.codex/subagent-kit/sources/<source>/categories/`
 - project-local injection lives under `.codex/subagent-kit/catalog/categories/`
 - global injection lives under `~/.codex/subagent-kit/catalog/categories/`
 - `--catalog-root <path>` accepts any awesome-style `categories/` tree
+- `catalog sync` refreshes a synced source root from VoltAgent upstream or a local awesome-style clone
 - `catalog import` can persist selected categories or agents into those injection paths
 - user-authored templates can follow the same folder format and participate in the same install flow
 
-When agent keys conflict, precedence is:
+Merged catalog precedence is:
+
+- built-in VoltAgent snapshot
+- global synced source roots
+- global user catalog injection roots
+- project synced source roots
+- project user catalog injection roots
+- explicit `--catalog-root` entries
+
+Installed agent files then take final precedence by scope:
 
 - `project`
 - `global`
-- `built-in`
 
 ## Template Scaffolding
 
@@ -106,6 +119,21 @@ codex-subagent-kit catalog import \
   --agents custom-helper,custom-reviewer
 ```
 
+Refresh the project-local VoltAgent source root from a local clone:
+
+```bash
+codex-subagent-kit catalog sync \
+  --scope project \
+  --project-root . \
+  --source-root /path/to/awesome-codex-subagents
+```
+
+Refresh directly from VoltAgent GitHub `main/categories`:
+
+```bash
+codex-subagent-kit catalog sync --scope project --project-root .
+```
+
 Generated agent files use a Codex-compatible TOML shape:
 
 - `name`
@@ -120,7 +148,7 @@ Generated agent files use a Codex-compatible TOML shape:
 Use `doctor` after install to confirm that visible agent files and any injected catalog roots are still well-formed. If you want that in one step, use `install --validate`.
 
 ```bash
-codex-subagent-kit install --scope project --agents cto-coordinator,reviewer --validate
+codex-subagent-kit install --scope project --agents multi-agent-coordinator,reviewer --validate
 codex-subagent-kit doctor --scope project --project-root .
 ```
 
@@ -179,7 +207,7 @@ See [docs/LEGACY_PYTHON_APP.md](./docs/LEGACY_PYTHON_APP.md) for the current leg
 
 The npm/TypeScript port now has a dedicated workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
-The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow, and the shared golden fixtures now validate generated TOML plus `usage` and `doctor` output. This is the current release target for npm, while the Python app remains in the repository as a legacy implementation.
+The TypeScript package now covers most of the stable CLI surface: `catalog`, `catalog sync`, `catalog import`, `template init`, `install`, `doctor`, `usage`, and the install-first interactive `tui`. The bare command entrypoint also opens the interactive install flow, and the shared golden fixtures now validate generated TOML plus `usage` and `doctor` output. This is the current release target for npm, while the Python app remains in the repository as a legacy implementation.
 
 Bootstrap validation commands:
 
@@ -192,8 +220,9 @@ npm run pack:ts
 node packages/codex-subagent-kit/dist/cli.js --help
 node packages/codex-subagent-kit/dist/cli.js
 node packages/codex-subagent-kit/dist/cli.js catalog
+node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example --source-root /tmp/awesome-codex-subagents
 node packages/codex-subagent-kit/dist/cli.js catalog import --scope project --project-root /tmp/example --catalog-root /tmp/categories --agents custom-helper
-node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents cto-coordinator,reviewer --validate
+node packages/codex-subagent-kit/dist/cli.js install --scope project --project-root /tmp/example --agents multi-agent-coordinator,reviewer --validate
 node packages/codex-subagent-kit/dist/cli.js usage --scope project --project-root /tmp/example --task "Review the failing auth flow"
 ```
 

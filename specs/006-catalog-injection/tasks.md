@@ -1,5 +1,7 @@
 # Tasks: Catalog Injection
 
+> Historical note: superseded in product direction by [031-voltagent-catalog-sync](../031-voltagent-catalog-sync/spec.md).
+
 ## Phase 1: Catalog Source Model
 
 - [x] Replace the vendored awesome catalog with app-owned built-in template files.

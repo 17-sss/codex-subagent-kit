@@ -12,7 +12,7 @@
 PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
   --scope project \
   --project-root .tmp-dispatch \
-  --agents cto-coordinator,reviewer,code-mapper
+  --agents multi-agent-coordinator,reviewer,code-mapper
 ```
 
 ## Enqueue a command
