@@ -4,17 +4,19 @@
 
 `codex-subagent-kit`는 프로젝트 또는 글로벌 `.codex` 디렉터리에 Codex subagent 정의를 설치하고 관리하는 local-first 툴킷이다.
 
-현재 제품 구현과 npm 릴리즈 대상은 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 TypeScript package다.
+이 툴은 보통 이런 상황에서 쓰면 된다.
 
-현재 stable core는 단순하다.
+- VoltAgent 기반 기본 catalog와 외부 또는 직접 만든 catalog를 함께 탐색하고 싶을 때
+- project 또는 global 범위에 호환되는 `.codex/agents/*.toml`을 설치하고 싶을 때
+- 직접 쓸 category / agent template를 빠르게 scaffold하고 싶을 때
+- upstream catalog 내용을 project 또는 global source root로 sync하고 싶을 때
+- 명령을 외우지 않고 install-first TUI로 바로 시작하고 싶을 때
 
-- VoltAgent 기반 기본 catalog와 external/user-authored catalog 탐색
-- 호환되는 `.codex/agents/*.toml` 설치
-- 새 category / agent template scaffold 생성
-- upstream catalog 내용을 project/global source root로 sync
-- install-first 흐름을 위한 TUI 제공
+실제 흐름은 단순하다. agent를 고르고 TOML 파일을 만든 뒤, 그 작업공간에서 `codex`를 열어 해당 subagent를 사용하면 된다.
 
 `codex-subagent-kit`는 작업공간을 준비하고, 실제 agent thread의 실행과 관리는 `codex`가 맡는다.
+
+저장소 기준으로 현재 구현과 npm 릴리즈 대상은 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 TypeScript package다.
 
 ## Quick Start
 

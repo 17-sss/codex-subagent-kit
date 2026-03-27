@@ -4,17 +4,19 @@ Korean version: [README.ko.md](./README.ko.md)
 
 `codex-subagent-kit` is a local-first toolkit for installing and managing Codex subagent definitions in project and global `.codex` directories.
 
-The active product lives under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) and is the npm release target.
+Use it when you want to:
 
-The stable product core is simple:
+- browse the VoltAgent-backed default catalog plus external or user-authored catalogs
+- install compatible `.codex/agents/*.toml` files into a project or global scope
+- scaffold your own category and agent templates
+- sync upstream catalog content into project or global source roots
+- use a simple install-first TUI when you do not want to memorize commands
 
-- browse the VoltAgent-backed default catalog plus external/user-authored catalogs
-- install compatible `.codex/agents/*.toml` files
-- scaffold new category and agent templates
-- sync upstream catalog content into project/global source roots
-- use a TUI for the install-first workflow
+In practice, the flow is simple: choose agents, generate TOML files, then open `codex` in that workspace and ask it to use those subagents.
 
 `codex-subagent-kit` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
+
+Repository note: the active implementation and npm release target live under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
 
 ## Quick Start
 
