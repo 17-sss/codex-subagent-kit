@@ -148,7 +148,7 @@ export async function runTui(
         choices: agentSpecs.map((agent) => ({
           value: agent.key,
           name: `${agent.name} - ${agent.description}`,
-          checked: defaultSelected.has(agent.key),
+          checked: defaultSelected.has(agent.key) ? true : undefined,
         })),
       });
       const selectedAgents = new Set(selectedAgentsList);
