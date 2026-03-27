@@ -6,8 +6,8 @@ Korean version: [TESTING.ko.md](./TESTING.ko.md)
 
 The testing workflow for `codex-subagent-kit` protects three things:
 
-- new work should not break existing CLI and TUI flows
-- generator changes should preserve rerun safety and output contracts
+- stable CLI and TUI flows should remain usable from the packaged TypeScript surface
+- generated TOML and template output should keep their contract
 - validation commands should catch malformed TOML before the user reaches Codex
 - independent validation promised in SDD documents should carry through to implementation
 
@@ -18,15 +18,14 @@ The repository also has a pull-request CI workflow for visibility before merge.
 - workflow file: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
 - trigger: `pull_request` targeting `main`
 - manual trigger: `workflow_dispatch`
-- gate command: `./scripts/test.sh`
-
-This keeps the GitHub gate aligned with the same default local gate used during development.
+- repository gate: `npm ci` followed by `./scripts/test.sh`
+- packaged consumer smoke: included inside `./scripts/test.sh`
 
 ## Core Principles
 
 - if a change affects user experience or generated output, leave behind either automated coverage or an explicit manual smoke procedure
-- automate in `tests/` with `unittest` whenever practical
-- for changes like the curses TUI that are harder to automate fully, keep both automated checks and manual PTY smoke
+- automate in the package test suite whenever practical
+- for TUI changes that are harder to automate fully, keep both automated checks and one manual smoke
 - for bug fixes and regressions, add a reproduction test first when possible; if not possible, document the reason and the manual validation path
 - for stable CLI and generated-output contracts, prefer a small number of golden fixtures over many fragile one-off assertions
 
@@ -49,55 +48,61 @@ This keeps the GitHub gate aligned with the same default local gate used during 
 
 ### 4. Implementation
 
-- validate pure logic and generator behavior with `unittest` under `tests/`
+- validate pure logic and generator behavior with the TypeScript package tests
 - validate CLI commands through stdout, stderr, and generated artifacts
-- for TUI changes, automate pure helpers and pure logic first, then finish with a PTY smoke pass
+- for TUI changes, automate pure helpers and pure logic first, then finish with one interactive smoke pass
 
 ### 5. Validation
 
 Default gate:
 
 ```bash
-python3 -m compileall src
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+./scripts/test.sh
 ```
 
 Integration smoke:
 
 ```bash
-PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog
-PYTHONPATH=src python3 -m codex_subagent_kit.cli catalog import \
+npm install
+npm run build:ts
+node packages/codex-subagent-kit/dist/cli.js catalog
+node packages/codex-subagent-kit/dist/cli.js catalog sync \
+  --scope project \
+  --project-root .tmp-smoke \
+  --source-root /path/to/awesome-codex-subagents
+node packages/codex-subagent-kit/dist/cli.js catalog import \
   --scope project \
   --project-root .tmp-smoke \
   --catalog-root /path/to/categories \
   --agents custom-helper
-PYTHONPATH=src python3 -m codex_subagent_kit.cli install \
+node packages/codex-subagent-kit/dist/cli.js install \
   --scope project \
   --project-root .tmp-smoke \
-  --agents cto-coordinator,reviewer \
+  --agents reviewer,code-mapper \
   --validate
-PYTHONPATH=src python3 -m codex_subagent_kit.cli doctor \
+node packages/codex-subagent-kit/dist/cli.js doctor \
   --scope project \
   --project-root .tmp-smoke
 ```
 
 Additional checks for TUI changes:
 
-- run `PYTHONPATH=src python3 -m codex_subagent_kit.cli tui --project-root <tmp-dir>` inside a PTY
+- run `node packages/codex-subagent-kit/dist/cli.js tui --project-root <tmp-dir>` inside a PTY
 - confirm that the flow reaches agent generation through real key input
 
 ## Current Automated Coverage
 
 - catalog structure and key consistency
+- VoltAgent-backed built-in snapshot availability and local `catalog sync` flows
 - persistent catalog import for selected agents, full categories, and rerun preservation
 - generator file creation, preservation, and error handling
 - doctor validation for healthy installs, malformed files, and missing explicit catalog roots
 - install-time validation via `install --validate`
 - golden fixtures for representative generated TOML, `usage` output, and `doctor` output
-- CLI flows for `catalog`, `install`, control-plane mutations, launcher preview, and dispatch handoff
+- CLI flows for `catalog`, `catalog sync`, `catalog import`, `install`, and root path handling
 - pure helper coverage around TUI default selection and project validation rules
 
 ## Current Limits
 
 - the full TUI flow is not fully automated end-to-end
-- as `.codex/subagent-kit` behavior grows, keep expanding coverage for scaffold, queue/dispatch, launcher, and runtime contracts
+- keep consumer smoke and one manual TUI pass in the release checklist

@@ -2,7 +2,7 @@
 
 영문 기본 문서: [RELEASING.md](./RELEASING.md)
 
-`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만든다.
+`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만들고, TypeScript package용 npm publish workflow도 별도로 가진다.
 
 ## 트리거
 
@@ -12,9 +12,10 @@
 권장 흐름은 다음과 같다.
 
 1. `main` 대상 PR 생성
-2. PR CI에서 기본 테스트 게이트 확인
+2. PR CI에서 TypeScript repository gate 확인
 3. `main`으로 merge
 4. release workflow가 tag와 GitHub Release 생성
+5. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish
 
 ## 태그 형식
 
@@ -36,15 +37,28 @@
 
 ## 초기 릴리즈
 
-아직 semver tag가 하나도 없다면, workflow는 [pyproject.toml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/pyproject.toml)의 현재 `[project].version`을 초기 기준 버전으로 사용한다.
+아직 semver tag가 하나도 없다면, workflow는 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)의 현재 package version을 초기 기준 버전으로 사용한다.
 
-즉 지금 기준으로는 package version을 바꾸지 않는 한 첫 자동 태그는 `0.1.0`부터 시작한다.
+즉 지금 기준으로는 TypeScript package version을 바꾸지 않는 한 첫 자동 태그는 `0.1.0`부터 시작한다.
 
 ## 중복 방지
 
 현재 커밋에 이미 semver tag가 붙어 있으면, workflow는 그 버전을 재사용하고 중복 tag 생성을 건너뛴다.
 
+## npm Publish 흐름
+
+- workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- 트리거: published GitHub Release
+- 인증 방식: GitHub Actions OIDC 기반 npm trusted publishing
+- 필요한 permission: npm provenance와 trusted publishing을 위한 `id-token: write`
+
+첫 publish 전에 npm package 설정에서 이 저장소와 workflow에 대한 trusted publishing을 먼저 연결해야 한다.
+
+npm workflow는 release tag가 plain semver인지 확인하고, publish 시점에 workspace package version을 그 tag와 맞춘 뒤 `./scripts/test.sh`를 실행하고 다음 명령으로 publish를 수행한다.
+
+- `npm publish --workspace codex-subagent-kit --access public --provenance`
+
 ## 구현 참고
 
 - workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- 테스트되는 semver helper: [release_versioning.py](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/src/codex_subagent_kit/release_versioning.py)
+- 테스트되는 semver helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)

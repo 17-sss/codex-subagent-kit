@@ -1,0 +1,58 @@
+name: Publish npm Package
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve release version
+        id: release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          if ! [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "unsupported release tag: ${RELEASE_TAG}" >&2
+            exit 1
+          fi
+
+          echo "version=${RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.version }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Sync package version to release tag
+        run: npm version --workspace codex-subagent-kit --no-git-tag-version "${{ steps.release.outputs.version }}"
+
+      - name: Run TypeScript repository gate
+        run: ./scripts/test.sh
+
+      - name: Publish to npm
+        run: npm publish --workspace codex-subagent-kit --access public --provenance

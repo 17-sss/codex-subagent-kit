@@ -1,0 +1,52 @@
+{
+  "name": "codex-subagent-kit",
+  "version": "0.1.0",
+  "description": "Install and manage Codex subagent catalogs, templates, and TOML definitions.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/17-sss/codex-subagent-kit.git",
+    "directory": "packages/codex-subagent-kit"
+  },
+  "homepage": "https://github.com/17-sss/codex-subagent-kit",
+  "bugs": {
+    "url": "https://github.com/17-sss/codex-subagent-kit/issues"
+  },
+  "keywords": [
+    "codex",
+    "subagents",
+    "cli",
+    "toml",
+    "developer-tools"
+  ],
+  "bin": {
+    "codex-subagent-kit": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "builtin_catalog"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/cli.ts --dts --format cjs --clean",
+    "dev": "tsx src/cli.ts",
+    "release:version": "tsx src/release-versioning-cli.ts",
+    "test": "tsx --test test/**/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.8.4",
+    "@iarna/toml": "^2.2.5",
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.4.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}
