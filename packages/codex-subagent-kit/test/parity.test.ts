@@ -31,7 +31,7 @@ test("TypeScript install output matches the reviewer golden TOML fixture", () =>
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const rendered = readFileSync(join(root, ".codex", "agents", "reviewer.toml"), "utf8");
@@ -50,7 +50,7 @@ test("TypeScript usage output matches the shared project usage fixture", () => {
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const rendered = renderUsageGuide({
@@ -75,7 +75,7 @@ test("TypeScript doctor output matches the shared project doctor fixture", () =>
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const rendered = renderDoctorReport(

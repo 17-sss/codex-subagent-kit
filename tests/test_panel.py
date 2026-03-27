@@ -21,7 +21,7 @@ version = 1
 label = "user"
 
 [team]
-orchestrator = "cto-coordinator"
+orchestrator = "multi-agent-coordinator"
 workers = ["reviewer", "code-mapper"]
 """.strip()
                 + "\n",
@@ -31,7 +31,7 @@ workers = ["reviewer", "code-mapper"]
             rendered = render_panel(project_root)
 
             self.assertIn("Operator: user", rendered)
-            self.assertIn("Orchestrator: cto-coordinator [idle]", rendered)
+            self.assertIn("Orchestrator: multi-agent-coordinator [idle]", rendered)
             self.assertIn("reviewer [idle]", rendered)
             self.assertIn("code-mapper [idle]", rendered)
             self.assertIn("Queue", rendered)
@@ -57,7 +57,7 @@ version = 1
 label = "user"
 
 [team]
-orchestrator = "cto-coordinator"
+orchestrator = "multi-agent-coordinator"
 workers = ["reviewer", "code-mapper"]
 """.strip()
                 + "\n",
@@ -68,7 +68,7 @@ workers = ["reviewer", "code-mapper"]
 version = 1
 
 [orchestrator]
-key = "cto-coordinator"
+key = "multi-agent-coordinator"
 status = "busy"
 
 [[workers]]
@@ -139,7 +139,7 @@ status = "failed"
 
             rendered = render_panel(project_root)
 
-            self.assertIn("Orchestrator: cto-coordinator [busy]", rendered)
+            self.assertIn("Orchestrator: multi-agent-coordinator [busy]", rendered)
             self.assertIn("reviewer [busy]", rendered)
             self.assertIn("code-mapper [idle]", rendered)
             self.assertIn("- pending: 1", rendered)

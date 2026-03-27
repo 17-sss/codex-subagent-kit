@@ -16,7 +16,7 @@ class DashboardTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,
@@ -24,9 +24,9 @@ class DashboardTests(unittest.TestCase):
             )
             open_dispatch(project_root=project_root)
 
-            rendered = render_role_board(project_root, "cto-coordinator")
+            rendered = render_role_board(project_root, "multi-agent-coordinator")
 
-            self.assertIn("Role: cto-coordinator", rendered)
+            self.assertIn("Role: multi-agent-coordinator", rendered)
             self.assertIn("Kind: orchestrator", rendered)
             self.assertIn("Status: busy", rendered)
             self.assertIn("Active Dispatch: dispatch-001", rendered)
@@ -39,7 +39,7 @@ class DashboardTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,
@@ -69,7 +69,7 @@ class DashboardTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             with self.assertRaises(DashboardError):

@@ -24,10 +24,10 @@ test("installAgents creates project agent files and scaffold", () => {
       scope: "project",
       projectRoot: root,
       homeDir: join(root, "home"),
-      agentKeys: ["cto-coordinator", "reviewer", "code-mapper"],
+      agentKeys: ["multi-agent-coordinator", "reviewer", "code-mapper"],
     });
 
-    assert.equal(result.orchestratorKey, "cto-coordinator");
+    assert.equal(result.orchestratorKey, "multi-agent-coordinator");
     assert.ok(result.agentPaths.some((path) => path.endsWith("reviewer.toml")));
     assert.ok(result.scaffoldCreatedPaths.some((path) => path.endsWith("team.toml")));
     assert.ok(existsSync(join(root, ".codex", "agents", "reviewer.toml")));
@@ -37,7 +37,7 @@ test("installAgents creates project agent files and scaffold", () => {
     );
     assert.match(
       readFileSync(join(resolveScaffoldDir(root), "team.toml"), "utf8"),
-      /orchestrator = "cto-coordinator"/,
+      /orchestrator = "multi-agent-coordinator"/,
     );
   } finally {
     cleanup(root);
@@ -113,7 +113,7 @@ test("rendered installed TOML remains parseable", () => {
       scope: "project",
       projectRoot: root,
       homeDir: join(root, "home"),
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const parsed = TOML.parse(readFileSync(join(root, ".codex", "agents", "reviewer.toml"), "utf8")) as Record<

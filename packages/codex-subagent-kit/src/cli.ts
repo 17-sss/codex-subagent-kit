@@ -6,6 +6,7 @@ import { Command } from "commander";
 
 import { renderCatalogOutput } from "./catalog";
 import { CatalogImportError, importCatalog } from "./catalog-import";
+import { CatalogSyncError, syncCatalog } from "./catalog-sync";
 import { renderDoctorReport, runDoctor } from "./doctor";
 import { GenerationError, installAgents, resolveTargetDir } from "./generator";
 import { EXPERIMENTAL_COMMANDS, STABLE_COMMANDS } from "./meta";
@@ -31,10 +32,12 @@ function buildCatalogCommand(): Command {
       collectRepeatedOption,
       [],
     )
+    .option("--source-name <name>", "Synced source name for catalog sync.", "voltagent")
+    .option("--source-root <path>", "Local awesome-style categories root used for catalog sync.")
     .option("--agents <keys>", "Comma-separated agent keys to import.")
     .option("--categories <keys>", "Comma-separated category keys to import.")
     .option("--overwrite", "Overwrite existing imported templates.")
-    .action((operation: string | undefined, options: { projectRoot: string; scope: string; catalogRoot: string[]; agents?: string; categories?: string; overwrite?: boolean }) => {
+    .action(async (operation: string | undefined, options: { projectRoot: string; scope: string; catalogRoot: string[]; sourceName: string; sourceRoot?: string; agents?: string; categories?: string; overwrite?: boolean }) => {
       if (!operation) {
         console.log(
           renderCatalogOutput({
@@ -44,6 +47,32 @@ function buildCatalogCommand(): Command {
             catalogRoots: options.catalogRoot ?? [],
           }),
         );
+        return;
+      }
+
+      if (operation === "sync") {
+        try {
+          const result = await syncCatalog({
+            projectRoot: options.projectRoot,
+            scope: options.scope as "project" | "global",
+            sourceName: options.sourceName,
+            sourceRoot: options.sourceRoot,
+          });
+          console.log(`source: ${result.sourceName}`);
+          console.log(`origin: ${result.sourceLabel}`);
+          console.log(`target: ${result.targetRoot}`);
+          console.log(`files: ${result.copiedPaths.length}`);
+          for (const path of result.copiedPaths.slice(0, 10)) {
+            console.log(`synced: ${path}`);
+          }
+          if (result.copiedPaths.length > 10) {
+            console.log(`... ${result.copiedPaths.length - 10} more`);
+          }
+        } catch (error) {
+          const message = error instanceof CatalogSyncError ? error.message : String(error);
+          console.error(`error: ${message}`);
+          process.exitCode = 1;
+        }
         return;
       }
 

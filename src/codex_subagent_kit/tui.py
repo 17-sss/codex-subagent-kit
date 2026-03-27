@@ -5,7 +5,13 @@ from pathlib import Path
 
 from .catalog import get_agents_by_category, get_categories
 from .doctor import DoctorReport, run_doctor
-from .generator import GenerationError, ORCHESTRATOR_CATEGORY, install_agents, resolve_target_dir
+from .generator import (
+    DEFAULT_ORCHESTRATOR_KEY,
+    GenerationError,
+    ORCHESTRATOR_CATEGORY,
+    install_agents,
+    resolve_target_dir,
+)
 from .models import AgentSpec, InstallResult
 
 
@@ -173,8 +179,8 @@ def _default_agent_selection(scope: str, agent_specs: list[AgentSpec]) -> set[st
         return set()
 
     preferred = [agent.key for agent in agent_specs if agent.category == ORCHESTRATOR_CATEGORY]
-    if "cto-coordinator" in preferred:
-        return {"cto-coordinator"}
+    if DEFAULT_ORCHESTRATOR_KEY in preferred:
+        return {DEFAULT_ORCHESTRATOR_KEY}
     if preferred:
         return {preferred[0]}
     return set()
@@ -197,7 +203,7 @@ def _validate_agent_selection(scope: str, agent_specs: list[AgentSpec], selected
 
     return (
         "project 설치에는 최소 1개의 meta-orchestration agent가 필요합니다.\n"
-        "예: cto-coordinator\n"
+        f"예: {DEFAULT_ORCHESTRATOR_KEY}\n"
         "필요하면 b로 돌아가 Meta & Orchestration 카테고리를 포함하세요."
     )
 

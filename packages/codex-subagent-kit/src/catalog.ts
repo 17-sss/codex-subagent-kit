@@ -9,8 +9,10 @@ import {
   normalizeCatalogRoots,
   resolveGlobalAgentsDir,
   resolveGlobalCatalogDir,
+  resolveGlobalSourceCategoriesDirs,
   resolveProjectAgentsDir,
   resolveProjectCatalogDir,
+  resolveProjectSourceCategoriesDirs,
 } from "./paths";
 
 export const BUILTIN_CATEGORIES_DIR = resolve(__dirname, "..", "builtin_catalog", "categories");
@@ -241,10 +243,16 @@ function buildCatalogState(options: CatalogOptions = {}): CatalogState {
   };
 
   if (includeGlobal) {
+    for (const root of resolveGlobalSourceCategoriesDirs(homeDir)) {
+      mergeCatalogInto(state, loadCatalogRoot(root, `global-source:${basename(resolve(root, ".."))}`));
+    }
     mergeCatalogInto(state, loadCatalogRoot(resolveGlobalCatalogDir(homeDir), "global-catalog"));
   }
 
   if (includeProject && options.projectRoot) {
+    for (const root of resolveProjectSourceCategoriesDirs(options.projectRoot)) {
+      mergeCatalogInto(state, loadCatalogRoot(root, `project-source:${basename(resolve(root, ".."))}`));
+    }
     mergeCatalogInto(
       state,
       loadCatalogRoot(resolveProjectCatalogDir(options.projectRoot), "project-catalog"),

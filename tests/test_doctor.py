@@ -20,7 +20,7 @@ class DoctorTests(unittest.TestCase):
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 report = run_doctor(project_root=project_root, scope="project")
 
@@ -67,7 +67,7 @@ sandbox_mode = "read-only"
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 missing_root = project_root / "missing-categories"
                 report = run_doctor(

@@ -3,6 +3,7 @@ import { checkbox, confirm, select } from "@inquirer/prompts";
 import { getAgentsByCategory, getCategories } from "./catalog";
 import { runDoctor } from "./doctor";
 import {
+  DEFAULT_ORCHESTRATOR_KEY,
   GenerationError,
   installAgents,
   ORCHESTRATOR_CATEGORY,
@@ -51,8 +52,8 @@ export function defaultAgentSelection(scope: "project" | "global", agentSpecs: A
   const preferred = agentSpecs
     .filter((agent) => agent.category === ORCHESTRATOR_CATEGORY)
     .map((agent) => agent.key);
-  if (preferred.includes("cto-coordinator")) {
-    return new Set(["cto-coordinator"]);
+  if (preferred.includes(DEFAULT_ORCHESTRATOR_KEY)) {
+    return new Set([DEFAULT_ORCHESTRATOR_KEY]);
   }
   if (preferred.length > 0) {
     return new Set([preferred[0]]);
@@ -80,7 +81,7 @@ export function validateAgentSelection(
     return undefined;
   }
 
-  return "Project installs require at least one meta-orchestration agent, for example cto-coordinator.";
+  return `Project installs require at least one meta-orchestration agent, for example ${DEFAULT_ORCHESTRATOR_KEY}.`;
 }
 
 function formatResultSummary(

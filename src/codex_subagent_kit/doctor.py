@@ -11,9 +11,13 @@ from .catalog import (
     _parse_category_dir,
     normalize_catalog_roots,
     resolve_global_agents_dir,
-    resolve_global_catalog_dir,
     resolve_project_agents_dir,
+)
+from .app_paths import (
+    resolve_global_catalog_dir,
+    resolve_global_source_categories_dirs,
     resolve_project_catalog_dir,
+    resolve_project_source_categories_dirs,
 )
 from .generator import resolve_target_dir
 from .models import AgentSpec, Category
@@ -116,6 +120,16 @@ def run_doctor(
     catalog_counts.append(("built-in", builtin_checked))
 
     if scope == "project":
+        for root in resolve_global_source_categories_dirs():
+            source_categories, source_agents, source_issues, source_checked = _scan_catalog_root(
+                root,
+                source=f"global-source:{root.parent.name}",
+            )
+            categories.update(source_categories)
+            agent_map.update(source_agents)
+            issues.extend(source_issues)
+            catalog_counts.append((f"global source: {root.parent.name}", source_checked))
+
         global_categories, global_agents, global_issues, global_checked = _scan_catalog_root(
             resolve_global_catalog_dir(),
             source="global-catalog",
@@ -124,6 +138,16 @@ def run_doctor(
         agent_map.update(global_agents)
         issues.extend(global_issues)
         catalog_counts.append(("global catalog", global_checked))
+
+        for root in resolve_project_source_categories_dirs(project_root):
+            source_categories, source_agents, source_issues, source_checked = _scan_catalog_root(
+                root,
+                source=f"project-source:{root.parent.name}",
+            )
+            categories.update(source_categories)
+            agent_map.update(source_agents)
+            issues.extend(source_issues)
+            catalog_counts.append((f"project source: {root.parent.name}", source_checked))
 
         project_categories, project_agents, project_issues, project_checked = _scan_catalog_root(
             resolve_project_catalog_dir(project_root),
@@ -134,6 +158,16 @@ def run_doctor(
         issues.extend(project_issues)
         catalog_counts.append(("project catalog", project_checked))
     else:
+        for root in resolve_global_source_categories_dirs():
+            source_categories, source_agents, source_issues, source_checked = _scan_catalog_root(
+                root,
+                source=f"global-source:{root.parent.name}",
+            )
+            categories.update(source_categories)
+            agent_map.update(source_agents)
+            issues.extend(source_issues)
+            catalog_counts.append((f"global source: {root.parent.name}", source_checked))
+
         global_categories, global_agents, global_issues, global_checked = _scan_catalog_root(
             resolve_global_catalog_dir(),
             source="global-catalog",

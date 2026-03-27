@@ -19,7 +19,7 @@ class GenerationError(RuntimeError):
 
 
 ORCHESTRATOR_CATEGORY = "meta-orchestration"
-DEFAULT_ORCHESTRATOR_KEY = "cto-coordinator"
+DEFAULT_ORCHESTRATOR_KEY = "multi-agent-coordinator"
 
 
 def resolve_target_dir(scope: str, project_root: Path) -> Path:
@@ -111,6 +111,7 @@ This folder is the project-local seed for the future control-plane.
 
 - `.codex/agents/` keeps static agent definitions.
 - `.codex/subagent-kit/` keeps team and runtime-oriented assets.
+- `.codex/subagent-kit/sources/` keeps synced upstream catalog overlays.
 - `.codex/subagent-kit/catalog/categories/` is the project-local catalog injection point for custom category directories and agent templates.
 - `runtime/agents.toml` tracks orchestrator/worker runtime status.
 - `queue/commands.toml` is the queue seed for future operator commands.
@@ -181,6 +182,7 @@ def generate_orchestrator_scaffold(
     _ensure_directory(scaffold_root / "ledger", created_paths=created_paths, preserved_paths=preserved_paths)
     _ensure_directory(scaffold_root / "launchers", created_paths=created_paths, preserved_paths=preserved_paths)
     _ensure_directory(scaffold_root / "catalog", created_paths=created_paths, preserved_paths=preserved_paths)
+    _ensure_directory(scaffold_root / "sources", created_paths=created_paths, preserved_paths=preserved_paths)
     _ensure_directory(
         scaffold_root / "catalog" / "categories",
         created_paths=created_paths,

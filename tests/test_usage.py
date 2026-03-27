@@ -20,14 +20,14 @@ class UsageTests(unittest.TestCase):
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 rendered = render_usage_guide(project_root=project_root, scope="project")
 
             self.assertIn("visible installed agents:", rendered)
-            self.assertIn("cto-coordinator", rendered)
+            self.assertIn("multi-agent-coordinator", rendered)
             self.assertIn("starter prompt:", rendered)
-            self.assertIn("Use cto-coordinator as the root orchestrator", rendered)
+            self.assertIn("Use multi-agent-coordinator as the root orchestrator", rendered)
 
     def test_usage_injects_task_text(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -39,7 +39,7 @@ class UsageTests(unittest.TestCase):
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 rendered = render_usage_guide(
                     project_root=project_root,

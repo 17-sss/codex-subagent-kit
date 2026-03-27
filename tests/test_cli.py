@@ -151,7 +151,7 @@ developer_instructions = "custom helper instructions"
                         "--project-root",
                         temp_dir,
                         "--agents",
-                        "cto-coordinator,reviewer",
+                        "multi-agent-coordinator,reviewer",
                     ]
                 )
                 self.assertEqual(install_exit_code, 0)
@@ -187,7 +187,7 @@ developer_instructions = "custom helper instructions"
                         "--project-root",
                         temp_dir,
                         "--agents",
-                        "cto-coordinator,reviewer",
+                        "multi-agent-coordinator,reviewer",
                     ]
                 )
                 self.assertEqual(install_exit_code, 0)
@@ -209,7 +209,7 @@ developer_instructions = "custom helper instructions"
             self.assertEqual(stderr, "")
             self.assertIn("starter prompt:", stdout)
             self.assertIn("Review the failing auth flow", stdout)
-            self.assertIn("cto-coordinator", stdout)
+            self.assertIn("multi-agent-coordinator", stdout)
 
     def test_catalog_command_supports_catalog_root(self) -> None:
         with TemporaryDirectory() as temp_dir:
@@ -304,7 +304,7 @@ codex_subagent_kit_category = "meta-orchestration"
                         "--project-root",
                         temp_dir,
                         "--agents",
-                        "cto-coordinator,reviewer",
+                        "multi-agent-coordinator,reviewer",
                         "--validate",
                     ]
                 )
@@ -343,7 +343,7 @@ sandbox_mode = "read-only"
                         "--project-root",
                         temp_dir,
                         "--agents",
-                        "cto-coordinator,reviewer",
+                        "multi-agent-coordinator,reviewer",
                         "--validate",
                     ]
                 )
@@ -423,7 +423,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer,code-mapper",
+                    "multi-agent-coordinator,reviewer,code-mapper",
                 ]
             )
 
@@ -431,7 +431,7 @@ sandbox_mode = "read-only"
             self.assertEqual(stderr, "")
             self.assertIn("target:", stdout)
             self.assertIn("reviewer.toml", stdout)
-            self.assertIn("orchestrator: cto-coordinator", stdout)
+            self.assertIn("orchestrator: multi-agent-coordinator", stdout)
             self.assertIn("scaffold created:", stdout)
             self.assertTrue((Path(temp_dir) / ".codex" / "agents" / "reviewer.toml").exists())
 
@@ -443,7 +443,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer,code-mapper",
+                    "multi-agent-coordinator,reviewer,code-mapper",
                 ]
             )
             self.assertEqual(second_exit_code, 0)
@@ -497,7 +497,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer,code-mapper",
+                    "multi-agent-coordinator,reviewer,code-mapper",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -514,7 +514,7 @@ sandbox_mode = "read-only"
             self.assertEqual(exit_code, 0)
             self.assertEqual(stderr, "")
             self.assertIn("Operator: user", stdout)
-            self.assertIn("Orchestrator: cto-coordinator", stdout)
+            self.assertIn("Orchestrator: multi-agent-coordinator", stdout)
             self.assertIn("reviewer", stdout)
             self.assertIn("code-mapper", stdout)
             self.assertIn("Queue", stdout)
@@ -530,7 +530,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -564,12 +564,12 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--role",
-                    "cto-coordinator",
+                    "multi-agent-coordinator",
                 ]
             )
             self.assertEqual(board_exit_code, 0)
             self.assertEqual(board_stderr, "")
-            self.assertIn("Role: cto-coordinator", board_stdout)
+            self.assertIn("Role: multi-agent-coordinator", board_stdout)
             self.assertIn("Kind: orchestrator", board_stdout)
             self.assertIn("dispatch-001 [ready]", board_stdout)
 
@@ -583,7 +583,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -616,7 +616,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -664,7 +664,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -704,7 +704,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -757,7 +757,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -813,7 +813,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -875,7 +875,7 @@ sandbox_mode = "read-only"
                     "--project-root",
                     temp_dir,
                     "--agents",
-                    "cto-coordinator,reviewer",
+                    "multi-agent-coordinator,reviewer",
                 ]
             )
             self.assertEqual(install_exit_code, 0)
@@ -941,7 +941,7 @@ sandbox_mode = "read-only"
             )
             self.assertEqual(panel_exit_code, 0)
             self.assertEqual(panel_stderr, "")
-            self.assertIn("Orchestrator: cto-coordinator [idle]", panel_stdout)
+            self.assertIn("Orchestrator: multi-agent-coordinator [idle]", panel_stdout)
             self.assertIn("- completed: 1", panel_stdout)
             self.assertIn("- ready: 0", panel_stdout)
 

@@ -15,7 +15,7 @@ class LaunchRuntimeTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             plan = build_launch_plan(
@@ -33,7 +33,7 @@ class LaunchRuntimeTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             plan = build_launch_plan(
@@ -52,7 +52,7 @@ class LaunchRuntimeTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             plan = build_launch_plan(
@@ -80,7 +80,7 @@ class LaunchRuntimeTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             with self.assertRaises(LaunchError):

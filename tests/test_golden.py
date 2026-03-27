@@ -30,7 +30,7 @@ class GoldenContractTests(unittest.TestCase):
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 rendered = (project_root / ".codex" / "agents" / "reviewer.toml").read_text(encoding="utf-8")
 
@@ -46,7 +46,7 @@ class GoldenContractTests(unittest.TestCase):
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 rendered = render_usage_guide(
                     project_root=project_root,
@@ -66,7 +66,7 @@ class GoldenContractTests(unittest.TestCase):
                 install_agents(
                     scope="project",
                     project_root=project_root,
-                    agent_keys=["cto-coordinator", "reviewer"],
+                    agent_keys=["multi-agent-coordinator", "reviewer"],
                 )
                 rendered = render_doctor_report(run_doctor(project_root=project_root, scope="project"))
 

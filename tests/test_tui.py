@@ -31,7 +31,7 @@ class TuiTests(unittest.TestCase):
 
         selected = _default_agent_selection("project", agent_specs)
 
-        self.assertEqual(selected, {"cto-coordinator"})
+        self.assertEqual(selected, {"multi-agent-coordinator"})
 
     def test_project_selection_requires_meta_orchestration_agent(self) -> None:
         agent_specs = get_agents_by_category()
@@ -40,12 +40,12 @@ class TuiTests(unittest.TestCase):
 
         self.assertIsNotNone(message)
         self.assertIn("meta-orchestration", message)
-        self.assertIn("cto-coordinator", message)
+        self.assertIn("multi-agent-coordinator", message)
 
     def test_project_selection_accepts_root_orchestrator(self) -> None:
         agent_specs = get_agents_by_category()
 
-        message = _validate_agent_selection("project", agent_specs, {"cto-coordinator", "reviewer"})
+        message = _validate_agent_selection("project", agent_specs, {"multi-agent-coordinator", "reviewer"})
 
         self.assertIsNone(message)
 
@@ -101,7 +101,7 @@ class TuiTests(unittest.TestCase):
             agent_preserved_paths=[],
             scaffold_created_paths=[],
             scaffold_preserved_paths=[],
-            orchestrator_key="cto-coordinator",
+            orchestrator_key="multi-agent-coordinator",
         )
         catalog_root = Path("/tmp/custom-catalog")
 
@@ -116,7 +116,7 @@ class TuiTests(unittest.TestCase):
                 "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     {"meta-orchestration"},
-                    {"cto-coordinator"},
+                    {"multi-agent-coordinator"},
                 ],
             ),
             patch("codex_subagent_kit.tui._summary_screen", return_value=True),
@@ -137,7 +137,7 @@ class TuiTests(unittest.TestCase):
             agent_preserved_paths=[],
             scaffold_created_paths=[],
             scaffold_preserved_paths=[],
-            orchestrator_key="cto-coordinator",
+            orchestrator_key="multi-agent-coordinator",
         )
 
         def fake_wrapper(func):
@@ -151,7 +151,7 @@ class TuiTests(unittest.TestCase):
                 "codex_subagent_kit.tui._multi_select",
                 side_effect=[
                     {"meta-orchestration"},
-                    {"cto-coordinator"},
+                    {"multi-agent-coordinator"},
                 ],
             ),
             patch("codex_subagent_kit.tui._summary_screen", return_value=True),

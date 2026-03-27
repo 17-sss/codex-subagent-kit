@@ -43,20 +43,20 @@ function withCapturedConsole<T>(run: () => Promise<T> | T): Promise<T> {
     });
 }
 
-test("defaultAgentSelection prefers cto-coordinator for project installs", () => {
+test("defaultAgentSelection prefers multi-agent-coordinator for project installs", () => {
   const selection = defaultAgentSelection("project", [
     createAgent({ key: "reviewer", category: "quality" }),
-    createAgent({ key: "cto-coordinator", category: "meta-orchestration" }),
+    createAgent({ key: "multi-agent-coordinator", category: "meta-orchestration" }),
     createAgent({ key: "multi-agent-coordinator", category: "meta-orchestration" }),
   ]);
 
-  assert.deepEqual([...selection], ["cto-coordinator"]);
+  assert.deepEqual([...selection], ["multi-agent-coordinator"]);
 });
 
 test("validateAgentSelection requires an orchestrator for project installs", () => {
   const agents = [
     createAgent({ key: "reviewer", category: "quality" }),
-    createAgent({ key: "cto-coordinator", category: "meta-orchestration" }),
+    createAgent({ key: "multi-agent-coordinator", category: "meta-orchestration" }),
   ];
 
   assert.match(
@@ -85,7 +85,7 @@ test("runTui installs selected agents and returns success when doctor is clean",
       if (checkboxCalls.length === 1) {
         return [];
       }
-      return ["reviewer", "cto-coordinator"];
+      return ["reviewer", "multi-agent-coordinator"];
     },
     async confirm(config) {
       confirmCalls.push(config);
@@ -94,11 +94,11 @@ test("runTui installs selected agents and returns success when doctor is clean",
   };
 
   const installResult: InstallResult = {
-    agentPaths: [join(root, ".codex", "agents", "cto-coordinator.toml")],
+    agentPaths: [join(root, ".codex", "agents", "multi-agent-coordinator.toml")],
     agentPreservedPaths: [],
     scaffoldCreatedPaths: [join(root, ".codex", "subagent-kit", "team.toml")],
     scaffoldPreservedPaths: [],
-    orchestratorKey: "cto-coordinator",
+    orchestratorKey: "multi-agent-coordinator",
   };
   const doctorReport: DoctorReport = {
     scope: "project",
@@ -135,12 +135,12 @@ test("runTui installs selected agents and returns success when doctor is clean",
     assert.equal(installCalls.length, 1);
     assert.deepEqual(installCalls[0], {
       scope: "project",
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
       projectRoot: root,
     });
 
     const agentCheckbox = checkboxCalls[1];
-    const ctoChoice = agentCheckbox.choices.find((choice) => choice.value === "cto-coordinator");
+    const ctoChoice = agentCheckbox.choices.find((choice) => choice.value === "multi-agent-coordinator");
     assert.equal(ctoChoice?.checked, true);
   } finally {
     cleanup(root);

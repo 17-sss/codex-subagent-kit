@@ -25,7 +25,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             command_id, queue_path = enqueue_command(
@@ -37,7 +37,7 @@ class ControlPlaneTests(unittest.TestCase):
             self.assertTrue(queue_path.exists())
             commands = load_queue_commands(project_root)
             self.assertEqual(len(commands), 1)
-            self.assertEqual(commands[0]["role"], "cto-coordinator")
+            self.assertEqual(commands[0]["role"], "multi-agent-coordinator")
             self.assertEqual(commands[0]["status"], "pending")
 
     def test_enqueue_rejects_unknown_role(self) -> None:
@@ -46,7 +46,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             with self.assertRaises(ControlPlaneError):
@@ -62,7 +62,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,
@@ -96,7 +96,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
 
             with self.assertRaises(ControlPlaneError):
@@ -108,7 +108,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,
@@ -133,7 +133,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,
@@ -168,7 +168,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,
@@ -207,7 +207,7 @@ class ControlPlaneTests(unittest.TestCase):
             install_agents(
                 scope="project",
                 project_root=project_root,
-                agent_keys=["cto-coordinator", "reviewer"],
+                agent_keys=["multi-agent-coordinator", "reviewer"],
             )
             enqueue_command(
                 project_root=project_root,

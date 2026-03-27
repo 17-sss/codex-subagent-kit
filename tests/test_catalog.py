@@ -35,8 +35,9 @@ class CatalogTests(unittest.TestCase):
         agent_map = get_agent_map()
         categories = get_categories()
 
-        self.assertIn("cto-coordinator", agent_map)
-        self.assertIn("backend-owner", agent_map)
+        self.assertIn("multi-agent-coordinator", agent_map)
+        self.assertIn("code-mapper", agent_map)
+        self.assertIn("reviewer", agent_map)
         self.assertIn("meta-orchestration", {category.key for category in categories})
         self.assertIn("core-development", {category.key for category in categories})
 

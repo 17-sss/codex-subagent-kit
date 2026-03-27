@@ -6,8 +6,10 @@ from pathlib import Path
 
 from .app_paths import (
     CATEGORY_OVERRIDE_KEY,
-    resolve_global_tool_dir,
-    resolve_project_tool_dir,
+    resolve_global_catalog_dir,
+    resolve_global_source_categories_dirs,
+    resolve_project_catalog_dir,
+    resolve_project_source_categories_dirs,
 )
 from .models import AgentSpec, Category
 
@@ -26,14 +28,6 @@ def resolve_project_agents_dir(project_root: Path) -> Path:
 
 def resolve_global_agents_dir() -> Path:
     return Path.home() / ".codex" / "agents"
-
-
-def resolve_project_catalog_dir(project_root: Path) -> Path:
-    return resolve_project_tool_dir(project_root) / "catalog" / "categories"
-
-
-def resolve_global_catalog_dir() -> Path:
-    return resolve_global_tool_dir() / "catalog" / "categories"
 
 
 def normalize_catalog_roots(catalog_roots: tuple[Path, ...] | None = None) -> tuple[Path, ...]:
@@ -198,6 +192,14 @@ def _merge_catalog_roots(
     agents: dict[str, AgentSpec] = dict(builtin_agents)
 
     if include_global:
+        for root in resolve_global_source_categories_dirs():
+            extra_categories, extra_agents = _load_catalog_root(
+                root,
+                source=f"global-source:{root.parent.name}",
+            )
+            categories.update(extra_categories)
+            agents.update(extra_agents)
+
         extra_categories, extra_agents = _load_catalog_root(
             resolve_global_catalog_dir(),
             source="global-catalog",
@@ -206,6 +208,14 @@ def _merge_catalog_roots(
         agents.update(extra_agents)
 
     if include_project and project_root is not None:
+        for root in resolve_project_source_categories_dirs(project_root):
+            extra_categories, extra_agents = _load_catalog_root(
+                root,
+                source=f"project-source:{root.parent.name}",
+            )
+            categories.update(extra_categories)
+            agents.update(extra_agents)
+
         extra_categories, extra_agents = _load_catalog_root(
             resolve_project_catalog_dir(project_root),
             source="project-catalog",

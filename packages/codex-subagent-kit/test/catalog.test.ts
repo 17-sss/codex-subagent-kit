@@ -18,7 +18,7 @@ test("builtin catalog exposes known stable agents", () => {
   const agentMap = getAgentMap();
   const categories = getCategories();
 
-  assert.equal(agentMap.get("cto-coordinator")?.source, "builtin");
+  assert.equal(agentMap.get("multi-agent-coordinator")?.source, "builtin");
   assert.ok(categories.some((category) => category.key === "meta-orchestration"));
   assert.ok(categories.some((category) => category.key === "core-development"));
 });

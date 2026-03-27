@@ -24,7 +24,7 @@ test("renderUsageGuide shows starter prompts for a project install", () => {
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const rendered = renderUsageGuide({
@@ -34,9 +34,9 @@ test("renderUsageGuide shows starter prompts for a project install", () => {
     });
 
     assert.match(rendered, /visible installed agents:/);
-    assert.match(rendered, /cto-coordinator/);
+    assert.match(rendered, /multi-agent-coordinator/);
     assert.match(rendered, /starter prompt:/);
-    assert.match(rendered, /Use cto-coordinator as the root orchestrator/);
+    assert.match(rendered, /Use multi-agent-coordinator as the root orchestrator/);
   } finally {
     cleanup(root);
   }
@@ -51,7 +51,7 @@ test("renderUsageGuide injects the requested task text", () => {
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const rendered = renderUsageGuide({

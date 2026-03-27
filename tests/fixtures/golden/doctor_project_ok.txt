@@ -3,7 +3,7 @@ scope: project
 target: <PROJECT_ROOT>/.codex/agents
 
 Catalog templates checked:
-- built-in: 12
+- built-in: 136
 - global catalog: 0
 - project catalog: 0
 

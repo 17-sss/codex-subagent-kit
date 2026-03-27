@@ -24,7 +24,7 @@ test("runDoctor reports ok for a fresh project install", () => {
       scope: "project",
       projectRoot: root,
       homeDir,
-      agentKeys: ["cto-coordinator", "reviewer"],
+      agentKeys: ["multi-agent-coordinator", "reviewer"],
     });
 
     const report = runDoctor({

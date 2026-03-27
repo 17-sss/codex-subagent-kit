@@ -1,5 +1,5 @@
 import { existsSync, readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 
 import {
   BUILTIN_CATEGORIES_DIR,
@@ -13,7 +13,9 @@ import {
   normalizeCatalogRoots,
   resolveGlobalAgentsDir,
   resolveGlobalCatalogDir,
+  resolveGlobalSourceCategoriesDirs,
   resolveProjectCatalogDir,
+  resolveProjectSourceCategoriesDirs,
 } from "./paths";
 import { resolveTargetDir } from "./generator";
 
@@ -112,6 +114,15 @@ export function runDoctor(options: {
   const categories = new Map(builtin.categories);
   const agentMap = new Map(builtin.agents);
 
+  for (const root of resolveGlobalSourceCategoriesDirs(options.homeDir)) {
+    const sourceName = basename(dirname(root)) || "unknown";
+    const synced = scanCatalogRoot(root, `global-source:${sourceName}`);
+    catalogCounts.push([`global source: ${sourceName}`, synced.checkedTemplates]);
+    issues.push(...synced.issues);
+    for (const [key, category] of synced.categories) categories.set(key, category);
+    for (const [key, agent] of synced.agents) agentMap.set(key, agent);
+  }
+
   const globalCatalog = scanCatalogRoot(resolveGlobalCatalogDir(options.homeDir), "global-catalog");
   catalogCounts.push(["global catalog", globalCatalog.checkedTemplates]);
   issues.push(...globalCatalog.issues);
@@ -119,6 +130,15 @@ export function runDoctor(options: {
   for (const [key, agent] of globalCatalog.agents) agentMap.set(key, agent);
 
   if (options.scope === "project") {
+    for (const root of resolveProjectSourceCategoriesDirs(options.projectRoot)) {
+      const sourceName = basename(dirname(root)) || "unknown";
+      const synced = scanCatalogRoot(root, `project-source:${sourceName}`);
+      catalogCounts.push([`project source: ${sourceName}`, synced.checkedTemplates]);
+      issues.push(...synced.issues);
+      for (const [key, category] of synced.categories) categories.set(key, category);
+      for (const [key, agent] of synced.agents) agentMap.set(key, agent);
+    }
+
     const projectCatalog = scanCatalogRoot(
       resolveProjectCatalogDir(options.projectRoot),
       "project-catalog",

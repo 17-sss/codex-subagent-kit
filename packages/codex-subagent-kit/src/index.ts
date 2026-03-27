@@ -7,6 +7,7 @@ export {
   renderCatalogOutput,
 } from "./catalog";
 export { CatalogImportError, importCatalog } from "./catalog-import";
+export { CatalogSyncError, syncCatalog, type CatalogSyncResult } from "./catalog-sync";
 export { buildProgram, main } from "./cli";
 export { renderDoctorReport, runDoctor } from "./doctor";
 export {
