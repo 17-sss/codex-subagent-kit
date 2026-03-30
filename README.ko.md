@@ -20,7 +20,25 @@
 
 ## Quick Start
 
-이 저장소에서 현재 TypeScript 구현을 바로 써보려면:
+배포된 CLI를 바로 써보려면:
+
+```bash
+npx codex-subagent-kit
+```
+
+bare command만 실행해도 install-first TUI가 열린다.
+
+비대화형으로 npm 경로를 바로 쓰려면:
+
+```bash
+npx codex-subagent-kit install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+```
+
+이 저장소에서 현재 TypeScript 구현을 직접 써보려면:
 
 ```bash
 npm install
@@ -46,12 +64,12 @@ node packages/codex-subagent-kit/dist/cli.js install \
 
 ```bash
 mkdir -p /tmp/codex-subagent-kit-demo
-node packages/codex-subagent-kit/dist/cli.js install \
+npx codex-subagent-kit install \
   --scope project \
   --project-root /tmp/codex-subagent-kit-demo \
   --agents reviewer,code-mapper \
   --validate
-node packages/codex-subagent-kit/dist/cli.js usage \
+npx codex-subagent-kit usage \
   --scope project \
   --project-root /tmp/codex-subagent-kit-demo \
   --task "Review the failing auth flow"
@@ -87,6 +105,7 @@ codex-subagent-kit
 
 ```bash
 codex-subagent-kit catalog
+npx codex-subagent-kit catalog
 codex-subagent-kit catalog sync --scope project --source-root /path/to/awesome-codex-subagents
 codex-subagent-kit catalog import --scope project --catalog-root /path/to/categories --agents custom-helper
 codex-subagent-kit catalog --catalog-root /path/to/categories
@@ -216,6 +235,14 @@ codex-subagent-kit usage \
 ## TypeScript 패키지 상태
 
 TypeScript 패키지는 이제 stable CLI surface의 source of truth다. `catalog`, `catalog sync`, `catalog import`, `template init`, `install`, `doctor`, `usage`, install-first interactive `tui`가 동작하고, bare command entrypoint도 interactive install flow를 연다. shared golden fixture로 generated TOML과 `usage`, `doctor` 출력도 함께 검증한다.
+
+npm 배포본 기준 예시는 이렇게 쓸 수 있다.
+
+```bash
+npx codex-subagent-kit --help
+npx codex-subagent-kit catalog
+npx codex-subagent-kit install --scope project --project-root /tmp/example --agents reviewer,code-mapper --validate
+```
 
 부트스트랩 검증 명령:
 

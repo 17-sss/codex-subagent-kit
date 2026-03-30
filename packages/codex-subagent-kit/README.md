@@ -18,28 +18,34 @@ This package is the active source of truth for the product and the npm release t
 
 ## Quick Start
 
+Run the published CLI directly:
+
+```bash
+npx codex-subagent-kit
+```
+
+That bare command opens the install-first TUI.
+
+If you want one quick non-interactive npm check:
+
+```bash
+npx codex-subagent-kit install \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --agents reviewer,code-mapper \
+  --validate
+npx codex-subagent-kit usage \
+  --scope project \
+  --project-root /tmp/codex-subagent-kit-demo \
+  --task "Review the failing auth flow"
+```
+
 From the repository root:
 
 ```bash
 npm install
 npm run build:ts
 node packages/codex-subagent-kit/dist/cli.js
-```
-
-That bare command opens the install-first TUI.
-
-If you want one quick non-interactive check:
-
-```bash
-node packages/codex-subagent-kit/dist/cli.js install \
-  --scope project \
-  --project-root /tmp/codex-subagent-kit-demo \
-  --agents reviewer,code-mapper \
-  --validate
-node packages/codex-subagent-kit/dist/cli.js usage \
-  --scope project \
-  --project-root /tmp/codex-subagent-kit-demo \
-  --task "Review the failing auth flow"
 ```
 
 ## Local Development
@@ -61,20 +67,20 @@ node packages/codex-subagent-kit/dist/cli.js
 Browse the VoltAgent-backed built-in snapshot and any injected catalogs:
 
 ```bash
-node packages/codex-subagent-kit/dist/cli.js catalog
+npx codex-subagent-kit catalog
 ```
 
 Refresh a project-local synced source root from a local clone or from VoltAgent upstream:
 
 ```bash
-node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example --source-root /tmp/awesome-codex-subagents
-node packages/codex-subagent-kit/dist/cli.js catalog sync --scope project --project-root /tmp/example
+npx codex-subagent-kit catalog sync --scope project --project-root /tmp/example --source-root /tmp/awesome-codex-subagents
+npx codex-subagent-kit catalog sync --scope project --project-root /tmp/example
 ```
 
 Import external awesome-style `categories/` content into the project catalog:
 
 ```bash
-node packages/codex-subagent-kit/dist/cli.js catalog import \
+npx codex-subagent-kit catalog import \
   --scope project \
   --project-root /tmp/example \
   --catalog-root /tmp/categories \
@@ -84,7 +90,7 @@ node packages/codex-subagent-kit/dist/cli.js catalog import \
 Install project-scoped agents and validate them immediately:
 
 ```bash
-node packages/codex-subagent-kit/dist/cli.js install \
+npx codex-subagent-kit install \
   --scope project \
   --project-root /tmp/example \
   --agents reviewer,code-mapper \
@@ -94,13 +100,13 @@ node packages/codex-subagent-kit/dist/cli.js install \
 Use `doctor` if you want to re-check the generated files later:
 
 ```bash
-node packages/codex-subagent-kit/dist/cli.js doctor --scope project --project-root /tmp/example
+npx codex-subagent-kit doctor --scope project --project-root /tmp/example
 ```
 
 Render a Codex starter prompt from the installed agents:
 
 ```bash
-node packages/codex-subagent-kit/dist/cli.js usage \
+npx codex-subagent-kit usage \
   --scope project \
   --project-root /tmp/example \
   --task "Review the failing auth flow"

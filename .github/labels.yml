@@ -1,0 +1,15 @@
+- name: "release:patch"
+  color: "0E8A16"
+  description: "Ship the next patch release after this PR merges to main."
+
+- name: "release:minor"
+  color: "1D76DB"
+  description: "Ship the next minor release after this PR merges to main."
+
+- name: "release:major"
+  color: "B60205"
+  description: "Ship the next major release after this PR merges to main."
+
+- name: "release:none"
+  color: "6A737D"
+  description: "Skip tag, GitHub Release, and npm publish for this PR."

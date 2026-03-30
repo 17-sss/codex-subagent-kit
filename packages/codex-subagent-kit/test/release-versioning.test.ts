@@ -3,8 +3,8 @@ import test from "node:test";
 
 import {
   bumpSemver,
-  classifyBump,
-  computeNextVersion,
+  classifyReleaseLabels,
+  computeNextVersionFromLabels,
   parseSemver,
 } from "../src/release-versioning";
 
@@ -17,27 +17,28 @@ test("parseSemver rejects invalid versions", () => {
   assert.throws(() => parseSemver("v1.0.0"));
 });
 
-test("classifyBump returns major for breaking change footer", () => {
-  const bump = classifyBump([
-    "feat: add release automation\n\nBREAKING CHANGE: release tags now follow semver",
-  ]);
-
-  assert.equal(bump, "major");
+test("classifyReleaseLabels returns patch when no label is provided", () => {
+  assert.equal(classifyReleaseLabels([]), "patch");
 });
 
-test("classifyBump returns major for bang subject", () => {
-  assert.equal(classifyBump(["feat!: change install contract"]), "major");
+test("classifyReleaseLabels returns major for release:major", () => {
+  assert.equal(classifyReleaseLabels(["release:major"]), "major");
 });
 
-test("classifyBump returns minor for feat commits", () => {
-  assert.equal(classifyBump(["feat: add usage helper", "docs: update readme"]), "minor");
+test("classifyReleaseLabels returns minor for release:minor", () => {
+  assert.equal(classifyReleaseLabels(["release:minor"]), "minor");
 });
 
-test("classifyBump returns patch otherwise", () => {
-  assert.equal(
-    classifyBump(["fix: escape generated metadata strings", "docs: update testing guide"]),
-    "patch",
-  );
+test("classifyReleaseLabels returns patch for release:patch", () => {
+  assert.equal(classifyReleaseLabels(["release:patch"]), "patch");
+});
+
+test("classifyReleaseLabels returns none for release:none", () => {
+  assert.equal(classifyReleaseLabels(["release:none"]), "none");
+});
+
+test("classifyReleaseLabels rejects conflicting labels", () => {
+  assert.throws(() => classifyReleaseLabels(["release:minor", "release:patch"]));
 });
 
 test("bumpSemver increments the expected component", () => {
@@ -46,6 +47,14 @@ test("bumpSemver increments the expected component", () => {
   assert.equal(bumpSemver("0.1.0", "major"), "1.0.0");
 });
 
-test("computeNextVersion uses the classified bump", () => {
-  assert.equal(computeNextVersion("0.1.0", ["feat: add persistent catalog import"]), "0.2.0");
+test("computeNextVersionFromLabels uses the classified label", () => {
+  assert.equal(computeNextVersionFromLabels("0.2.0", ["release:minor"]), "0.3.0");
+});
+
+test("computeNextVersionFromLabels can skip a release", () => {
+  assert.equal(computeNextVersionFromLabels("0.2.0", ["release:none"]), null);
+});
+
+test("computeNextVersionFromLabels keeps the base version for the first release", () => {
+  assert.equal(computeNextVersionFromLabels("0.2.0", [], { initialRelease: true }), "0.2.0");
 });

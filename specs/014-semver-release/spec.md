@@ -15,18 +15,19 @@
 
 ### User Story 2 - Version bump rules are predictable and testable (Priority: P1)
 
-사용자는 어떤 커밋이 major/minor/patch를 올리는지 명확하게 알고 싶다.
+사용자는 어떤 PR label이 major/minor/patch를 올리는지 명확하게 알고 싶다.
 
-**Independent Test**: pure versioning helper tests가 breaking change, `feat`, 그 외 변경에 대해 각각 major, minor, patch를 반환하면 된다.
+**Independent Test**: pure release-label helper tests가 `release:major`, `release:minor`, `release:patch`, `release:none`, no-label 기본값을 각각 올바르게 처리하면 된다.
 
 ## Requirements
 
 - **FR-001**: System MUST provide a GitHub Actions workflow that runs on `push` to `main` and on manual dispatch.
-- **FR-002**: System MUST compute semantic versions from existing semver tags and commit messages since the latest tag.
-- **FR-003**: System MUST treat `BREAKING CHANGE` and conventional-commit `!` markers as major bumps.
-- **FR-004**: System MUST treat `feat` commits as minor bumps when no major bump is present.
-- **FR-005**: System MUST treat all other release-triggering pushes as patch bumps.
+- **FR-002**: System MUST compute semantic versions from existing semver tags and the merged PR's release labels.
+- **FR-003**: System MUST support `release:major`, `release:minor`, `release:patch`, and `release:none` labels.
+- **FR-004**: System MUST default to a patch bump when no release label is present.
+- **FR-005**: System MUST fail the release workflow when multiple supported release labels are present on the merged PR.
 - **FR-006**: System MUST skip tag creation when the current commit already has a semver tag.
+- **FR-007**: System MUST allow the first release to use the current package version as-is when no semver tag exists yet.
 
 ## Success Criteria
 
