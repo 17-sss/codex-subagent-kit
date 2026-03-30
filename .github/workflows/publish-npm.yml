@@ -51,7 +51,16 @@ jobs:
         run: npm ci
 
       - name: Sync package version to release tag
-        run: npm version --workspace codex-subagent-kit --no-git-tag-version "${{ steps.release.outputs.version }}"
+        run: |
+          set -euo pipefail
+
+          current_version="$(node -p 'require("./packages/codex-subagent-kit/package.json").version')"
+          if [ "${current_version}" = "${{ steps.release.outputs.version }}" ]; then
+            echo "package version already matches ${current_version}; skipping npm version"
+            exit 0
+          fi
+
+          npm version --workspace codex-subagent-kit --no-git-tag-version "${{ steps.release.outputs.version }}"
 
       - name: Run TypeScript repository gate
         run: ./scripts/test.sh

@@ -91,6 +91,8 @@ GitHub Release 생성은 성공했지만 npm publish만 다시 시도해야 할 
 - 트리거: `workflow_dispatch`
 - 필수 입력값: `release_tag`
 
+이 수동 복구 workflow는 checkout된 tag의 package version이 이미 `release_tag`와 같아도 실패하지 않고 그대로 진행한다.
+
 ## 구현 참고
 
 - workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)

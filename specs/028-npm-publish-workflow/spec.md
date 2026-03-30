@@ -17,7 +17,7 @@
 
 유지보수자는 GitHub Release 생성 이후 npm publish만 따로 재시도해야 할 때 수동 복구 workflow를 실행하고 싶다.
 
-**Independent Test**: 수동 workflow에 semver `release_tag`를 넣고 실행하면 같은 검증 후 npm publish를 수행하면 된다.
+**Independent Test**: 수동 workflow에 semver `release_tag`를 넣고 실행했을 때 checkout된 package version이 이미 같은 값이어도 실패하지 않고 같은 검증 후 npm publish를 수행하면 된다.
 
 ## Requirements
 
@@ -25,6 +25,7 @@
 - **FR-002**: System MUST sync the workspace package version to the computed release version before pack/publish.
 - **FR-003**: System MUST run TypeScript test, typecheck, build, and dry-run packaging before npm publish.
 - **FR-004**: System MUST keep a manual recovery workflow that can publish a specific semver tag on demand.
+- **FR-004a**: System MUST allow the manual recovery workflow to continue when the checked-out package version already matches the requested release tag.
 - **FR-005**: System MUST document the trusted publishing configuration and the release-to-publish sequence.
 
 ## Success Criteria

@@ -91,6 +91,8 @@ If GitHub Release creation succeeds but npm needs to be retried manually, use th
 - trigger: `workflow_dispatch`
 - required input: `release_tag`
 
+The recovery workflow tolerates tags whose checked-out package version already matches the requested `release_tag`.
+
 ## Implementation Notes
 
 - workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
