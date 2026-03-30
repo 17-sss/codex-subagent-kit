@@ -42,7 +42,9 @@ Release bumping is PR-label-based.
 - `release:none`
   - skip tag / GitHub Release / npm publish for that merge
 - no release label
-  - defaults to `patch`
+  - skips release automation
+
+Direct pushes to `main` also skip release automation. A release only happens when the `main` push can be traced back to a merged PR that has exactly one supported release label.
 
 If multiple release labels are present on the merged PR, the release workflow fails so maintainers can correct the PR metadata.
 

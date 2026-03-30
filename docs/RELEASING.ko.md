@@ -42,7 +42,9 @@
 - `release:none`
   - 해당 merge에서는 tag / GitHub Release / npm publish를 만들지 않는다
 - release label이 없을 때
-  - 기본값은 `patch`
+  - 릴리즈 자동화를 건너뛴다
+
+또한 `main`에 대한 direct push도 릴리즈 자동화를 건너뛴다. 즉 release는 `main` push가 merge된 PR에 연결되고, 그 PR에 지원되는 release label이 정확히 하나 있을 때만 발생한다.
 
 하나의 PR에 release label이 여러 개 붙어 있으면, maintainers가 metadata를 정리할 수 있도록 release workflow를 실패시킨다.
 
