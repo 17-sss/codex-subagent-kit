@@ -17,8 +17,8 @@ test("parseSemver rejects invalid versions", () => {
   assert.throws(() => parseSemver("v1.0.0"));
 });
 
-test("classifyReleaseLabels returns patch when no label is provided", () => {
-  assert.equal(classifyReleaseLabels([]), "patch");
+test("classifyReleaseLabels returns none when no label is provided", () => {
+  assert.equal(classifyReleaseLabels([]), "none");
 });
 
 test("classifyReleaseLabels returns major for release:major", () => {
@@ -56,5 +56,5 @@ test("computeNextVersionFromLabels can skip a release", () => {
 });
 
 test("computeNextVersionFromLabels keeps the base version for the first release", () => {
-  assert.equal(computeNextVersionFromLabels("0.2.0", [], { initialRelease: true }), "0.2.0");
+  assert.equal(computeNextVersionFromLabels("0.2.0", [], { initialRelease: true }), null);
 });

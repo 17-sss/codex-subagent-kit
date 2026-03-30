@@ -2,7 +2,9 @@
 
 영문 기본 문서: [RELEASING.md](./RELEASING.md)
 
-`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그와 GitHub Release를 만들고, TypeScript package용 npm publish workflow도 별도로 가진다.
+`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그, GitHub Release, npm publish를 한 흐름에서 수행한다.
+
+별도로 필요한 경우를 위한 수동 npm 복구 workflow도 함께 가진다.
 
 ## 트리거
 
@@ -16,7 +18,7 @@
 3. `main`으로 merge
 4. release workflow가 workspace version file을 먼저 `main`에 sync
 5. sync된 commit 기준으로 tag와 GitHub Release 생성
-6. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish
+6. 같은 release workflow가 같은 버전의 `codex-subagent-kit` package를 npm에 publish
 
 ## 태그 형식
 
@@ -40,7 +42,9 @@
 - `release:none`
   - 해당 merge에서는 tag / GitHub Release / npm publish를 만들지 않는다
 - release label이 없을 때
-  - 기본값은 `patch`
+  - 릴리즈 자동화를 건너뛴다
+
+또한 `main`에 대한 direct push도 릴리즈 자동화를 건너뛴다. 즉 release는 `main` push가 merge된 PR에 연결되고, 그 PR에 지원되는 release label이 정확히 하나 있을 때만 발생한다.
 
 하나의 PR에 release label이 여러 개 붙어 있으면, maintainers가 metadata를 정리할 수 있도록 release workflow를 실패시킨다.
 
@@ -64,8 +68,8 @@
 
 ## npm Publish 흐름
 
-- workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
-- 트리거: published GitHub Release
+- 기본 workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- 트리거: `main`에 대한 `push`
 - 인증 방식: GitHub Actions OIDC 기반 npm trusted publishing
 - 필요한 permission: npm provenance와 trusted publishing을 위한 `id-token: write`
 
@@ -77,9 +81,15 @@
 
 첫 publish 전에 npm package 설정에서 이 저장소와 workflow에 대한 trusted publishing을 먼저 연결해야 한다.
 
-npm workflow는 release tag가 plain semver인지 확인하고, publish 시점에 workspace package version을 그 tag와 맞춘 뒤 `./scripts/test.sh`를 실행하고 다음 명령으로 publish를 수행한다.
+release workflow는 계산된 release version에 맞춰 workspace package version을 정렬하고, `./scripts/test.sh`를 실행한 뒤 다음 명령으로 publish를 수행한다.
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
+
+GitHub Release 생성은 성공했지만 npm publish만 다시 시도해야 할 때는 수동 복구 workflow를 사용한다.
+
+- workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- 트리거: `workflow_dispatch`
+- 필수 입력값: `release_tag`
 
 ## 구현 참고
 

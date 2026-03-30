@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   pull-requests: read
+  id-token: write
 
 concurrency:
   group: release-semver-${{ github.ref }}
@@ -56,17 +57,51 @@ jobs:
             echo "labels="
           } >> "${GITHUB_OUTPUT}"
 
+      - name: Decide whether this push should release
+        id: gate
+        run: |
+          set -euo pipefail
+
+          if [ -z "${{ steps.labels.outputs.pr_number }}" ]; then
+            echo "Direct push to main detected. Release automation will skip." >&2
+            echo "skip_release=true" >> "${GITHUB_OUTPUT}"
+            echo "reason=no-merged-pr" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          release_labels="$(grep -E '^release:(major|minor|patch|none)$' /tmp/release-labels.txt || true)"
+          release_label_count="$(printf '%s\n' "${release_labels}" | sed '/^$/d' | wc -l | tr -d ' ')"
+
+          if [ "${release_label_count}" = "0" ]; then
+            echo "Merged PR has no release label. Release automation will skip." >&2
+            echo "skip_release=true" >> "${GITHUB_OUTPUT}"
+            echo "reason=missing-release-label" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [ "${release_label_count}" -gt 1 ]; then
+            echo "Merged PR has multiple release labels." >&2
+            exit 1
+          fi
+
+          echo "skip_release=false" >> "${GITHUB_OUTPUT}"
+          echo "reason=labeled-pr" >> "${GITHUB_OUTPUT}"
+
       - name: Set up Node.js
+        if: steps.gate.outputs.skip_release != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install npm dependencies
+        if: steps.gate.outputs.skip_release != 'true'
         run: npm ci
 
       - name: Compute semantic version
         id: semver
+        if: steps.gate.outputs.skip_release != 'true'
         run: |
           set -euo pipefail
 
@@ -112,7 +147,7 @@ jobs:
 
       - name: Sync workspace version into main
         id: sync
-        if: steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
         env:
           RELEASE_VERSION: ${{ steps.semver.outputs.version }}
         run: |
@@ -140,16 +175,28 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Create git tag
-        if: steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
         run: |
           git tag "${{ steps.semver.outputs.version }}" "${{ steps.sync.outputs.sha || github.sha }}"
           git push origin "${{ steps.semver.outputs.version }}"
 
       - name: Create GitHub Release
-        if: steps.semver.outputs.skip_release != 'true'
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.semver.outputs.version }}
           name: ${{ steps.semver.outputs.version }}
           generate_release_notes: true
           target_commitish: ${{ steps.sync.outputs.sha || github.sha }}
+
+      - name: Sync package version to release version for publish
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
+        run: npm version --workspace codex-subagent-kit --no-git-tag-version "${{ steps.semver.outputs.version }}"
+
+      - name: Run TypeScript repository gate
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
+        run: ./scripts/test.sh
+
+      - name: Publish to npm
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
+        run: npm publish --workspace codex-subagent-kit --access public --provenance

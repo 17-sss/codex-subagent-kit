@@ -32,7 +32,7 @@ export function classifyReleaseLabels(labels: Iterable<string>): ReleaseDecision
   ))];
 
   if (recognized.length === 0) {
-    return "patch";
+    return "none";
   }
   if (recognized.length > 1) {
     throw new Error(`conflicting release labels: ${recognized.join(", ")}`);
