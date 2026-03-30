@@ -1,17 +1,19 @@
-name: Publish npm Package
+name: Publish npm Package (Manual Recovery)
 
 on:
-  release:
-    types:
-      - published
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Semver tag to publish, for example 0.2.1
+        required: true
+        type: string
 
 permissions:
   contents: read
   id-token: write
 
 concurrency:
-  group: publish-npm-${{ github.event.release.tag_name || github.ref }}
+  group: publish-npm-${{ github.event.inputs.release_tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +24,7 @@ jobs:
       - name: Resolve release version
         id: release
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
         run: |
           set -euo pipefail
 

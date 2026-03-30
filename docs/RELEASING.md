@@ -2,9 +2,9 @@
 
 Korean version: [RELEASING.ko.md](./RELEASING.ko.md)
 
-`codex-subagent-kit` uses a `main`-only GitHub Actions workflow to create semantic-version tags and GitHub Releases.
+`codex-subagent-kit` uses a `main`-only GitHub Actions workflow to create semantic-version tags, GitHub Releases, and npm publishes.
 
-The repository also includes a dedicated npm publish workflow for the TypeScript package.
+The repository also includes a dedicated manual npm recovery workflow for exceptional cases.
 
 ## Trigger
 
@@ -18,7 +18,7 @@ The intended sequence is:
 3. merge to `main`
 4. let the release workflow sync the workspace version files into `main`
 5. let the release workflow create the tag and GitHub Release from that synced commit
-6. let the npm publish workflow publish the matching `codex-subagent-kit` package version
+6. let the same release workflow publish the matching `codex-subagent-kit` package version
 
 ## Tag Format
 
@@ -66,8 +66,8 @@ If branch protection is enabled later, make sure the release workflow can still 
 
 ## npm Publish Flow
 
-- workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
-- trigger: published GitHub Release
+- primary workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- trigger: `push` to `main`
 - authentication model: npm trusted publishing via GitHub Actions OIDC
 - required permissions: `id-token: write` for npm provenance and trusted publishing
 
@@ -79,9 +79,15 @@ If branch protection is enabled later, make sure the release workflow can still 
 
 Before the first publish, configure npm trusted publishing for this repository and workflow in the npm package settings.
 
-The npm workflow validates that the release tag is plain semver, syncs the workspace package version to that tag at publish time, runs `./scripts/test.sh`, and then publishes with:
+The release workflow syncs the workspace package version to the computed release version, runs `./scripts/test.sh`, and then publishes with:
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
+
+If GitHub Release creation succeeds but npm needs to be retried manually, use the recovery workflow:
+
+- workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- trigger: `workflow_dispatch`
+- required input: `release_tag`
 
 ## Implementation Notes
 
