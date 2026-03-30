@@ -95,6 +95,10 @@ jobs:
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Upgrade npm for trusted publishing
+        if: steps.gate.outputs.skip_release != 'true'
+        run: npm install -g npm@11.12.1
+
       - name: Install npm dependencies
         if: steps.gate.outputs.skip_release != 'true'
         run: npm ci

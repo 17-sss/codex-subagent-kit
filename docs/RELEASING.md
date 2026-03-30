@@ -81,6 +81,8 @@ If branch protection is enabled later, make sure the release workflow can still 
 
 Before the first publish, configure npm trusted publishing for this repository and workflow in the npm package settings.
 
+Trusted publishing on GitHub Actions should run on Node 22 with npm 11.5.1 or newer. The workflows in this repository explicitly upgrade npm before publishing.
+
 The release workflow syncs the workspace package version to the computed release version, runs `./scripts/test.sh`, and then publishes with:
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`

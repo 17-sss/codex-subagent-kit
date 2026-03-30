@@ -47,6 +47,9 @@ jobs:
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@11.12.1
+
       - name: Install npm dependencies
         run: npm ci
 

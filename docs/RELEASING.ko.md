@@ -81,6 +81,8 @@
 
 첫 publish 전에 npm package 설정에서 이 저장소와 workflow에 대한 trusted publishing을 먼저 연결해야 한다.
 
+GitHub Actions에서 trusted publishing을 쓸 때는 Node 22와 npm 11.5.1 이상을 사용하는 것이 안전하다. 이 저장소의 workflow는 publish 전에 npm을 명시적으로 업그레이드한다.
+
 release workflow는 계산된 release version에 맞춰 workspace package version을 정렬하고, `./scripts/test.sh`를 실행한 뒤 다음 명령으로 publish를 수행한다.
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
