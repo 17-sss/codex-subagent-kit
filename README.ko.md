@@ -27,6 +27,7 @@ npx codex-subagent-kit
 ```
 
 bare command만 실행해도 install-first TUI가 열린다.
+처음 쓰는 경우에는 bare `codex-subagent-kit`보다 `npx codex-subagent-kit`를 먼저 쓰는 편이 안전하다.
 
 비대화형으로 npm 경로를 바로 쓰려면:
 
@@ -231,6 +232,31 @@ codex-subagent-kit usage \
 
 - `Use reviewer to review the current changes for bugs, regressions, and missing tests.`
 - `Use code-mapper to map the auth flow before we change it.`
+
+## Troubleshooting
+
+`ModuleNotFoundError: No module named 'codex_subagent_kit'` 같은 Python 에러가 뜨면, 현재 셸이 npm CLI가 아니라 예전에 남은 Python shim을 먼저 잡고 있을 가능성이 크다.
+
+어떤 실행 파일이 잡히는지 먼저 확인하면 된다.
+
+```bash
+which codex-subagent-kit
+head -n 5 "$(which codex-subagent-kit)"
+```
+
+그 경로가 `~/.local/bin/codex-subagent-kit`이고 파일 안에 `codex_subagent_kit.cli` import가 보이면, 예전 shim을 지우고 npm CLI를 쓰면 된다.
+
+```bash
+rm -f ~/.local/bin/codex-subagent-kit
+npx codex-subagent-kit --help
+```
+
+정리 후에도 bare command를 계속 쓰고 싶다면 npm global install을 하면 된다.
+
+```bash
+npm install -g codex-subagent-kit
+codex-subagent-kit --help
+```
 
 ## TypeScript 패키지 상태
 
