@@ -44,6 +44,8 @@
 
 하나의 PR에 release label이 여러 개 붙어 있으면, maintainers가 metadata를 정리할 수 있도록 release workflow를 실패시킨다.
 
+이 label들의 저장소 기준 source of truth는 [.github/labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/labels.yml)에 있고, [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml)로 GitHub label 상태를 sync할 수 있다.
+
 ## 초기 릴리즈
 
 아직 semver tag가 하나도 없다면, workflow는 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)의 현재 package version을 첫 릴리즈 버전으로 사용한다.
@@ -66,6 +68,12 @@
 - 트리거: published GitHub Release
 - 인증 방식: GitHub Actions OIDC 기반 npm trusted publishing
 - 필요한 permission: npm provenance와 trusted publishing을 위한 `id-token: write`
+
+## Label 관리
+
+- labels 설정 파일: [.github/labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/labels.yml)
+- sync workflow: [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml)
+- 트리거: 수동 실행 또는 `.github/labels.yml` 변경 push
 
 첫 publish 전에 npm package 설정에서 이 저장소와 workflow에 대한 trusted publishing을 먼저 연결해야 한다.
 

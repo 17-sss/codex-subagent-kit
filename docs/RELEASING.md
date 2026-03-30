@@ -46,6 +46,8 @@ Release bumping is PR-label-based.
 
 If multiple release labels are present on the merged PR, the release workflow fails so maintainers can correct the PR metadata.
 
+The repository-managed source of truth for those labels lives in [.github/labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/labels.yml), and [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml) can sync them into GitHub.
+
 ## Initial Release
 
 If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the first release version.
@@ -68,6 +70,12 @@ If branch protection is enabled later, make sure the release workflow can still 
 - trigger: published GitHub Release
 - authentication model: npm trusted publishing via GitHub Actions OIDC
 - required permissions: `id-token: write` for npm provenance and trusted publishing
+
+## Label Management
+
+- labels config: [.github/labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/labels.yml)
+- sync workflow: [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml)
+- trigger: manual dispatch or pushes that change `.github/labels.yml`
 
 Before the first publish, configure npm trusted publishing for this repository and workflow in the npm package settings.
 
