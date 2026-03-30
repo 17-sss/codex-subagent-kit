@@ -16,8 +16,9 @@ The intended sequence is:
 1. open a PR targeting `main`
 2. let the PR CI workflow run the TypeScript repository gate
 3. merge to `main`
-4. let the release workflow create the tag and GitHub Release
-5. let the npm publish workflow publish the matching `codex-subagent-kit` package version
+4. let the release workflow sync the workspace version files into `main`
+5. let the release workflow create the tag and GitHub Release from that synced commit
+6. let the npm publish workflow publish the matching `codex-subagent-kit` package version
 
 ## Tag Format
 
@@ -44,11 +45,15 @@ If no semver tag exists yet, the workflow uses the current package version from 
 
 The repository currently keeps `0.2.1` as the visible package baseline.
 
-Note that the publish workflow syncs the workspace version to the release tag only inside CI. It does not write the released version back to `main`, so maintainers should bump [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) manually when they want the repository-visible baseline to stay aligned with the next intended release.
+On each new release, the release workflow now syncs [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) and [package-lock.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/package-lock.json) back into `main` before tagging. That means the repository-visible version, git tag, GitHub Release, and npm package version stay aligned automatically after merge.
 
 ## Duplicate Protection
 
 If the current commit already has a semver tag, the workflow reuses that version and skips creating a duplicate tag.
+
+The automated version sync commit uses a `[skip release]` marker so the release workflow does not loop on itself.
+
+If branch protection is enabled later, make sure the release workflow can still push its automated version-sync commit back to `main`.
 
 ## npm Publish Flow
 

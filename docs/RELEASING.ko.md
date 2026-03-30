@@ -14,8 +14,9 @@
 1. `main` 대상 PR 생성
 2. PR CI에서 TypeScript repository gate 확인
 3. `main`으로 merge
-4. release workflow가 tag와 GitHub Release 생성
-5. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish
+4. release workflow가 workspace version file을 먼저 `main`에 sync
+5. sync된 commit 기준으로 tag와 GitHub Release 생성
+6. npm publish workflow가 같은 버전의 `codex-subagent-kit` package를 publish
 
 ## 태그 형식
 
@@ -42,11 +43,15 @@
 
 현재 저장소는 `0.2.1`을 눈에 보이는 package 기준선으로 유지한다.
 
-중요한 점은 publish workflow가 release tag에 맞춰 workspace version을 CI 안에서만 일시적으로 동기화한다는 것이다. 즉 release된 버전을 자동으로 `main`에 다시 써주지는 않으므로, 저장소에 보이는 기준 버전을 다음 릴리즈 기준선과 맞추고 싶다면 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)을 maintainers가 수동으로 올려줘야 한다.
+이제 release workflow가 새 릴리즈를 만들 때 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)과 [package-lock.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/package-lock.json)을 먼저 `main`에 sync한 뒤 tag를 생성한다. 즉 merge 이후에는 저장소에 보이는 버전, git tag, GitHub Release, npm package version이 자동으로 같은 릴리즈 기준으로 맞춰진다.
 
 ## 중복 방지
 
 현재 커밋에 이미 semver tag가 붙어 있으면, workflow는 그 버전을 재사용하고 중복 tag 생성을 건너뛴다.
+
+자동 version sync commit에는 `[skip release]` marker를 넣어 release workflow가 자기 자신을 다시 트리거하지 않도록 한다.
+
+나중에 branch protection을 다시 강하게 걸 경우에는 release workflow가 자동 version sync commit을 `main`에 push할 수 있도록 허용해야 한다.
 
 ## npm Publish 흐름
 
