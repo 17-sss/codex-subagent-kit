@@ -43,7 +43,7 @@ The workflow uses plain semver tags without a `v` prefix.
 
 If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the base release version.
 
-The repository currently keeps `0.2.1` as the visible package baseline.
+The repository currently keeps `0.2.0` as the visible package baseline.
 
 On each new release, the release workflow now syncs [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) and [package-lock.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/package-lock.json) back into `main` before tagging. That means the repository-visible version, git tag, GitHub Release, and npm package version stay aligned automatically after merge.
 

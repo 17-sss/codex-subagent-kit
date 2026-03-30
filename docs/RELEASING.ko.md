@@ -41,7 +41,7 @@
 
 아직 semver tag가 하나도 없다면, workflow는 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)의 현재 package version을 초기 기준 버전으로 사용한다.
 
-현재 저장소는 `0.2.1`을 눈에 보이는 package 기준선으로 유지한다.
+현재 저장소는 `0.2.0`을 눈에 보이는 package 기준선으로 유지한다.
 
 이제 release workflow가 새 릴리즈를 만들 때 [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json)과 [package-lock.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/package-lock.json)을 먼저 `main`에 sync한 뒤 tag를 생성한다. 즉 merge 이후에는 저장소에 보이는 버전, git tag, GitHub Release, npm package version이 자동으로 같은 릴리즈 기준으로 맞춰진다.
 
