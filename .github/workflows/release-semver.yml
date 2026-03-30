@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 concurrency:
   group: release-semver-${{ github.ref }}
@@ -26,6 +27,34 @@ jobs:
 
       - name: Fetch tags
         run: git fetch --force --tags
+
+      - name: Resolve release labels from the merged PR
+        id: labels
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls"
+          response="$(curl -fsSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "${api_url}" || printf '[]')"
+
+          pr_number="$(printf '%s' "${response}" | jq -r '.[0].number // empty')"
+          if [ -n "${pr_number}" ]; then
+            printf '%s' "${response}" | jq -r '.[0].labels[]?.name // empty' > /tmp/release-labels.txt
+            label_summary="$(tr '\n' ',' < /tmp/release-labels.txt | sed 's/,$//')"
+            echo "pr_number=${pr_number}" >> "${GITHUB_OUTPUT}"
+            echo "labels=${label_summary}" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          : > /tmp/release-labels.txt
+          {
+            echo "pr_number="
+            echo "labels="
+          } >> "${GITHUB_OUTPUT}"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -51,34 +80,39 @@ jobs:
           fi
 
           latest_version="$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1 || true)"
+          initial_release="0"
           if [ -n "${latest_version}" ]; then
-            commit_range="${latest_version}..${GITHUB_SHA}"
             base_version="${latest_version}"
           else
             base_version="$(node -p 'require("./packages/codex-subagent-kit/package.json").version')"
+            initial_release="1"
+          fi
+
+          version="$(
+            BASE_VERSION="${base_version}" \
+            LABELS_FILE="/tmp/release-labels.txt" \
+            INITIAL_RELEASE="${initial_release}" \
+            npm run release:version --workspace codex-subagent-kit --silent
+          )"
+
+          if [ "${version}" = "skip" ]; then
             {
-              echo "version=${base_version}"
+              echo "version="
               echo "tag_exists=false"
+              echo "skip_release=true"
             } >> "${GITHUB_OUTPUT}"
             exit 0
           fi
 
-          git log --format='%B%n---commit-boundary---' "${commit_range}" > /tmp/release-commit-messages.txt
-
-          version="$(
-            BASE_VERSION="${base_version}" \
-            COMMITS_FILE="/tmp/release-commit-messages.txt" \
-            npm run release:version --workspace codex-subagent-kit --silent
-          )"
-
           {
             echo "version=${version}"
             echo "tag_exists=false"
+            echo "skip_release=false"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Sync workspace version into main
         id: sync
-        if: steps.semver.outputs.tag_exists == 'false'
+        if: steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
         env:
           RELEASE_VERSION: ${{ steps.semver.outputs.version }}
         run: |
@@ -106,12 +140,13 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Create git tag
-        if: steps.semver.outputs.tag_exists == 'false'
+        if: steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
         run: |
           git tag "${{ steps.semver.outputs.version }}" "${{ steps.sync.outputs.sha || github.sha }}"
           git push origin "${{ steps.semver.outputs.version }}"
 
       - name: Create GitHub Release
+        if: steps.semver.outputs.skip_release != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.semver.outputs.version }}

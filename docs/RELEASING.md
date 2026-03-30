@@ -31,17 +31,24 @@ The workflow uses plain semver tags without a `v` prefix.
 
 ## Bump Rules
 
-- `major`
-  - any commit containing `BREAKING CHANGE:`
-  - any conventional-commit subject using `!`, for example `feat!: ...`
-- `minor`
-  - any `feat: ...` commit when no major bump is present
-- `patch`
-  - everything else
+Release bumping is PR-label-based.
+
+- `release:major`
+  - bump to the next major version
+- `release:minor`
+  - bump to the next minor version
+- `release:patch`
+  - bump to the next patch version
+- `release:none`
+  - skip tag / GitHub Release / npm publish for that merge
+- no release label
+  - defaults to `patch`
+
+If multiple release labels are present on the merged PR, the release workflow fails so maintainers can correct the PR metadata.
 
 ## Initial Release
 
-If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the base release version.
+If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the first release version.
 
 The repository currently keeps `0.2.0` as the visible package baseline.
 
@@ -71,4 +78,4 @@ The npm workflow validates that the release tag is plain semver, syncs the works
 ## Implementation Notes
 
 - workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- tested semver helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)
+- tested release-label helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)

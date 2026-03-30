@@ -1,27 +1,29 @@
 import { readFileSync } from "node:fs";
 
-import { computeNextVersion } from "./release-versioning";
+import { computeNextVersionFromLabels } from "./release-versioning";
 
 function main(): number {
   const baseVersion = process.env.BASE_VERSION;
-  const commitsFile = process.env.COMMITS_FILE;
+  const labelsFile = process.env.LABELS_FILE;
+  const initialRelease = process.env.INITIAL_RELEASE === "1";
 
   if (!baseVersion) {
     console.error("missing BASE_VERSION");
     return 1;
   }
-  if (!commitsFile) {
-    console.error("missing COMMITS_FILE");
+  if (!labelsFile) {
+    console.error("missing LABELS_FILE");
     return 1;
   }
 
-  const rawMessages = readFileSync(commitsFile, "utf8");
-  const messages = rawMessages
-    .split("---commit-boundary---")
+  const rawLabels = readFileSync(labelsFile, "utf8");
+  const labels = rawLabels
+    .split(/\r?\n/)
     .map((chunk) => chunk.trim())
     .filter(Boolean);
 
-  console.log(computeNextVersion(baseVersion, messages));
+  const version = computeNextVersionFromLabels(baseVersion, labels, { initialRelease });
+  console.log(version ?? "skip");
   return 0;
 }
 

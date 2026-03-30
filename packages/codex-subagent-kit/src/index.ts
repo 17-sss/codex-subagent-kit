@@ -21,9 +21,10 @@ export {
 export { STABLE_COMMANDS } from "./meta";
 export {
   bumpSemver,
-  classifyBump,
-  computeNextVersion,
+  classifyReleaseLabels,
+  computeNextVersionFromLabels,
   parseSemver,
+  type ReleaseDecision,
   type SemverBump,
 } from "./release-versioning";
 export {
