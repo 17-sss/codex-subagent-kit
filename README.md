@@ -27,6 +27,7 @@ npx codex-subagent-kit
 ```
 
 That bare command opens the install-first TUI without a local clone.
+For first-time use, prefer `npx codex-subagent-kit` over a bare `codex-subagent-kit` shell command.
 
 If you prefer the non-interactive npm path:
 
@@ -231,6 +232,31 @@ After install, common Codex prompts look like this:
 
 - `Use reviewer to review the current changes for bugs, regressions, and missing tests.`
 - `Use code-mapper to map the auth flow before we change it.`
+
+## Troubleshooting
+
+If `codex-subagent-kit` fails with a Python error such as `ModuleNotFoundError: No module named 'codex_subagent_kit'`, your shell is probably finding an old Python-era shim before the npm CLI.
+
+Check which command is currently being used:
+
+```bash
+which codex-subagent-kit
+head -n 5 "$(which codex-subagent-kit)"
+```
+
+If that path points to `~/.local/bin/codex-subagent-kit` and the file imports `codex_subagent_kit.cli`, remove the stale shim and use the npm CLI instead:
+
+```bash
+rm -f ~/.local/bin/codex-subagent-kit
+npx codex-subagent-kit --help
+```
+
+If you want a persistent shell command after cleanup:
+
+```bash
+npm install -g codex-subagent-kit
+codex-subagent-kit --help
+```
 
 ## TypeScript Package Status
 

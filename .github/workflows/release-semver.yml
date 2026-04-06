@@ -9,7 +9,6 @@ on:
 permissions:
   contents: write
   pull-requests: read
-  id-token: write
 
 concurrency:
   group: release-semver-${{ github.ref }}
@@ -95,10 +94,6 @@ jobs:
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Upgrade npm for trusted publishing
-        if: steps.gate.outputs.skip_release != 'true'
-        run: npm install -g npm@11.12.1
-
       - name: Install npm dependencies
         if: steps.gate.outputs.skip_release != 'true'
         run: npm ci
@@ -178,6 +173,10 @@ jobs:
             echo "committed=true"
           } >> "${GITHUB_OUTPUT}"
 
+      - name: Run TypeScript repository gate
+        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
+        run: ./scripts/test.sh
+
       - name: Create git tag
         if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.tag_exists == 'false' && steps.semver.outputs.skip_release != 'true'
         run: |
@@ -192,15 +191,3 @@ jobs:
           name: ${{ steps.semver.outputs.version }}
           generate_release_notes: true
           target_commitish: ${{ steps.sync.outputs.sha || github.sha }}
-
-      - name: Sync package version to release version for publish
-        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
-        run: npm version --workspace codex-subagent-kit --no-git-tag-version "${{ steps.semver.outputs.version }}"
-
-      - name: Run TypeScript repository gate
-        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
-        run: ./scripts/test.sh
-
-      - name: Publish to npm
-        if: steps.gate.outputs.skip_release != 'true' && steps.semver.outputs.skip_release != 'true'
-        run: npm publish --workspace codex-subagent-kit --access public --provenance
