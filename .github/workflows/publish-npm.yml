@@ -1,6 +1,9 @@
-name: Publish npm Package (Manual Recovery)
+name: Publish npm Package
 
 on:
+  push:
+    tags:
+      - "*.*.*"
   workflow_dispatch:
     inputs:
       release_tag:
@@ -13,7 +16,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: publish-npm-${{ github.event.inputs.release_tag || github.ref }}
+  group: publish-npm-${{ github.event.inputs.release_tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:

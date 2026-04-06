@@ -2,9 +2,9 @@
 
 영문 기본 문서: [RELEASING.md](./RELEASING.md)
 
-`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 시멘틱 버전 태그, GitHub Release, npm publish를 한 흐름에서 수행한다.
+`codex-subagent-kit`는 `main` 브랜치 전용 GitHub Actions workflow로 다음 시멘틱 버전을 계산하고, 저장소 버전 파일을 sync하고, repository gate를 실행하고, semver tag와 GitHub Release를 생성한다.
 
-별도로 필요한 경우를 위한 수동 npm 복구 workflow도 함께 가진다.
+별도로 semver tag push 시 자동으로 실행되는 npm publish workflow가 있고, 필요할 때는 수동 복구용으로도 실행할 수 있다.
 
 ## 트리거
 
@@ -18,7 +18,7 @@
 3. `main`으로 merge
 4. release workflow가 workspace version file을 먼저 `main`에 sync
 5. sync된 commit 기준으로 tag와 GitHub Release 생성
-6. 같은 release workflow가 같은 버전의 `codex-subagent-kit` package를 npm에 publish
+6. tag를 받은 publish workflow가 같은 버전의 `codex-subagent-kit` package를 npm에 publish
 
 ## 태그 형식
 
@@ -68,10 +68,12 @@
 
 ## npm Publish 흐름
 
-- 기본 workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- 트리거: `main`에 대한 `push`
+- release workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- release 트리거: `main`에 대한 `push`
+- publish workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- publish 트리거: semver tag `push` 또는 수동 `workflow_dispatch`
 - 인증 방식: GitHub Actions OIDC 기반 npm trusted publishing
-- 필요한 permission: npm provenance와 trusted publishing을 위한 `id-token: write`
+- 필요한 permission: npm provenance와 trusted publishing을 위한 `id-token: write`는 `publish-npm.yml`에 둔다
 
 ## Label 관리
 
@@ -79,23 +81,26 @@
 - sync workflow: [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml)
 - 트리거: 수동 실행 또는 `.github/labels.yml` 변경 push
 
-첫 publish 전에 npm package 설정에서 이 저장소와 workflow에 대한 trusted publishing을 먼저 연결해야 한다.
+첫 publish 전에 npm package 설정에서 이 저장소와 `publish-npm.yml`에 대한 trusted publishing을 먼저 연결해야 한다.
 
 GitHub Actions에서 trusted publishing을 쓸 때는 Node 22와 npm 11.5.1 이상을 사용하는 것이 안전하다. 이 저장소의 workflow는 publish 전에 npm을 명시적으로 업그레이드한다.
 
-release workflow는 계산된 release version에 맞춰 workspace package version을 정렬하고, `./scripts/test.sh`를 실행한 뒤 다음 명령으로 publish를 수행한다.
+release workflow는 계산된 release version에 맞춰 workspace package version을 정렬하고, `./scripts/test.sh`를 실행한 뒤 tag와 GitHub Release를 생성한다.
+
+publish workflow는 해당 tag를 checkout하고, 필요하면 workspace package version을 tag에 맞춘 뒤 다음 명령으로 publish를 수행한다.
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
 
-GitHub Release 생성은 성공했지만 npm publish만 다시 시도해야 할 때는 수동 복구 workflow를 사용한다.
+tag와 GitHub Release 생성은 성공했지만 npm publish만 다시 시도해야 할 때는 수동 복구 workflow를 사용한다.
 
 - workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
-- 트리거: `workflow_dispatch`
+- 트리거: semver tag `push` 또는 `workflow_dispatch`
 - 필수 입력값: `release_tag`
 
 이 수동 복구 workflow는 checkout된 tag의 package version이 이미 `release_tag`와 같아도 실패하지 않고 그대로 진행한다.
 
 ## 구현 참고
 
-- workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- release workflow 파일: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- publish workflow 파일: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
 - 테스트되는 release-label helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)

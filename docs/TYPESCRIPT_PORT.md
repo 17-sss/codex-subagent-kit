@@ -97,4 +97,4 @@ The repository now includes:
 
 - PR CI for the TypeScript package
 - a release semver workflow
-- an npm publish workflow triggered from published GitHub releases
+- an npm publish workflow triggered from semver tag pushes

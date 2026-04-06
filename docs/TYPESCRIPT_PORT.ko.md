@@ -97,4 +97,4 @@ npm package를 publish하기 전에 아래를 확인해야 한다.
 
 - TypeScript package용 PR CI
 - semver release workflow
-- published GitHub Release에서 실행되는 npm publish workflow
+- semver tag push에서 실행되는 npm publish workflow

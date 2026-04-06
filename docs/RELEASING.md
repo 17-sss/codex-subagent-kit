@@ -2,9 +2,9 @@
 
 Korean version: [RELEASING.ko.md](./RELEASING.ko.md)
 
-`codex-subagent-kit` uses a `main`-only GitHub Actions workflow to create semantic-version tags, GitHub Releases, and npm publishes.
+`codex-subagent-kit` uses a `main`-only GitHub Actions workflow to compute the next semantic version, sync repository version files, run the repository gate, create a semver tag, and create a GitHub Release.
 
-The repository also includes a dedicated manual npm recovery workflow for exceptional cases.
+The repository also includes a dedicated npm publish workflow that runs automatically when that semver tag is pushed, and it can be dispatched manually for recovery.
 
 ## Trigger
 
@@ -18,7 +18,7 @@ The intended sequence is:
 3. merge to `main`
 4. let the release workflow sync the workspace version files into `main`
 5. let the release workflow create the tag and GitHub Release from that synced commit
-6. let the same release workflow publish the matching `codex-subagent-kit` package version
+6. let the tag-triggered publish workflow publish the matching `codex-subagent-kit` package version
 
 ## Tag Format
 
@@ -68,10 +68,12 @@ If branch protection is enabled later, make sure the release workflow can still 
 
 ## npm Publish Flow
 
-- primary workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- trigger: `push` to `main`
+- release workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- release trigger: `push` to `main`
+- publish workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- publish trigger: semver tag `push` or manual `workflow_dispatch`
 - authentication model: npm trusted publishing via GitHub Actions OIDC
-- required permissions: `id-token: write` for npm provenance and trusted publishing
+- required permissions: `id-token: write` on `publish-npm.yml` for npm provenance and trusted publishing
 
 ## Label Management
 
@@ -79,23 +81,26 @@ If branch protection is enabled later, make sure the release workflow can still 
 - sync workflow: [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml)
 - trigger: manual dispatch or pushes that change `.github/labels.yml`
 
-Before the first publish, configure npm trusted publishing for this repository and workflow in the npm package settings.
+Before the first publish, configure npm trusted publishing for this repository and `publish-npm.yml` in the npm package settings.
 
 Trusted publishing on GitHub Actions should run on Node 22 with npm 11.5.1 or newer. The workflows in this repository explicitly upgrade npm before publishing.
 
-The release workflow syncs the workspace package version to the computed release version, runs `./scripts/test.sh`, and then publishes with:
+The release workflow syncs the workspace package version to the computed release version, runs `./scripts/test.sh`, then creates the tag and GitHub Release.
+
+The publish workflow checks out the matching tag, keeps the workspace package version aligned with that tag when needed, and publishes with:
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
 
-If GitHub Release creation succeeds but npm needs to be retried manually, use the recovery workflow:
+If tag creation and GitHub Release succeed but npm needs to be retried manually, use the recovery workflow:
 
 - workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
-- trigger: `workflow_dispatch`
+- trigger: semver tag `push` or `workflow_dispatch`
 - required input: `release_tag`
 
 The recovery workflow tolerates tags whose checked-out package version already matches the requested `release_tag`.
 
 ## Implementation Notes
 
-- workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- release workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- publish workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
 - tested release-label helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)
