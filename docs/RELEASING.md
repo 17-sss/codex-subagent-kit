@@ -91,6 +91,8 @@ The publish workflow checks out the matching tag, keeps the workspace package ve
 
 - `npm publish --workspace codex-subagent-kit --access public --provenance`
 
+The publish workflow skips safely if npm already has that exact version.
+
 If tag creation and GitHub Release succeed but npm needs to be retried manually, use the recovery workflow:
 
 - workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
@@ -98,6 +100,8 @@ If tag creation and GitHub Release succeed but npm needs to be retried manually,
 - required input: `release_tag`
 
 The recovery workflow tolerates tags whose checked-out package version already matches the requested `release_tag`.
+
+If npm already has a version but the git tag or GitHub Release is missing, sync the workspace version into `main` first if needed and then run `Backfill GitHub Release (Manual)`.
 
 ## Implementation Notes
 
