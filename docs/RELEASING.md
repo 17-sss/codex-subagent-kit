@@ -48,15 +48,15 @@ Direct pushes to `main` also skip release automation. A release only happens whe
 
 If multiple release labels are present on the merged PR, the release workflow fails so maintainers can correct the PR metadata.
 
-The repository-managed source of truth for those labels lives in [.github/labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/labels.yml), and [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml) can sync them into GitHub.
+The repository-managed source of truth for those labels lives in [.github/labels.yml](../.github/labels.yml), and [create-labels.yml](../.github/workflows/create-labels.yml) can sync them into GitHub.
 
 ## Initial Release
 
-If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) as the first release version.
+If no semver tag exists yet, the workflow uses the current package version from [packages/codex-subagent-kit/package.json](../packages/codex-subagent-kit/package.json) as the first release version.
 
 The repository currently keeps `0.2.0` as the visible package baseline.
 
-On each new release, the release workflow now syncs [packages/codex-subagent-kit/package.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/package.json) and [package-lock.json](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/package-lock.json) back into `main` before tagging. That means the repository-visible version, git tag, GitHub Release, and npm package version stay aligned automatically after merge.
+On each new release, the release workflow now syncs [packages/codex-subagent-kit/package.json](../packages/codex-subagent-kit/package.json) and [package-lock.json](../package-lock.json) back into `main` before tagging. That means the repository-visible version, git tag, GitHub Release, and npm package version stay aligned automatically after merge.
 
 ## Duplicate Protection
 
@@ -68,17 +68,17 @@ If branch protection is enabled later, make sure the release workflow can still 
 
 ## npm Publish Flow
 
-- release workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
+- release workflow file: [release-semver.yml](../.github/workflows/release-semver.yml)
 - release trigger: `push` to `main`
-- publish workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- publish workflow file: [publish-npm.yml](../.github/workflows/publish-npm.yml)
 - publish trigger: semver tag `push` or manual `workflow_dispatch`
 - authentication model: npm trusted publishing via GitHub Actions OIDC
 - required permissions: `id-token: write` on `publish-npm.yml` for npm provenance and trusted publishing
 
 ## Label Management
 
-- labels config: [.github/labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/labels.yml)
-- sync workflow: [create-labels.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/create-labels.yml)
+- labels config: [.github/labels.yml](../.github/labels.yml)
+- sync workflow: [create-labels.yml](../.github/workflows/create-labels.yml)
 - trigger: manual dispatch or pushes that change `.github/labels.yml`
 
 Before the first publish, configure npm trusted publishing for this repository and `publish-npm.yml` in the npm package settings.
@@ -95,7 +95,7 @@ The publish workflow skips safely if npm already has that exact version.
 
 If tag creation and GitHub Release succeed but npm needs to be retried manually, use the recovery workflow:
 
-- workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
+- workflow file: [publish-npm.yml](../.github/workflows/publish-npm.yml)
 - trigger: semver tag `push` or `workflow_dispatch`
 - required input: `release_tag`
 
@@ -105,6 +105,6 @@ If npm already has a version but the git tag or GitHub Release is missing, sync 
 
 ## Implementation Notes
 
-- release workflow file: [release-semver.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/release-semver.yml)
-- publish workflow file: [publish-npm.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/publish-npm.yml)
-- tested release-label helper: [release-versioning.ts](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/src/release-versioning.ts)
+- release workflow file: [release-semver.yml](../.github/workflows/release-semver.yml)
+- publish workflow file: [publish-npm.yml](../.github/workflows/publish-npm.yml)
+- tested release-label helper: [release-versioning.ts](../packages/codex-subagent-kit/src/release-versioning.ts)

@@ -16,7 +16,7 @@ In practice, the flow is simple: choose agents, generate TOML files, then open `
 
 `codex-subagent-kit` prepares the workspace. `codex` remains the runtime that spawns and manages agent threads.
 
-Repository note: the active implementation and npm release target live under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
+Package note: the active implementation and npm release target live under [`packages/codex-subagent-kit/`](./packages/codex-subagent-kit/).
 
 ## Quick Start
 

@@ -16,7 +16,7 @@
 
 `codex-subagent-kit`는 작업공간을 준비하고, 실제 agent thread의 실행과 관리는 `codex`가 맡는다.
 
-저장소 기준으로 현재 구현과 npm 릴리즈 대상은 [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit) 아래의 TypeScript package다.
+패키지 기준으로 현재 구현과 npm 릴리즈 대상은 [`packages/codex-subagent-kit/`](./packages/codex-subagent-kit/) 아래의 TypeScript package다.
 
 ## Quick Start
 

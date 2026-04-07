@@ -4,7 +4,7 @@ Korean version: [TYPESCRIPT_PORT.ko.md](./TYPESCRIPT_PORT.ko.md)
 
 ## Goal
 
-The TypeScript migration is complete for the stable product surface. `codex-subagent-kit` now ships as an npm-oriented CLI built from the workspace under [`packages/codex-subagent-kit/`](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit).
+The TypeScript migration is complete for the stable product surface. `codex-subagent-kit` now ships as an npm-oriented CLI built from the workspace under [`packages/codex-subagent-kit/`](../packages/codex-subagent-kit/).
 
 ## Current TypeScript Status
 
@@ -66,8 +66,8 @@ Priority parity targets:
 
 Use the package-local fixtures as the release contract:
 
-- golden fixtures under [packages/codex-subagent-kit/test/fixtures/golden](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/test/fixtures/golden)
-- TypeScript CLI behavior locked in [packages/codex-subagent-kit/test](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/packages/codex-subagent-kit/test)
+- golden fixtures under [packages/codex-subagent-kit/test/fixtures/golden](../packages/codex-subagent-kit/test/fixtures/golden)
+- TypeScript CLI behavior locked in [packages/codex-subagent-kit/test](../packages/codex-subagent-kit/test)
 
 ## Recommended Stack
 

@@ -15,7 +15,7 @@ The testing workflow for `codex-subagent-kit` protects three things:
 
 The repository also has a pull-request CI workflow for visibility before merge.
 
-- workflow file: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
+- workflow file: [ci.yml](../.github/workflows/ci.yml)
 - trigger: `pull_request` targeting `main`
 - manual trigger: `workflow_dispatch`
 - repository gate: `npm ci` followed by `./scripts/test.sh`

@@ -15,7 +15,7 @@
 
 이 저장소에는 merge 전에 상태를 볼 수 있도록 PR CI workflow도 함께 있다.
 
-- workflow 파일: [ci.yml](/Users/hoyoungson/Code/Project/Personal/codex-orchestrator/.github/workflows/ci.yml)
+- workflow 파일: [ci.yml](../.github/workflows/ci.yml)
 - 트리거: `main` 대상 `pull_request`
 - 수동 실행: `workflow_dispatch`
 - repository gate: `npm ci` 후 `./scripts/test.sh`
