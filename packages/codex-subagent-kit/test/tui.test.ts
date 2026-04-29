@@ -74,11 +74,11 @@ test("runTui installs selected agents and returns success when doctor is clean",
   const root = createTempRoot();
   const selectCalls: Array<{
     message: string;
-    choices: Array<{ value: string; name: string; description?: string; checked?: boolean }>;
+    choices: Array<{ value: string; name: string; checkedName?: string; description?: string; short?: string; checked?: boolean }>;
   }> = [];
   const checkboxCalls: Array<{
     message: string;
-    choices: Array<{ value: string; name: string; description?: string; checked?: boolean }>;
+    choices: Array<{ value: string; name: string; checkedName?: string; description?: string; short?: string; checked?: boolean }>;
   }> = [];
   const confirmCalls: Array<{ message: string; default?: boolean }> = [];
   const installCalls: Array<{ scope: "project" | "global"; agentKeys: string[]; projectRoot: string }> = [];
@@ -150,12 +150,16 @@ test("runTui installs selected agents and returns success when doctor is clean",
 
     const categoryCheckbox = checkboxCalls[0];
     const languageCategory = categoryCheckbox.choices.find((choice) => choice.value === "language-specialists");
-    assert.equal(languageCategory?.name, "Language Specialists");
+    assert.equal(languageCategory?.name, " Language Specialists");
+    assert.equal(languageCategory?.checkedName, " Language Specialists");
+    assert.equal(languageCategory?.short, "Language Specialists");
     assert.match(languageCategory?.description ?? "", /Language and framework specialists/);
 
     const agentCheckbox = checkboxCalls[1];
     const ctoChoice = agentCheckbox.choices.find((choice) => choice.value === "multi-agent-coordinator");
-    assert.equal(ctoChoice?.name, "multi-agent-coordinator");
+    assert.equal(ctoChoice?.name, " multi-agent-coordinator");
+    assert.equal(ctoChoice?.checkedName, " multi-agent-coordinator");
+    assert.equal(ctoChoice?.short, "multi-agent-coordinator");
     assert.match(ctoChoice?.description ?? "", /concrete multi-agent plan/);
     assert.equal(ctoChoice?.checked, undefined);
   } finally {
@@ -231,7 +235,7 @@ test("runTui can go back from categories to install target selection", async () 
 test("runTui can go back from confirmation to agent selection", async () => {
   const root = createTempRoot();
   const agentChoiceSnapshots: Array<
-    Array<{ value: string; name: string; description?: string; checked?: boolean }>
+    Array<{ value: string; name: string; checkedName?: string; description?: string; short?: string; checked?: boolean }>
   > = [];
   const installCalls: Array<{ scope: "project" | "global"; agentKeys: string[]; projectRoot: string }> = [];
   let confirmCallCount = 0;

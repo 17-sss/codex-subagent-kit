@@ -13,7 +13,9 @@ import type { AgentSpec, DoctorReport, InstallResult } from "./models";
 export interface PromptChoice<T> {
   value: T;
   name: string;
+  checkedName?: string;
   description?: string;
+  short?: string;
   checked?: boolean;
 }
 
@@ -89,6 +91,16 @@ function isBackNavigationError(error: unknown): boolean {
     return isBackNavigationError(error.cause);
   }
   return false;
+}
+
+function withCheckboxLabelSpacing<T>(choice: PromptChoice<T>): PromptChoice<T> {
+  const displayName = ` ${choice.name}`;
+  return {
+    ...choice,
+    name: displayName,
+    checkedName: displayName,
+    short: choice.short ?? choice.name,
+  };
 }
 
 async function promptWithBack<T>(
@@ -213,7 +225,7 @@ export async function runTui(
                 name: category.title,
                 description: category.description,
                 checked: selectedCategorySet.has(category.key) ? true : undefined,
-              })),
+              })).map(withCheckboxLabelSpacing),
             },
             context,
           ),
@@ -250,7 +262,7 @@ export async function runTui(
                 name: agent.name,
                 description: agent.description,
                 checked: selectedAgentSet.has(agent.key) ? true : undefined,
-              })),
+              })).map(withCheckboxLabelSpacing),
             },
             context,
           ),
