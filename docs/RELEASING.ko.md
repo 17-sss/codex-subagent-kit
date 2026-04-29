@@ -79,7 +79,7 @@
 
 - labels 설정 파일: [.github/labels.yml](../.github/labels.yml)
 - sync workflow: [create-labels.yml](../.github/workflows/create-labels.yml)
-- 트리거: 수동 실행 또는 `.github/labels.yml` 변경 push
+- 트리거: 수동 실행 또는 `.github/labels.yml`이 변경된 `main` push
 
 첫 publish 전에 npm package 설정에서 이 저장소와 `publish-npm.yml`에 대한 trusted publishing을 먼저 연결해야 한다.
 

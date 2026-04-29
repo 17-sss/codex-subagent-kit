@@ -79,7 +79,7 @@ If branch protection is enabled later, make sure the release workflow can still 
 
 - labels config: [.github/labels.yml](../.github/labels.yml)
 - sync workflow: [create-labels.yml](../.github/workflows/create-labels.yml)
-- trigger: manual dispatch or pushes that change `.github/labels.yml`
+- trigger: manual dispatch or `main` pushes that change `.github/labels.yml`
 
 Before the first publish, configure npm trusted publishing for this repository and `publish-npm.yml` in the npm package settings.
 
