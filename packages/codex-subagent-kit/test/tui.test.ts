@@ -43,6 +43,12 @@ function withCapturedConsole<T>(run: () => Promise<T> | T): Promise<T> {
     });
 }
 
+function createBackNavigationError(): Error {
+  const error = new Error("back");
+  error.name = "BackNavigationError";
+  return error;
+}
+
 test("defaultAgentSelection starts empty for project installs", () => {
   const selection = defaultAgentSelection("project", [
     createAgent({ key: "reviewer", category: "quality" }),
@@ -152,6 +158,141 @@ test("runTui installs selected agents and returns success when doctor is clean",
     assert.equal(ctoChoice?.name, "multi-agent-coordinator");
     assert.match(ctoChoice?.description ?? "", /concrete multi-agent plan/);
     assert.equal(ctoChoice?.checked, undefined);
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("runTui can go back from categories to install target selection", async () => {
+  const root = createTempRoot();
+  const selectCalls: Array<{ message: string }> = [];
+  const installCalls: Array<{ scope: "project" | "global"; agentKeys: string[]; projectRoot: string }> = [];
+  let checkboxCallCount = 0;
+
+  try {
+    const exitCode = await withCapturedConsole(() =>
+      runTui(root, {
+        promptAdapter: {
+          async select(config) {
+            selectCalls.push(config);
+            return selectCalls.length === 1 ? "project" : "global";
+          },
+          async checkbox(config) {
+            checkboxCallCount++;
+            if (checkboxCallCount === 1) {
+              throw createBackNavigationError();
+            }
+            if (config.message.includes("categories")) {
+              return [];
+            }
+            return ["reviewer"];
+          },
+          async confirm() {
+            return true;
+          },
+        },
+        deps: {
+          installAgentsImpl(options) {
+            installCalls.push({
+              scope: options.scope,
+              agentKeys: [...options.agentKeys],
+              projectRoot: options.projectRoot,
+            });
+            return {
+              agentPaths: [],
+              agentPreservedPaths: [],
+            };
+          },
+          runDoctorImpl() {
+            return {
+              scope: "global",
+              targetDir: join(root, ".codex", "agents"),
+              catalogCounts: [],
+              installedCounts: [],
+              issues: [],
+            };
+          },
+        },
+      }),
+    );
+
+    assert.equal(exitCode, 0);
+    assert.equal(selectCalls.length, 2);
+    assert.deepEqual(installCalls[0], {
+      scope: "global",
+      agentKeys: ["reviewer"],
+      projectRoot: root,
+    });
+  } finally {
+    cleanup(root);
+  }
+});
+
+test("runTui can go back from confirmation to agent selection", async () => {
+  const root = createTempRoot();
+  const agentChoiceSnapshots: Array<
+    Array<{ value: string; name: string; description?: string; checked?: boolean }>
+  > = [];
+  const installCalls: Array<{ scope: "project" | "global"; agentKeys: string[]; projectRoot: string }> = [];
+  let confirmCallCount = 0;
+
+  try {
+    const exitCode = await withCapturedConsole(() =>
+      runTui(root, {
+        promptAdapter: {
+          async select() {
+            return "project";
+          },
+          async checkbox(config) {
+            if (config.message.includes("categories")) {
+              return [];
+            }
+            agentChoiceSnapshots.push(config.choices);
+            return agentChoiceSnapshots.length === 1 ? ["reviewer"] : ["multi-agent-coordinator"];
+          },
+          async confirm() {
+            confirmCallCount++;
+            if (confirmCallCount === 1) {
+              throw createBackNavigationError();
+            }
+            return true;
+          },
+        },
+        deps: {
+          installAgentsImpl(options) {
+            installCalls.push({
+              scope: options.scope,
+              agentKeys: [...options.agentKeys],
+              projectRoot: options.projectRoot,
+            });
+            return {
+              agentPaths: [],
+              agentPreservedPaths: [],
+            };
+          },
+          runDoctorImpl() {
+            return {
+              scope: "project",
+              targetDir: join(root, ".codex", "agents"),
+              catalogCounts: [],
+              installedCounts: [],
+              issues: [],
+            };
+          },
+        },
+      }),
+    );
+
+    assert.equal(exitCode, 0);
+    assert.equal(confirmCallCount, 2);
+    assert.equal(agentChoiceSnapshots.length, 2);
+    const reviewerOnReturn = agentChoiceSnapshots[1].find((choice) => choice.value === "reviewer");
+    assert.equal(reviewerOnReturn?.checked, true);
+    assert.deepEqual(installCalls[0], {
+      scope: "project",
+      agentKeys: ["multi-agent-coordinator"],
+      projectRoot: root,
+    });
   } finally {
     cleanup(root);
   }
