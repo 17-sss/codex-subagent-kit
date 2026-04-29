@@ -13,6 +13,7 @@ import type { AgentSpec, DoctorReport, InstallResult } from "./models";
 export interface PromptChoice<T> {
   value: T;
   name: string;
+  description?: string;
   checked?: boolean;
 }
 
@@ -102,8 +103,16 @@ export async function runTui(
       const scope = await prompt.select<"project" | "global">({
         message: `Choose an install target for ${projectRoot}`,
         choices: [
-          { value: "project", name: "Project (.codex/agents in current project)" },
-          { value: "global", name: "Global (~/.codex/agents)" },
+          {
+            value: "project",
+            name: "Project",
+            description: ".codex/agents in current project",
+          },
+          {
+            value: "global",
+            name: "Global",
+            description: "~/.codex/agents",
+          },
         ],
       });
 
@@ -118,7 +127,8 @@ export async function runTui(
         message: "Select categories. Leave empty to browse all agents.",
         choices: categories.map((category) => ({
           value: category.key,
-          name: `${category.title} - ${category.description}`,
+          name: category.title,
+          description: category.description,
         })),
       });
 
@@ -135,7 +145,8 @@ export async function runTui(
         message: "Select subagents.",
         choices: agentSpecs.map((agent) => ({
           value: agent.key,
-          name: `${agent.name} - ${agent.description}`,
+          name: agent.name,
+          description: agent.description,
           checked: defaultSelected.has(agent.key) ? true : undefined,
         })),
       });

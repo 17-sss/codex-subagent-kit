@@ -66,10 +66,14 @@ test("validateAgentSelection only requires at least one selected agent", () => {
 
 test("runTui installs selected agents and returns success when doctor is clean", async () => {
   const root = createTempRoot();
-  const selectCalls: Array<{ message: string; choices: Array<{ value: string; name: string; checked?: boolean }> }> =
-    [];
-  const checkboxCalls: Array<{ message: string; choices: Array<{ value: string; name: string; checked?: boolean }> }> =
-    [];
+  const selectCalls: Array<{
+    message: string;
+    choices: Array<{ value: string; name: string; description?: string; checked?: boolean }>;
+  }> = [];
+  const checkboxCalls: Array<{
+    message: string;
+    choices: Array<{ value: string; name: string; description?: string; checked?: boolean }>;
+  }> = [];
   const confirmCalls: Array<{ message: string; default?: boolean }> = [];
   const installCalls: Array<{ scope: "project" | "global"; agentKeys: string[]; projectRoot: string }> = [];
 
@@ -134,8 +138,19 @@ test("runTui installs selected agents and returns success when doctor is clean",
       projectRoot: root,
     });
 
+    const projectChoice = selectCalls[0].choices.find((choice) => choice.value === "project");
+    assert.equal(projectChoice?.name, "Project");
+    assert.equal(projectChoice?.description, ".codex/agents in current project");
+
+    const categoryCheckbox = checkboxCalls[0];
+    const languageCategory = categoryCheckbox.choices.find((choice) => choice.value === "language-specialists");
+    assert.equal(languageCategory?.name, "Language Specialists");
+    assert.match(languageCategory?.description ?? "", /Language and framework specialists/);
+
     const agentCheckbox = checkboxCalls[1];
     const ctoChoice = agentCheckbox.choices.find((choice) => choice.value === "multi-agent-coordinator");
+    assert.equal(ctoChoice?.name, "multi-agent-coordinator");
+    assert.match(ctoChoice?.description ?? "", /concrete multi-agent plan/);
     assert.equal(ctoChoice?.checked, undefined);
   } finally {
     cleanup(root);
