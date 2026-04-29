@@ -13,13 +13,35 @@ import type { AgentSpec, DoctorReport, InstallResult } from "./models";
 export interface PromptChoice<T> {
   value: T;
   name: string;
+  checkedName?: string;
+  description?: string;
+  short?: string;
   checked?: boolean;
 }
 
+interface SelectPromptConfig<T> {
+  message: string;
+  choices: Array<PromptChoice<T>>;
+}
+
+interface CheckboxPromptConfig<T> {
+  message: string;
+  choices: Array<PromptChoice<T>>;
+}
+
+interface ConfirmPromptConfig {
+  message: string;
+  default?: boolean;
+}
+
+interface PromptRuntimeContext {
+  signal?: AbortSignal;
+}
+
 export interface PromptAdapter {
-  select<T>(config: { message: string; choices: Array<PromptChoice<T>> }): Promise<T>;
-  checkbox<T>(config: { message: string; choices: Array<PromptChoice<T>> }): Promise<T[]>;
-  confirm(config: { message: string; default?: boolean }): Promise<boolean>;
+  select<T>(config: SelectPromptConfig<T>, context?: PromptRuntimeContext): Promise<T>;
+  checkbox<T>(config: CheckboxPromptConfig<T>, context?: PromptRuntimeContext): Promise<T[]>;
+  confirm(config: ConfirmPromptConfig, context?: PromptRuntimeContext): Promise<boolean>;
 }
 
 interface TuiDeps {
@@ -41,6 +63,68 @@ const defaultDeps: TuiDeps = {
   installAgentsImpl: installAgents,
   runDoctorImpl: runDoctor,
 };
+
+const BACK = Symbol("back");
+
+class BackNavigationError extends Error {
+  override name = "BackNavigationError";
+
+  constructor() {
+    super("Back navigation requested");
+  }
+}
+
+type TuiStep = "scope" | "categories" | "agents" | "confirm";
+
+function isBackKey(key: { name?: string } | undefined): boolean {
+  return key?.name === "escape" || key?.name === "left";
+}
+
+function isBackNavigationError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  if (error.name === "BackNavigationError") {
+    return true;
+  }
+  if (error.name === "AbortPromptError") {
+    return isBackNavigationError(error.cause);
+  }
+  return false;
+}
+
+function withCheckboxLabelSpacing<T>(choice: PromptChoice<T>): PromptChoice<T> {
+  const displayName = ` ${choice.name}`;
+  return {
+    ...choice,
+    name: displayName,
+    checkedName: displayName,
+    short: choice.short ?? choice.name,
+  };
+}
+
+async function promptWithBack<T>(
+  runPrompt: (context: PromptRuntimeContext) => Promise<T>,
+): Promise<T | typeof BACK> {
+  const controller = new AbortController();
+  const handleKeypress = (_input: string, key: { name?: string } | undefined) => {
+    if (isBackKey(key) && !controller.signal.aborted) {
+      controller.abort(new BackNavigationError());
+    }
+  };
+
+  process.stdin.on("keypress", handleKeypress);
+  try {
+    return await runPrompt({ signal: controller.signal });
+  } catch (error) {
+    if (isBackNavigationError(error)) {
+      return BACK;
+    }
+    throw error;
+  } finally {
+    process.stdin.off("keypress", handleKeypress);
+  }
+}
 
 export function defaultAgentSelection(scope: "project" | "global", agentSpecs: AgentSpec[]): Set<string> {
   void scope;
@@ -98,14 +182,30 @@ export async function runTui(
   const deps: TuiDeps = { ...defaultDeps, ...options.deps };
 
   try {
+    let step: TuiStep = "scope";
+    let scope: "project" | "global" = "project";
+    let selectedCategoryKeys: string[] = [];
+    let selectedAgentKeys: string[] = [];
+
     while (true) {
-      const scope = await prompt.select<"project" | "global">({
-        message: `Choose an install target for ${projectRoot}`,
-        choices: [
-          { value: "project", name: "Project (.codex/agents in current project)" },
-          { value: "global", name: "Global (~/.codex/agents)" },
-        ],
-      });
+      if (step === "scope") {
+        scope = await prompt.select<"project" | "global">({
+          message: `Choose an install target for ${projectRoot}`,
+          choices: [
+            {
+              value: "project",
+              name: "Project",
+              description: ".codex/agents in current project",
+            },
+            {
+              value: "global",
+              name: "Global",
+              description: "~/.codex/agents",
+            },
+          ],
+        });
+        step = "categories";
+      }
 
       const categories = getCategories({
         projectRoot,
@@ -114,13 +214,29 @@ export async function runTui(
         catalogRoots: options.catalogRoots,
       });
 
-      const selectedCategoryKeys = await prompt.checkbox<string>({
-        message: "Select categories. Leave empty to browse all agents.",
-        choices: categories.map((category) => ({
-          value: category.key,
-          name: `${category.title} - ${category.description}`,
-        })),
-      });
+      if (step === "categories") {
+        const selectedCategorySet = new Set(selectedCategoryKeys);
+        const categoryResult = await promptWithBack((context) =>
+          prompt.checkbox<string>(
+            {
+              message: "Select categories. Leave empty to browse all agents. Esc to go back.",
+              choices: categories.map((category) => ({
+                value: category.key,
+                name: category.title,
+                description: category.description,
+                checked: selectedCategorySet.has(category.key) ? true : undefined,
+              })).map(withCheckboxLabelSpacing),
+            },
+            context,
+          ),
+        );
+        if (categoryResult === BACK) {
+          step = "scope";
+          continue;
+        }
+        selectedCategoryKeys = categoryResult;
+        step = "agents";
+      }
 
       const categorySet = new Set(selectedCategoryKeys);
       const agentSpecs = getAgentsByCategory(categorySet, {
@@ -131,26 +247,58 @@ export async function runTui(
       });
 
       const defaultSelected = defaultAgentSelection(scope, agentSpecs);
-      const selectedAgentsList = await prompt.checkbox<string>({
-        message: "Select subagents.",
-        choices: agentSpecs.map((agent) => ({
-          value: agent.key,
-          name: `${agent.name} - ${agent.description}`,
-          checked: defaultSelected.has(agent.key) ? true : undefined,
-        })),
-      });
-      const selectedAgents = new Set(selectedAgentsList);
-      const validationError = validateAgentSelection(scope, agentSpecs, selectedAgents);
-      if (validationError) {
-        console.error(validationError);
-        continue;
+      const availableAgentKeys = new Set(agentSpecs.map((agent) => agent.key));
+      selectedAgentKeys = selectedAgentKeys.filter((key) => availableAgentKeys.has(key));
+
+      if (step === "agents") {
+        const selectedAgentSet =
+          selectedAgentKeys.length > 0 ? new Set(selectedAgentKeys) : defaultSelected;
+        const agentResult = await promptWithBack((context) =>
+          prompt.checkbox<string>(
+            {
+              message: "Select subagents. Esc to go back.",
+              choices: agentSpecs.map((agent) => ({
+                value: agent.key,
+                name: agent.name,
+                description: agent.description,
+                checked: selectedAgentSet.has(agent.key) ? true : undefined,
+              })).map(withCheckboxLabelSpacing),
+            },
+            context,
+          ),
+        );
+        if (agentResult === BACK) {
+          step = "categories";
+          continue;
+        }
+
+        selectedAgentKeys = agentResult;
+        const selectedAgents = new Set(selectedAgentKeys);
+        const validationError = validateAgentSelection(scope, agentSpecs, selectedAgents);
+        if (validationError) {
+          console.error(validationError);
+          step = "agents";
+          continue;
+        }
+        step = "confirm";
       }
 
-      const confirmed = await prompt.confirm({
-        message: `Install ${selectedAgents.size} agent(s) into ${resolveTargetDir(scope, projectRoot)}?`,
-        default: true,
-      });
+      const selectedAgents = new Set(selectedAgentKeys);
+      const confirmed = await promptWithBack((context) =>
+        prompt.confirm(
+          {
+            message: `Install ${selectedAgents.size} agent(s) into ${resolveTargetDir(scope, projectRoot)}? Esc to go back.`,
+            default: true,
+          },
+          context,
+        ),
+      );
+      if (confirmed === BACK) {
+        step = "agents";
+        continue;
+      }
       if (!confirmed) {
+        step = "agents";
         continue;
       }
 
