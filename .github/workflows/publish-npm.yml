@@ -46,7 +46,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
@@ -79,9 +79,20 @@ jobs:
           cat /tmp/npm-view.stderr >&2
           exit "${status}"
 
-      - name: Upgrade npm for trusted publishing
+      - name: Verify npm trusted publishing support
         if: steps.registry.outputs.already_published != 'true'
-        run: npm install -g npm@11.12.1
+        run: |
+          set -euo pipefail
+
+          npm_version="$(npm --version)"
+          minimum_npm_version="11.5.1"
+
+          if [ "$(printf '%s\n%s\n' "${minimum_npm_version}" "${npm_version}" | sort -V | head -n1)" != "${minimum_npm_version}" ]; then
+            echo "npm ${minimum_npm_version} or newer is required for trusted publishing; found ${npm_version}" >&2
+            exit 1
+          fi
+
+          echo "npm ${npm_version} supports trusted publishing"
 
       - name: Install npm dependencies
         if: steps.registry.outputs.already_published != 'true'
@@ -106,7 +117,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.registry.outputs.already_published != 'true'
-        run: npm publish --workspace codex-subagent-kit --access public --provenance
+        run: npm publish --workspace codex-subagent-kit --access public
 
       - name: Skip duplicate publish
         if: steps.registry.outputs.already_published == 'true'
